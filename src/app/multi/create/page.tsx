@@ -39,7 +39,15 @@ export default function CreateMultiGamePage() {
           >
             ← Back
           </Link>
-          <h1 className="text-xl font-black">Create Game</h1>
+          <h1
+            className="text-2xl"
+            style={{
+              fontFamily: "var(--font-rye), Georgia, serif",
+              color: "#f4e4b7",
+            }}
+          >
+            Set the Table
+          </h1>
           <div className="w-12" />
         </div>
 

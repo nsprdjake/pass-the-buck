@@ -59,7 +59,16 @@ export default function LobbyPage() {
           >
             ← Back
           </Link>
-          <h1 className="text-2xl font-black">Lobby</h1>
+          <h1
+            className="text-3xl"
+            style={{
+              fontFamily: "var(--font-rye), Georgia, serif",
+              color: "#f4e4b7",
+              textShadow: "0 2px 0 rgba(0,0,0,0.55)",
+            }}
+          >
+            Saloon
+          </h1>
           <button
             onClick={newGame}
             className="text-white/50 hover:text-white text-xs font-bold uppercase tracking-widest"

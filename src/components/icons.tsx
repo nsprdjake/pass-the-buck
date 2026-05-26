@@ -113,9 +113,22 @@ export function Asterisk({ size = 24, color = "currentColor", className }: IconP
 }
 
 // =========================================================
-// Trophy
+// Trophy — rendered as a sheriff's star "Champion" badge for the
+// Western theme. Five points, brass gradient, "CHAMPION" banner across.
 // =========================================================
-export function Trophy({ size = 64, color = "#FBBF24", className }: IconProps) {
+export function Trophy({ size = 64, className }: IconProps) {
+  // Build a 5-point star path (radius pulled in slightly for a chunkier look).
+  const outerR = 28;
+  const innerR = 13;
+  const cx = 32;
+  const cy = 32;
+  const pts: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const ang = -Math.PI / 2 + (Math.PI / 5) * i;
+    pts.push(`${cx + r * Math.cos(ang)},${cy + r * Math.sin(ang)}`);
+  }
+  const starPath = `M ${pts.join(" L ")} Z`;
   return (
     <svg
       width={size}
@@ -125,79 +138,102 @@ export function Trophy({ size = 64, color = "#FBBF24", className }: IconProps) {
       className={className}
     >
       <defs>
-        <linearGradient id="trophy-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#FDE68A" />
-          <stop offset="50%" stopColor={color} />
-          <stop offset="100%" stopColor="#92580A" />
+        <linearGradient id="star-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FFE3A0" />
+          <stop offset="55%" stopColor="#c99a33" />
+          <stop offset="100%" stopColor="#5c3c0e" />
+        </linearGradient>
+        <linearGradient id="ribbon-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#a53d1f" />
+          <stop offset="100%" stopColor="#5e1a0a" />
         </linearGradient>
       </defs>
       {/* shadow */}
-      <ellipse cx="32" cy="59" rx="18" ry="2.5" fill="#000" opacity={0.35} />
-      {/* base plate */}
-      <rect x="20" y="52" width="24" height="5" rx="1.5" fill="url(#trophy-grad)" stroke="#5C3604" strokeWidth="1" />
-      {/* stem */}
-      <rect x="28" y="42" width="8" height="11" fill="url(#trophy-grad)" stroke="#5C3604" strokeWidth="1" />
-      {/* cup */}
+      <ellipse cx="32" cy="60" rx="22" ry="2.5" fill="#000" opacity={0.4} />
+
+      {/* star */}
       <path
-        d="M 14 8 L 50 8 L 48 26 Q 48 42 32 44 Q 16 42 16 26 Z"
-        fill="url(#trophy-grad)"
-        stroke="#5C3604"
-        strokeWidth="1.4"
+        d={starPath}
+        fill="url(#star-grad)"
+        stroke="#2a1a0a"
+        strokeWidth={1.6}
         strokeLinejoin="round"
       />
-      {/* left handle */}
+      {/* inner star outline for depth */}
       <path
-        d="M 14 12 Q 4 14 4 22 Q 4 30 14 30"
+        d={starPath}
         fill="none"
-        stroke="url(#trophy-grad)"
-        strokeWidth="4"
-        strokeLinecap="round"
+        stroke="#5c3c0e"
+        strokeWidth={0.8}
+        strokeOpacity={0.7}
+        transform="scale(0.78) translate(9 9)"
       />
-      <path
-        d="M 14 12 Q 4 14 4 22 Q 4 30 14 30"
-        fill="none"
-        stroke="#5C3604"
-        strokeWidth="1"
-        strokeLinecap="round"
-        opacity={0.7}
-      />
-      {/* right handle */}
-      <path
-        d="M 50 12 Q 60 14 60 22 Q 60 30 50 30"
-        fill="none"
-        stroke="url(#trophy-grad)"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
-      <path
-        d="M 50 12 Q 60 14 60 22 Q 60 30 50 30"
-        fill="none"
-        stroke="#5C3604"
-        strokeWidth="1"
-        strokeLinecap="round"
-        opacity={0.7}
-      />
-      {/* cup top highlight */}
-      <ellipse cx="32" cy="9" rx="17" ry="2" fill="#FFFAE0" opacity={0.7} />
-      {/* "1" badge */}
-      <circle cx="32" cy="22" r="7" fill="#5C3604" />
+      {/* center bead */}
+      <circle cx={cx} cy={cy - 1} r={5.5} fill="#5c3c0e" stroke="#2a1a0a" strokeWidth={0.8} />
       <text
-        x="32"
-        y="27"
+        x={cx}
+        y={cy + 2.5}
         textAnchor="middle"
-        fontSize="13"
+        fontSize="7.5"
         fontWeight="900"
-        fill="#FDE68A"
-        style={{ fontFamily: "Georgia, serif" }}
+        fill="#FFE3A0"
+        style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
       >
         1
       </text>
+
+      {/* "CHAMPION" ribbon across the lower half */}
+      <g>
+        <path
+          d="M 4 44 L 60 44 L 56 52 L 8 52 Z"
+          fill="url(#ribbon-grad)"
+          stroke="#2a1a0a"
+          strokeWidth={1.4}
+          strokeLinejoin="round"
+        />
+        {/* ribbon tails */}
+        <path d="M 4 44 L 1 50 L 7 49 L 8 52 Z" fill="#7a2412" stroke="#2a1a0a" strokeWidth={1.2} strokeLinejoin="round" />
+        <path d="M 60 44 L 63 50 L 57 49 L 56 52 Z" fill="#7a2412" stroke="#2a1a0a" strokeWidth={1.2} strokeLinejoin="round" />
+        <text
+          x={cx}
+          y={50.5}
+          textAnchor="middle"
+          fontSize="6.6"
+          fontWeight="700"
+          fill="#FFE3A0"
+          style={{
+            fontFamily: "var(--font-rye), Georgia, serif",
+            letterSpacing: "0.2em",
+          }}
+        >
+          CHAMPION
+        </text>
+      </g>
+
+      {/* tiny ball studs at each star point */}
+      {Array.from({ length: 5 }).map((_, i) => {
+        const ang = -Math.PI / 2 + (Math.PI * 2 / 5) * i;
+        const x = cx + (outerR - 1.5) * Math.cos(ang);
+        const y = cy + (outerR - 1.5) * Math.sin(ang);
+        return (
+          <circle
+            key={i}
+            cx={x}
+            cy={y}
+            r={1.6}
+            fill="#FFE3A0"
+            stroke="#2a1a0a"
+            strokeWidth={0.45}
+          />
+        );
+      })}
     </svg>
   );
 }
 
 // =========================================================
-// Phone
+// Saloon Doors — used in place of "phone" for pass-the-device flows.
+// Two slatted swinging doors slightly ajar.
 // =========================================================
 export function Phone({ size = 64, color = "currentColor", className }: IconProps) {
   return (
@@ -209,50 +245,81 @@ export function Phone({ size = 64, color = "currentColor", className }: IconProp
       className={className}
     >
       <defs>
-        <linearGradient id="phone-body" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#3F3F46" />
-          <stop offset="100%" stopColor="#18181B" />
+        <linearGradient id="door-grad-l" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#5c3b1e" />
+          <stop offset="100%" stopColor="#8b5a2b" />
+        </linearGradient>
+        <linearGradient id="door-grad-r" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#8b5a2b" />
+          <stop offset="100%" stopColor="#5c3b1e" />
         </linearGradient>
       </defs>
-      {/* shadow */}
-      <ellipse cx="32" cy="62" rx="20" ry="2" fill="#000" opacity={0.35} />
-      {/* body */}
-      <rect
-        x="14"
-        y="4"
-        width="36"
-        height="58"
-        rx="7"
-        fill="url(#phone-body)"
-        stroke="#000"
-        strokeWidth="1"
-      />
-      {/* screen */}
-      <rect
-        x="17"
-        y="11"
-        width="30"
-        height="44"
-        rx="2"
-        fill={color}
-        opacity={0.95}
-      />
-      {/* speaker dot */}
-      <rect x="28" y="7" width="8" height="2" rx="1" fill="#000" />
-      {/* home indicator */}
-      <rect x="27" y="58" width="10" height="2" rx="1" fill="#71717A" />
-      {/* screen content — abstract chip */}
-      <circle cx="32" cy="30" r="9" fill="#FBBF24" opacity={0.85} />
-      <text
-        x="32"
-        y="34"
-        textAnchor="middle"
-        fontSize="10"
-        fontWeight="900"
-        fill="#0E7A4F"
-      >
-        $
-      </text>
+
+      {/* Frame top and bottom rails */}
+      <rect x="2" y="6" width="60" height="3" fill="#3a2410" stroke="#1a0c04" strokeWidth="0.6" />
+      <rect x="2" y="55" width="60" height="3" fill="#3a2410" stroke="#1a0c04" strokeWidth="0.6" />
+
+      {/* Floor shadow */}
+      <ellipse cx="32" cy="61" rx="22" ry="1.4" fill="#000" opacity={0.45} />
+
+      {/* LEFT door — slightly tilted outward, hinged at the top */}
+      <g transform="rotate(-6 8 12)">
+        <rect
+          x="8"
+          y="12"
+          width="22"
+          height="40"
+          rx="1"
+          fill="url(#door-grad-l)"
+          stroke="#1a0c04"
+          strokeWidth="1.2"
+        />
+        {/* horizontal slats */}
+        {[18, 24, 30, 36, 42, 48].map((y) => (
+          <line
+            key={y}
+            x1="9"
+            y1={y}
+            x2="29"
+            y2={y}
+            stroke="#1a0c04"
+            strokeOpacity={0.55}
+            strokeWidth={0.6}
+          />
+        ))}
+        {/* tiny iron handle */}
+        <circle cx="26" cy="32" r="1.2" fill="#2a1a0a" />
+      </g>
+
+      {/* RIGHT door — mirrored tilt */}
+      <g transform="rotate(6 56 12)">
+        <rect
+          x="34"
+          y="12"
+          width="22"
+          height="40"
+          rx="1"
+          fill="url(#door-grad-r)"
+          stroke="#1a0c04"
+          strokeWidth="1.2"
+        />
+        {[18, 24, 30, 36, 42, 48].map((y) => (
+          <line
+            key={y}
+            x1="35"
+            y1={y}
+            x2="55"
+            y2={y}
+            stroke="#1a0c04"
+            strokeOpacity={0.55}
+            strokeWidth={0.6}
+          />
+        ))}
+        <circle cx="38" cy="32" r="1.2" fill="#2a1a0a" />
+      </g>
+
+      {/* small accent color on top frame */}
+      <rect x="14" y="3" width="36" height="2" rx="0.5" fill={color} opacity={0.6} />
     </svg>
   );
 }

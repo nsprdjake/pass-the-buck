@@ -2,8 +2,6 @@ import type { RollOutcome } from "@/lib/types";
 
 type DieFace = {
   letter: string;
-  body: string;
-  bodyDark: string;
   letterFill: string;
   letterStroke: string;
   glow: string;
@@ -12,34 +10,26 @@ type DieFace = {
 const FACE_BY_OUTCOME: Record<RollOutcome, DieFace> = {
   left: {
     letter: "L",
-    body: "#FAFAFA",
-    bodyDark: "#C7CFD8",
-    letterFill: "#1E40AF",
-    letterStroke: "#0B1E4A",
+    letterFill: "#1e3a8a",
+    letterStroke: "#0a1746",
     glow: "#60A5FA",
   },
   right: {
     letter: "R",
-    body: "#FAFAFA",
-    bodyDark: "#C7CFD8",
-    letterFill: "#1E40AF",
-    letterStroke: "#0B1E4A",
+    letterFill: "#1e3a8a",
+    letterStroke: "#0a1746",
     glow: "#60A5FA",
   },
   center: {
     letter: "C",
-    body: "#FAFAFA",
-    bodyDark: "#C7CFD8",
-    letterFill: "#B91C1C",
-    letterStroke: "#5C0A0A",
+    letterFill: "#8b2222",
+    letterStroke: "#3a0a0a",
     glow: "#F97066",
   },
   keep: {
     letter: "✱",
-    body: "#FAFAFA",
-    bodyDark: "#C7CFD8",
-    letterFill: "#A16207",
-    letterStroke: "#3D2A05",
+    letterFill: "#a16207",
+    letterStroke: "#3a2410",
     glow: "#FBBF24",
   },
 };
@@ -47,13 +37,14 @@ const FACE_BY_OUTCOME: Record<RollOutcome, DieFace> = {
 type DieProps = {
   size?: number;
   outcome?: RollOutcome;
-  /** If true, hides the letter and shows a generic "?" — for the rolling state */
+  /** When true the letter is replaced with a "?" — used during the roll */
   blind?: boolean;
 };
 
 /**
- * A single die face rendered as a rounded square with an outcome letter.
- * Looks like the front-facing face of a small casino die viewed head-on.
+ * A bone-coloured aged die face with an inked western letter. The body has
+ * subtle wear and a slight ivory gradient so it feels carved/old rather than
+ * plastic.
  */
 export default function Die({ size = 40, outcome, blind = false }: DieProps) {
   const face: DieFace = outcome
@@ -61,10 +52,12 @@ export default function Die({ size = 40, outcome, blind = false }: DieProps) {
     : FACE_BY_OUTCOME.keep;
   const id = Math.random().toString(36).slice(2, 8);
   const bodyGrad = `die-body-${id}`;
+  const innerGrad = `die-inner-${id}`;
   const letter = blind ? "?" : face.letter;
-  // The asterisk is visually a touch smaller because of its strokes.
   const letterFontSize = letter === "✱" ? size * 0.7 : size * 0.62;
   const letterYAdjust = letter === "✱" ? size * 0.22 : size * 0.22;
+  const bone = "#f4e4c1";
+  const boneShadow = "#a89169";
 
   return (
     <svg
@@ -78,77 +71,71 @@ export default function Die({ size = 40, outcome, blind = false }: DieProps) {
     >
       <defs>
         <linearGradient id={bodyGrad} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFFFFF" />
-          <stop offset="50%" stopColor={face.body} />
-          <stop offset="100%" stopColor={face.bodyDark} />
+          <stop offset="0%" stopColor="#fff5d6" />
+          <stop offset="55%" stopColor={bone} />
+          <stop offset="100%" stopColor={boneShadow} />
         </linearGradient>
+        <radialGradient id={innerGrad} cx="50%" cy="35%" r="65%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity={0.45} />
+          <stop offset="80%" stopColor="#ffffff" stopOpacity={0} />
+        </radialGradient>
       </defs>
 
       {/* Shadow under die */}
-      <ellipse
-        cx="30"
-        cy="56"
-        rx="22"
-        ry="3"
-        fill="#000000"
-        opacity={0.35}
-      />
+      <ellipse cx="30" cy="56" rx="22" ry="3" fill="#000000" opacity={0.4} />
 
-      {/* Die body */}
-      <rect
-        x="3"
-        y="3"
-        width="54"
-        height="54"
-        rx="11"
-        ry="11"
-        fill={`url(#${bodyGrad})`}
-        stroke="#5A6470"
-        strokeWidth="1.2"
-      />
-
-      {/* inner bevel */}
-      <rect
-        x="6"
-        y="6"
-        width="48"
-        height="48"
-        rx="9"
-        ry="9"
-        fill="none"
-        stroke="#FFFFFF"
-        strokeOpacity={0.7}
-        strokeWidth="1"
-      />
-
-      {/* Top-left glossy highlight */}
+      {/* Die body — soft rounded square, more carved than rounded-clean */}
       <path
-        d="M 10 8 Q 14 6 22 6 L 36 6"
-        stroke="#FFFFFF"
-        strokeOpacity={0.85}
-        strokeWidth="1.5"
+        d="M 8 4 L 52 5 Q 56 5 56 9 L 55 51 Q 55 56 51 56 L 9 55 Q 4 55 4 51 L 5 9 Q 4 4 8 4 Z"
+        fill={`url(#${bodyGrad})`}
+        stroke="#3a2410"
+        strokeWidth={1.4}
+        strokeLinejoin="round"
+      />
+
+      {/* Inner highlight */}
+      <rect
+        x={6.5}
+        y={6.5}
+        width={47}
+        height={47}
+        rx={7.5}
+        fill={`url(#${innerGrad})`}
+        pointerEvents="none"
+      />
+
+      {/* Inked border ring */}
+      <rect
+        x={7}
+        y={7}
+        width={46}
+        height={46}
+        rx={7}
+        fill="none"
+        stroke="#3a2410"
+        strokeOpacity={0.65}
+        strokeWidth={0.7}
+      />
+
+      {/* Top-left glossy ink chip */}
+      <path
+        d="M 12 10 Q 16 8 22 8"
+        stroke="#ffffff"
+        strokeOpacity={0.75}
+        strokeWidth={1.2}
         strokeLinecap="round"
         fill="none"
       />
 
-      {/* Subtle corner dot quartet for "die" texture */}
-      {[
-        [10, 10],
-        [50, 10],
-        [10, 50],
-        [50, 50],
-      ].map(([x, y], i) => (
-        <circle
-          key={i}
-          cx={x}
-          cy={y}
-          r={1}
-          fill="#9CA3AF"
-          opacity={0.5}
-        />
-      ))}
+      {/* Subtle ageing pock marks */}
+      <g opacity={0.32} fill="#3a2410">
+        <circle cx={14} cy={50} r={0.7} />
+        <circle cx={48} cy={14} r={0.6} />
+        <circle cx={48} cy={48} r={0.5} />
+        <circle cx={20} cy={20} r={0.4} />
+      </g>
 
-      {/* The letter */}
+      {/* Letter */}
       <text
         x="30"
         y={30 + letterYAdjust}
@@ -157,9 +144,9 @@ export default function Die({ size = 40, outcome, blind = false }: DieProps) {
         fontWeight="900"
         fill={face.letterFill}
         stroke={face.letterStroke}
-        strokeWidth={0.8}
+        strokeWidth={0.9}
         style={{
-          fontFamily: "Georgia, serif",
+          fontFamily: "var(--font-rye), Georgia, serif",
           letterSpacing: "-0.04em",
         }}
       >

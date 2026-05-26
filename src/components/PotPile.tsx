@@ -112,22 +112,24 @@ export default function PotPile({ count }: PotPileProps) {
       {/* Label */}
       <div className="flex flex-col items-start leading-none">
         <span
-          className="text-buck-gold font-black tracking-[0.35em] text-xs uppercase"
+          className="text-buck-gold tracking-[0.18em] text-sm"
           style={{
-            textShadow: "0 1px 0 rgba(0,0,0,0.5)",
+            fontFamily: "var(--font-rye), Georgia, serif",
+            textShadow: "0 2px 0 rgba(0,0,0,0.55)",
           }}
         >
-          Pot
+          The Pot
         </span>
         <motion.span
           key={`count-${count}`}
-          initial={{ scale: 1.4, color: "#FBBF24" }}
+          initial={{ scale: 1.4, color: "#FFE3A0" }}
           animate={{ scale: 1, color: "#FFFFFF" }}
           transition={{ duration: 0.35, ease: "easeOut" }}
-          className="font-black text-white text-3xl leading-none"
+          className="text-white text-3xl leading-none mt-0.5"
           style={{
+            fontFamily: "var(--font-rye), Georgia, serif",
             textShadow:
-              "0 2px 0 rgba(0,0,0,0.45), 0 0 14px rgba(251,191,36,0.55)",
+              "0 2px 0 rgba(0,0,0,0.5), 0 0 16px rgba(251,191,36,0.6)",
           }}
         >
           {count}

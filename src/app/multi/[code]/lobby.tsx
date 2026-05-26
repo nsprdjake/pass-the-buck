@@ -81,7 +81,16 @@ export default function LobbyView({ code }: { code: string }) {
           >
             ← Leave
           </button>
-          <h1 className="text-xl font-black">Lobby</h1>
+          <h1
+            className="text-3xl"
+            style={{
+              fontFamily: "var(--font-rye), Georgia, serif",
+              color: "#f4e4b7",
+              textShadow: "0 2px 0 rgba(0,0,0,0.55)",
+            }}
+          >
+            Round-Up
+          </h1>
           <div className="w-12" />
         </div>
 

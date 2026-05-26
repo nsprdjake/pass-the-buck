@@ -15,11 +15,29 @@ export default function Home() {
           <BillStack size={140} />
         </div>
 
-        <h1 className="text-5xl font-black tracking-tight leading-none">
-          Pass the <span className="text-buck-green">Buck</span>
+        <h1
+          className="leading-none"
+          style={{
+            fontFamily: "var(--font-rye), Georgia, serif",
+            fontSize: "clamp(2.6rem, 12vw, 4.5rem)",
+            color: "#f4e4b7",
+            textShadow: "0 4px 0 rgba(0,0,0,0.55)",
+            letterSpacing: "0.02em",
+          }}
+        >
+          Pass the <span style={{ color: "#c99a33" }}>Buck</span>
         </h1>
 
-        <p className="mt-3 text-white/70 text-lg">Who&apos;s keeping theirs?</p>
+        <p
+          className="mt-3 text-lg"
+          style={{
+            fontFamily: "var(--font-fell), Georgia, serif",
+            color: "rgba(244,228,183,0.75)",
+            fontStyle: "italic",
+          }}
+        >
+          A saloon dice game — who&apos;s keepin&apos; theirs?
+        </p>
 
         {inProgress && (
           <Link

@@ -92,7 +92,15 @@ export default function JoinMultiGamePage() {
           >
             ← Back
           </Link>
-          <h1 className="text-xl font-black">Join Game</h1>
+          <h1
+            className="text-2xl"
+            style={{
+              fontFamily: "var(--font-rye), Georgia, serif",
+              color: "#f4e4b7",
+            }}
+          >
+            Pull Up A Chair
+          </h1>
           <div className="w-12" />
         </div>
         <Suspense

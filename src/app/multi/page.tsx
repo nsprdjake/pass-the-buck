@@ -17,12 +17,26 @@ export default function MultiLandingPage() {
         <div className="mb-3 flex justify-center" aria-hidden>
           <Phone size={88} color="#10B981" />
         </div>
-        <h1 className="text-4xl font-black tracking-tight">
-          Play <span className="text-buck-green">across devices</span>
+        <h1
+          className="leading-tight"
+          style={{
+            fontFamily: "var(--font-rye), Georgia, serif",
+            fontSize: "clamp(2rem, 9vw, 3.5rem)",
+            color: "#f4e4b7",
+            textShadow: "0 3px 0 rgba(0,0,0,0.55)",
+          }}
+        >
+          Saloon by Wire
         </h1>
-        <p className="mt-3 text-white/70">
-          Each player on their own phone. Open the app any time to take your
-          turn — no need to be in the same room.
+        <p
+          className="mt-3 italic"
+          style={{
+            fontFamily: "var(--font-fell), Georgia, serif",
+            color: "rgba(244,228,183,0.8)",
+          }}
+        >
+          Every cowpoke on their own phone. Ride into the game whenever you
+          please — no need to share a table.
         </p>
 
         <Link

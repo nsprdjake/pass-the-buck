@@ -4,13 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import BuckPile from "@/components/BuckPile";
-import Die from "@/components/Die";
 import DiceTray from "@/components/DiceTray";
 import PotPile from "@/components/PotPile";
+import RollButton from "@/components/game/RollButton";
 import {
   BUCK_FLY_MS,
-  FELT_GRADIENT,
-  FeltBackground,
   FlyingBuck,
   OUTCOME_GAP_MS,
   OutcomeCard,
@@ -244,12 +242,7 @@ export default function ActiveGameView() {
   const stageColor = current.color;
 
   return (
-    <main
-      className="min-h-screen flex flex-col overflow-hidden relative"
-      style={{ background: FELT_GRADIENT }}
-    >
-      <FeltBackground />
-
+    <main className="felt-saloon min-h-screen flex flex-col overflow-hidden relative">
       {/* Top nav */}
       <div className="relative z-30 flex items-center justify-between px-4 pt-3 pb-1">
         <div className="text-white/80 text-xs font-black uppercase tracking-widest">
@@ -265,13 +258,14 @@ export default function ActiveGameView() {
         </button>
       </div>
 
-      {/* Pot band */}
+      {/* Pot band — sits on a wood rail */}
       <div
-        className="relative z-20 flex items-center justify-center px-4 py-2 border-y"
+        className="wood-grain relative z-20 flex items-center justify-center px-4 py-2"
         style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.35) 100%)",
-          borderColor: "rgba(251,191,36,0.28)",
+          borderTop: "3px solid #2a1a0a",
+          borderBottom: "3px solid #2a1a0a",
+          boxShadow:
+            "inset 0 2px 0 rgba(255,225,170,0.12), inset 0 -2px 0 rgba(0,0,0,0.5), 0 6px 12px rgba(0,0,0,0.45)",
         }}
       >
         <PotPile count={displayedPot} />
@@ -322,22 +316,30 @@ export default function ActiveGameView() {
             transition={{ type: "spring", stiffness: 320, damping: 26 }}
             className="text-center w-full"
           >
-            <div className="text-[10px] uppercase tracking-[0.4em] text-white/50 font-black">
-              {isMyTurn ? "Your turn" : "Rolling"}
+            <div
+              className="text-[10px] uppercase tracking-[0.4em]"
+              style={{ fontFamily: "var(--font-fell), Georgia, serif", color: "#f4e4b7", opacity: 0.75 }}
+            >
+              {isMyTurn ? "yer turn, partner" : "now rollin'"}
             </div>
             <h1
-              className="mt-1 font-black leading-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
+              className="mt-1 leading-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
               style={{
+                fontFamily: "var(--font-rye), Georgia, serif",
                 color: stageColor,
                 fontSize: "clamp(2.5rem, 10vw, 4.5rem)",
-                letterSpacing: "-0.02em",
+                letterSpacing: "0.01em",
+                textShadow: "0 3px 0 rgba(0,0,0,0.45)",
               }}
             >
               {current.display_name}
             </h1>
             {current.bucks > 0 && phase === "idle" && (
-              <div className="mt-2 text-buck-gold/90 font-black uppercase tracking-widest text-xs">
-                {rollCount} di{rollCount === 1 ? "e" : "ce"} to roll
+              <div
+                className="mt-2 text-buck-gold/90 uppercase tracking-widest text-xs"
+                style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+              >
+                {rollCount} di{rollCount === 1 ? "e" : "ce"} on the table
               </div>
             )}
           </motion.div>
@@ -466,91 +468,55 @@ export default function ActiveGameView() {
             </div>
           )}
           {isMyTurn ? (
-            <motion.button
-              whileTap={canRoll ? { scale: 0.9 } : {}}
-              animate={
-                phase === "slam"
-                  ? { scale: [1, 0.85, 1.04, 1] }
-                  : canRoll
-                  ? { scale: [1, 1.02, 1] }
-                  : { scale: 1 }
-              }
-              transition={
-                phase === "slam"
-                  ? { duration: 0.22, times: [0, 0.4, 0.7, 1] }
-                  : canRoll
-                  ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
-                  : {}
-              }
-              onClick={onRoll}
-              disabled={!canRoll}
-              className="w-full rounded-3xl font-black text-2xl tracking-wider text-white disabled:cursor-not-allowed border-2 relative overflow-hidden"
-              style={{
-                padding: "26px 24px",
-                background: canRoll
-                  ? `linear-gradient(135deg, ${stageColor} 0%, ${stageColor}dd 50%, #000 200%)`
-                  : `linear-gradient(135deg, #2a2a3a 0%, #1a1a2e 100%)`,
-                borderColor: canRoll ? "#ffffff44" : "#ffffff10",
-                boxShadow: canRoll
-                  ? `0 12px 40px ${stageColor}80, inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -4px 0 rgba(0,0,0,0.3)`
-                  : "0 4px 12px rgba(0,0,0,0.4)",
-                opacity: canRoll ? 1 : 0.55,
-              }}
-            >
-              {canRoll && (
-                <motion.span
-                  aria-hidden
-                  className="absolute inset-0 rounded-3xl pointer-events-none"
-                  animate={{ opacity: [0.3, 0.6, 0.3] }}
-                  transition={{
-                    duration: 1.8,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  style={{
-                    boxShadow: `0 0 30px ${stageColor}, 0 0 60px ${stageColor}66`,
-                  }}
-                />
-              )}
-              <span className="relative inline-flex items-center justify-center gap-3">
-                <Die size={36} blind />
-                <span>
-                  {phase === "rolling"
-                    ? "ROLLING…"
-                    : phase === "reveal" ||
-                      phase === "buckfly" ||
-                      phase === "outro"
-                    ? "…"
-                    : phase === "skip"
-                    ? "SKIPPING…"
-                    : current.bucks <= 0
-                    ? "NO BUCKS"
-                    : "ROLL!"}
-                </span>
-                <Die size={36} blind />
-              </span>
-            </motion.button>
+            <RollButton
+              onTap={onRoll}
+              enabled={canRoll}
+              state={phase}
+              playerColor={stageColor}
+              bucks={current.bucks}
+            />
           ) : (
             <div
-              className="w-full rounded-3xl font-black text-center px-6 py-6 border-2"
+              className="wood-grain w-full px-6 py-5 text-center relative"
               style={{
-                background: "rgba(0,0,0,0.4)",
-                borderColor: "rgba(255,255,255,0.1)",
+                borderRadius: 10,
+                border: "3px solid #2a1a0a",
+                boxShadow:
+                  "inset 0 2px 0 rgba(255,255,255,0.12), inset 0 -3px 0 rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.5)",
               }}
             >
-              <div className="text-[10px] uppercase tracking-[0.4em] text-white/50 font-black">
-                Waiting for
+              <div
+                className="text-[10px] uppercase tracking-[0.4em] text-parchment"
+                style={{
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                  color: "#f4e4b7",
+                  opacity: 0.8,
+                }}
+              >
+                Waitin' on
               </div>
               <div
-                className="mt-1 font-black text-2xl"
-                style={{ color: stageColor }}
+                className="mt-1"
+                style={{
+                  fontFamily: "var(--font-rye), Georgia, serif",
+                  color: stageColor,
+                  fontSize: 28,
+                  textShadow: "0 2px 0 rgba(0,0,0,0.7)",
+                }}
               >
                 {current.display_name}
               </div>
-              <div className="text-white/40 text-xs font-bold uppercase tracking-widest mt-1">
+              <div
+                className="text-[11px] uppercase tracking-widest mt-1"
+                style={{
+                  color: "#f4e4b7",
+                  opacity: 0.7,
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                }}
+              >
                 {phase === "rolling" || phase === "reveal" || phase === "buckfly"
-                  ? "rolling…"
-                  : "to roll"}
+                  ? "to make their roll…"
+                  : "to step up to the table"}
               </div>
             </div>
           )}
@@ -581,13 +547,20 @@ export default function ActiveGameView() {
                 <Skip size={48} color="#F97066" />
               </div>
               <div
-                className="font-black text-2xl"
-                style={{ color: current.color }}
+                className="text-3xl"
+                style={{
+                  color: current.color,
+                  fontFamily: "var(--font-rye), Georgia, serif",
+                  textShadow: "0 2px 0 rgba(0,0,0,0.55)",
+                }}
               >
                 {current.display_name}
               </div>
-              <div className="text-buck-coral font-black text-sm uppercase tracking-widest mt-1">
-                No bucks — skipped!
+              <div
+                className="text-buck-coral text-sm uppercase tracking-widest mt-1"
+                style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+              >
+                Plumb broke — skip 'em!
               </div>
             </motion.div>
           </motion.div>

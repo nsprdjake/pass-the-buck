@@ -21,43 +21,49 @@ export const TURN_OUTRO_MS = 380;
 
 type OutcomeMeta = {
   label: string;
-  cardFrom: string;
-  cardTo: string;
-  accent: string;
+  /** Color used for the headline and the stamp accent. */
+  inkColor: string;
+  /** Tag line printed below the label in the smaller serif. */
+  caption: string;
 };
 
 export const OUTCOME_META: Record<RollOutcome, OutcomeMeta> = {
   left: {
     label: "LEFT",
-    cardFrom: "#1E40AF",
-    cardTo: "#3B82F6",
-    accent: "#60A5FA",
+    inkColor: "#1e3a8a",
+    caption: "yer neighbor takes a buck",
   },
   right: {
     label: "RIGHT",
-    cardFrom: "#1E40AF",
-    cardTo: "#3B82F6",
-    accent: "#60A5FA",
+    inkColor: "#1e3a8a",
+    caption: "yer neighbor takes a buck",
   },
   center: {
     label: "POT!",
-    cardFrom: "#9F1239",
-    cardTo: "#F97066",
-    accent: "#F97066",
+    inkColor: "#8b2222",
+    caption: "into the kitty it goes",
   },
   keep: {
     label: "KEEP!",
-    cardFrom: "#854D0E",
-    cardTo: "#FBBF24",
-    accent: "#FBBF24",
+    inkColor: "#a16207",
+    caption: "yer buck rides another round",
   },
 };
 
-function OutcomeIcon({ outcome, size }: { outcome: RollOutcome; size: number }) {
-  if (outcome === "left") return <ArrowLeft size={size} color="#fff" />;
-  if (outcome === "right") return <ArrowRight size={size} color="#fff" />;
-  if (outcome === "center") return <ArrowDown size={size} color="#fff" />;
-  return <Asterisk size={size} color="#fff" />;
+function OutcomeIcon({
+  outcome,
+  size,
+  color,
+}: {
+  outcome: RollOutcome;
+  size: number;
+  color?: string;
+}) {
+  const c = color ?? OUTCOME_META[outcome].inkColor;
+  if (outcome === "left") return <ArrowLeft size={size} color={c} />;
+  if (outcome === "right") return <ArrowRight size={size} color={c} />;
+  if (outcome === "center") return <ArrowDown size={size} color={c} />;
+  return <Asterisk size={size} color={c} />;
 }
 
 // ============================================================
@@ -116,33 +122,92 @@ export function OutcomeCard({
   recipientColor?: string;
 }) {
   const meta = OUTCOME_META[outcome];
+  // Slight tilt for character — outcome index would be nicer but we don't
+  // have it here; deterministic per outcome label.
+  const tilt = outcome === "left" || outcome === "keep" ? -2.5 : 2.5;
   return (
     <motion.div
       key={`${outcome}-${recipientName ?? ""}`}
-      initial={{ scale: 0.4, opacity: 0, rotateX: -45 }}
-      animate={{ scale: 1, opacity: 1, rotateX: 0 }}
+      initial={{ scale: 0.4, opacity: 0, rotateX: -45, rotate: 0 }}
+      animate={{ scale: 1, opacity: 1, rotateX: 0, rotate: tilt }}
       exit={{ scale: 0.85, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 480, damping: 22 }}
-      className="relative rounded-2xl px-6 py-4 text-center"
+      transition={{ type: "spring", stiffness: 460, damping: 22 }}
+      className="parchment relative px-5 pt-2.5 pb-3 text-center min-w-[240px]"
       style={{
-        background: `linear-gradient(135deg, ${meta.cardFrom} 0%, ${meta.cardTo} 100%)`,
-        boxShadow: `0 0 40px ${meta.accent}66, 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.25)`,
-        border: `2px solid ${meta.accent}`,
-        minWidth: 220,
+        // chunky deckle/aged edge via thick ink stroke + heavy shadow
+        border: `3px solid #2a1a0a`,
+        boxShadow: `0 10px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(244,228,183,0.5)`,
+        borderRadius: 3,
       }}
     >
-      <div className="flex items-center justify-center mb-1">
-        <OutcomeIcon outcome={outcome} size={42} />
+      {/* Hairline inner border for that double-rule poster look */}
+      <div
+        aria-hidden
+        className="absolute pointer-events-none"
+        style={{
+          inset: 4,
+          border: "1px solid #2a1a0a",
+          borderRadius: 1,
+          opacity: 0.65,
+        }}
+      />
+
+      <div
+        className="text-[9px] uppercase tracking-[0.4em]"
+        style={{
+          fontFamily: "var(--font-fell), Georgia, serif",
+          color: "#2a1a0a",
+          opacity: 0.7,
+        }}
+      >
+        ★  the die says  ★
       </div>
-      <div className="font-black text-3xl tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-        {meta.label}
+
+      <div className="flex items-center justify-center gap-2.5 mt-0.5">
+        <OutcomeIcon outcome={outcome} size={36} />
+        <span
+          className="leading-none"
+          style={{
+            fontFamily: "var(--font-rye), Georgia, serif",
+            color: meta.inkColor,
+            fontSize: 38,
+            letterSpacing: "0.02em",
+            textShadow: "1px 1px 0 rgba(0,0,0,0.18)",
+          }}
+        >
+          {meta.label}
+        </span>
       </div>
-      {recipientName && (
-        <div className="mt-1 text-xs font-black uppercase tracking-widest">
-          <span className="text-white/70">to </span>
-          <span style={{ color: recipientColor ?? "#fff" }}>
+
+      {recipientName ? (
+        <div
+          className="mt-0.5"
+          style={{
+            fontFamily: "var(--font-fell), Georgia, serif",
+            color: "#2a1a0a",
+          }}
+        >
+          <span className="text-[11px] italic">to </span>
+          <span
+            className="text-base font-black"
+            style={{
+              color: recipientColor ?? "#2a1a0a",
+              textShadow: "0 1px 0 rgba(244,228,183,0.7)",
+            }}
+          >
             {recipientName}
           </span>
+        </div>
+      ) : (
+        <div
+          className="mt-0.5 text-[10px] italic"
+          style={{
+            fontFamily: "var(--font-fell), Georgia, serif",
+            color: "#2a1a0a",
+            opacity: 0.7,
+          }}
+        >
+          {meta.caption}
         </div>
       )}
     </motion.div>

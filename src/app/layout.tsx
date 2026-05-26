@@ -1,11 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { IM_Fell_English, Inter, Rye } from "next/font/google";
 import "./globals.css";
 import { LocalGameProvider } from "@/context/LocalGameContext";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+const rye = Rye({
+  variable: "--font-rye",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
+const fell = IM_Fell_English({
+  variable: "--font-fell",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -38,7 +53,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${rye.variable} ${fell.variable} h-full`}
+    >
       <body className="min-h-full bg-buck-dark text-white antialiased">
         <LocalGameProvider>{children}</LocalGameProvider>
       </body>

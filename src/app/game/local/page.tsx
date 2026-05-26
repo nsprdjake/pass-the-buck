@@ -5,14 +5,12 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import Buck from "@/components/Buck";
 import BuckPile from "@/components/BuckPile";
-import Die from "@/components/Die";
 import DiceTray from "@/components/DiceTray";
 import PotPile from "@/components/PotPile";
+import RollButton from "@/components/game/RollButton";
 import {
   BUCK_FLY_MS,
   Confetti,
-  FELT_GRADIENT,
-  FeltBackground,
   FlyingBuck,
   OUTCOME_GAP_MS,
   OutcomeCard,
@@ -268,15 +266,22 @@ export default function LocalGamePage() {
           >
             <Trophy size={128} />
           </motion.div>
-          <div className="text-xs uppercase tracking-[0.4em] text-buck-gold font-black">
-            Winner
+          <div
+            className="text-xs uppercase tracking-[0.4em] text-buck-gold"
+            style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+          >
+            Champion of the Saloon
           </div>
           <motion.h1
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
-            className="mt-2 text-6xl font-black leading-tight"
-            style={{ color: winner.color }}
+            className="mt-2 text-6xl leading-tight"
+            style={{
+              color: winner.color,
+              fontFamily: "var(--font-rye), Georgia, serif",
+              textShadow: "0 4px 0 rgba(0,0,0,0.55)",
+            }}
           >
             {winner.name}
           </motion.h1>
@@ -330,12 +335,7 @@ export default function LocalGamePage() {
       : null;
 
   return (
-    <main
-      className="min-h-screen flex flex-col overflow-hidden relative"
-      style={{ background: FELT_GRADIENT }}
-    >
-      <FeltBackground />
-
+    <main className="felt-saloon min-h-screen flex flex-col overflow-hidden relative">
       {/* Top nav */}
       <div className="relative z-30 flex items-center justify-between px-4 pt-3 pb-1">
         <div className="text-white/80 text-xs font-black uppercase tracking-widest">
@@ -354,13 +354,14 @@ export default function LocalGamePage() {
         </button>
       </div>
 
-      {/* Pot band */}
+      {/* Pot band — sits on a wood rail */}
       <div
-        className="relative z-20 flex items-center justify-center px-4 py-2 border-y"
+        className="wood-grain relative z-20 flex items-center justify-center px-4 py-2"
         style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.35) 100%)",
-          borderColor: "rgba(251,191,36,0.28)",
+          borderTop: "3px solid #2a1a0a",
+          borderBottom: "3px solid #2a1a0a",
+          boxShadow:
+            "inset 0 2px 0 rgba(255,225,170,0.12), inset 0 -2px 0 rgba(0,0,0,0.5), 0 6px 12px rgba(0,0,0,0.45)",
         }}
       >
         <PotPile count={displayedPot} />
@@ -377,22 +378,30 @@ export default function LocalGamePage() {
             transition={{ type: "spring", stiffness: 320, damping: 26 }}
             className="text-center w-full"
           >
-            <div className="text-[10px] uppercase tracking-[0.4em] text-white/50 font-black">
-              Your turn
+            <div
+              className="text-[10px] uppercase tracking-[0.4em] text-parchment/70"
+              style={{ fontFamily: "var(--font-fell), Georgia, serif", color: "#f4e4b7", opacity: 0.7 }}
+            >
+              step right up,
             </div>
             <h1
-              className="mt-1 font-black leading-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
+              className="mt-1 leading-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
               style={{
+                fontFamily: "var(--font-rye), Georgia, serif",
                 color: current.color,
                 fontSize: "clamp(2.5rem, 10vw, 4.5rem)",
-                letterSpacing: "-0.02em",
+                letterSpacing: "0.01em",
+                textShadow: "0 3px 0 rgba(0,0,0,0.45)",
               }}
             >
               {current.name}
             </h1>
             {current.bucks > 0 && phase === "idle" && (
-              <div className="mt-2 text-buck-gold/90 font-black uppercase tracking-widest text-xs">
-                {rollCount} di{rollCount === 1 ? "e" : "ce"} to roll
+              <div
+                className="mt-2 text-buck-gold/90 uppercase tracking-widest text-xs"
+                style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+              >
+                {rollCount} di{rollCount === 1 ? "e" : "ce"} on the table
               </div>
             )}
           </motion.div>
@@ -517,70 +526,13 @@ export default function LocalGamePage() {
       {/* ROLL BUTTON */}
       <div className="relative z-20 px-5 pb-7 pt-2">
         <div className="max-w-md mx-auto">
-          <motion.button
-            whileTap={canRoll ? { scale: 0.9 } : {}}
-            animate={
-              phase === "slam"
-                ? { scale: [1, 0.85, 1.04, 1] }
-                : canRoll
-                ? { scale: [1, 1.02, 1] }
-                : { scale: 1 }
-            }
-            transition={
-              phase === "slam"
-                ? { duration: 0.22, times: [0, 0.4, 0.7, 1] }
-                : canRoll
-                ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
-                : {}
-            }
-            onClick={onRoll}
-            disabled={!canRoll}
-            className="w-full rounded-3xl font-black text-2xl tracking-wider text-white disabled:cursor-not-allowed border-2 relative overflow-hidden"
-            style={{
-              padding: "24px 24px",
-              background: canRoll
-                ? `linear-gradient(135deg, ${current.color} 0%, ${current.color}dd 50%, #000 200%)`
-                : `linear-gradient(135deg, #2a2a3a 0%, #1a1a2e 100%)`,
-              borderColor: canRoll ? "#ffffff44" : "#ffffff10",
-              boxShadow: canRoll
-                ? `0 12px 40px ${current.color}80, inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -4px 0 rgba(0,0,0,0.3)`
-                : "0 4px 12px rgba(0,0,0,0.4)",
-              opacity: canRoll ? 1 : 0.55,
-            }}
-          >
-            {canRoll && (
-              <motion.span
-                aria-hidden
-                className="absolute inset-0 rounded-3xl pointer-events-none"
-                animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                style={{
-                  boxShadow: `0 0 30px ${current.color}, 0 0 60px ${current.color}66`,
-                }}
-              />
-            )}
-            <span className="relative inline-flex items-center justify-center gap-3">
-              <Die size={36} blind />
-              <span>
-                {phase === "rolling"
-                  ? "ROLLING…"
-                  : phase === "reveal" ||
-                    phase === "buckfly" ||
-                    phase === "outro"
-                  ? "…"
-                  : phase === "skip"
-                  ? "SKIPPING…"
-                  : current.bucks <= 0
-                  ? "NO BUCKS"
-                  : "ROLL!"}
-              </span>
-              <Die size={36} blind />
-            </span>
-          </motion.button>
+          <RollButton
+            onTap={onRoll}
+            enabled={canRoll}
+            state={phase === "pass" || phase === "finished" ? "idle" : phase}
+            playerColor={current.color}
+            bucks={current.bucks}
+          />
         </div>
       </div>
 
@@ -608,13 +560,22 @@ export default function LocalGamePage() {
                 <Skip size={48} color="#F97066" />
               </div>
               <div
-                className="font-black text-2xl"
-                style={{ color: current?.color }}
+                className="text-3xl"
+                style={{
+                  color: current?.color,
+                  fontFamily: "var(--font-rye), Georgia, serif",
+                  textShadow: "0 2px 0 rgba(0,0,0,0.55)",
+                }}
               >
                 {current?.name}
               </div>
-              <div className="text-buck-coral font-black text-sm uppercase tracking-widest mt-1">
-                No bucks — skipped!
+              <div
+                className="text-buck-coral text-sm uppercase tracking-widest mt-1"
+                style={{
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                }}
+              >
+                Plumb broke — skip 'em!
               </div>
             </motion.div>
           </motion.div>
@@ -648,15 +609,24 @@ export default function LocalGamePage() {
               >
                 <Phone size={96} color={nextPlayer.color} />
               </motion.div>
-              <div className="text-[10px] uppercase tracking-[0.4em] text-white/50 font-black">
-                Pass the phone to
+              <div
+                className="text-[10px] uppercase tracking-[0.4em] text-parchment"
+                style={{
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                  color: "#f4e4b7",
+                  opacity: 0.75,
+                }}
+              >
+                hand 'er over to
               </div>
               <h2
-                className="mt-2 font-black leading-none"
+                className="mt-2 leading-none"
                 style={{
+                  fontFamily: "var(--font-rye), Georgia, serif",
                   color: nextPlayer.color,
                   fontSize: "clamp(2.75rem, 11vw, 5rem)",
-                  letterSpacing: "-0.02em",
+                  letterSpacing: "0.01em",
+                  textShadow: "0 3px 0 rgba(0,0,0,0.55)",
                 }}
               >
                 {nextPlayer.name}
@@ -664,9 +634,14 @@ export default function LocalGamePage() {
               <motion.div
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.4, repeat: Infinity }}
-                className="mt-8 text-white/70 font-black uppercase tracking-widest text-sm"
+                className="mt-8 uppercase tracking-widest text-sm"
+                style={{
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                  color: "#f4e4b7",
+                  opacity: 0.75,
+                }}
               >
-                Tap anywhere to continue
+                Tap anywhere to mosey on
               </motion.div>
             </motion.div>
           </motion.button>

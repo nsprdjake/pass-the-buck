@@ -74,15 +74,22 @@ export default function FinishedView({ code }: { code: string }) {
         >
           <Trophy size={128} />
         </motion.div>
-        <div className="text-xs uppercase tracking-[0.4em] text-buck-gold font-black">
-          Winner
+        <div
+          className="text-xs uppercase tracking-[0.4em] text-buck-gold"
+          style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+        >
+          Champion of the Saloon
         </div>
         <motion.h1
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
-          className="mt-2 text-6xl font-black leading-tight"
-          style={{ color: winner?.color }}
+          className="mt-2 text-6xl leading-tight"
+          style={{
+            color: winner?.color,
+            fontFamily: "var(--font-rye), Georgia, serif",
+            textShadow: "0 4px 0 rgba(0,0,0,0.55)",
+          }}
         >
           {winner?.display_name}
         </motion.h1>
