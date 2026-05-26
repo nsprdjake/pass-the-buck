@@ -14,19 +14,13 @@ export function rollTurn(numBucks: number): RollOutcome[] {
   return results;
 }
 
-function findNeighbor(
+function neighborIndex(
   players: Player[],
   fromIdx: number,
   direction: 1 | -1
 ): number {
   const n = players.length;
-  let idx = (fromIdx + direction + n) % n;
-  let safety = 0;
-  while (players[idx].eliminated && idx !== fromIdx && safety < n) {
-    idx = (idx + direction + n) % n;
-    safety++;
-  }
-  return idx;
+  return (fromIdx + direction + n) % n;
 }
 
 export function applyTurn(
@@ -44,7 +38,7 @@ export function applyTurn(
 
     switch (outcome) {
       case "left": {
-        const leftIdx = findNeighbor(updated, currentIdx, -1);
+        const leftIdx = neighborIndex(updated, currentIdx, -1);
         if (leftIdx !== currentIdx) {
           current.bucks -= 1;
           updated[leftIdx].bucks += 1;
@@ -52,7 +46,7 @@ export function applyTurn(
         break;
       }
       case "right": {
-        const rightIdx = findNeighbor(updated, currentIdx, 1);
+        const rightIdx = neighborIndex(updated, currentIdx, 1);
         if (rightIdx !== currentIdx) {
           current.bucks -= 1;
           updated[rightIdx].bucks += 1;
@@ -69,18 +63,16 @@ export function applyTurn(
     }
   }
 
+  // Eliminated is dynamic: a player with bucks > 0 is back in the game.
   for (const p of updated) {
-    if (p.bucks <= 0) {
-      p.bucks = 0;
-      p.eliminated = true;
-    }
+    p.eliminated = p.bucks <= 0;
   }
 
   return { players: updated, pot: newPot };
 }
 
 export function checkWinner(players: Player[]): Player | null {
-  const alive = players.filter((p) => !p.eliminated && p.bucks > 0);
+  const alive = players.filter((p) => p.bucks > 0);
   if (alive.length === 1) return alive[0];
   return null;
 }
@@ -92,7 +84,7 @@ export function getNextActivePlayer(
   const n = players.length;
   let idx = (currentIdx + 1) % n;
   let safety = 0;
-  while (players[idx].eliminated && safety < n) {
+  while (players[idx].bucks <= 0 && safety < n) {
     idx = (idx + 1) % n;
     safety++;
   }

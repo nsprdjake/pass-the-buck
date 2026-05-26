@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { LocalGameProvider } from "@/context/LocalGameContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -39,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
       <body className="min-h-full bg-buck-dark text-white antialiased">
-        {children}
+        <LocalGameProvider>{children}</LocalGameProvider>
       </body>
     </html>
   );

@@ -15,14 +15,18 @@ export default function PlayerCard({ player, active = false }: PlayerCardProps) 
       className={[
         "rounded-2xl p-3 transition-all",
         "bg-buck-card border",
-        active ? "border-buck-gold shadow-[0_0_24px_rgba(251,191,36,0.35)]" : "border-white/10",
-        isOut ? "opacity-50" : "opacity-100",
+        active
+          ? "border-buck-gold shadow-[0_0_24px_rgba(251,191,36,0.35)]"
+          : isOut
+          ? "border-buck-coral/30"
+          : "border-white/10",
+        isOut ? "opacity-60" : "opacity-100",
       ].join(" ")}
     >
       <div className="flex items-center gap-3">
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-lg flex-shrink-0"
-          style={{ backgroundColor: player.color }}
+          style={{ backgroundColor: isOut ? "#F97066" : player.color }}
         >
           {initial}
         </div>
@@ -30,13 +34,15 @@ export default function PlayerCard({ player, active = false }: PlayerCardProps) 
           <div
             className={[
               "font-bold text-sm truncate",
-              isOut ? "line-through text-white/60" : "text-white",
+              isOut ? "text-buck-coral" : "text-white",
             ].join(" ")}
           >
             {player.name}
           </div>
           <div className="text-xs text-white/60">
-            {isOut ? "Eliminated" : `${player.bucks} buck${player.bucks === 1 ? "" : "s"}`}
+            {isOut
+              ? "Out — needs a pass"
+              : `${player.bucks} buck${player.bucks === 1 ? "" : "s"}`}
           </div>
         </div>
       </div>

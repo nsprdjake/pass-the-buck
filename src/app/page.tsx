@@ -1,6 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useLocalGame } from "@/context/LocalGameContext";
 
 export default function Home() {
+  const { status, players } = useLocalGame();
+  const inProgress = status === "active" && players.length > 0;
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark">
       <div className="flex flex-col items-center text-center max-w-md w-full">
@@ -14,9 +20,20 @@ export default function Home() {
 
         <p className="mt-3 text-white/70 text-lg">Who&apos;s keeping theirs?</p>
 
+        {inProgress && (
+          <Link
+            href="/game/local"
+            className="mt-10 w-full text-center py-4 rounded-2xl font-black text-lg text-buck-dark bg-buck-gold shadow-[0_10px_30px_rgba(251,191,36,0.35)] active:scale-[0.98] transition-transform"
+          >
+            CONTINUE GAME
+          </Link>
+        )}
+
         <Link
           href="/lobby"
-          className="mt-10 w-full text-center py-4 rounded-2xl font-black text-lg text-white bg-gradient-to-br from-buck-green to-emerald-700 shadow-[0_10px_30px_rgba(16,185,129,0.35)] active:scale-[0.98] transition-transform"
+          className={`${
+            inProgress ? "mt-3" : "mt-10"
+          } w-full text-center py-4 rounded-2xl font-black text-lg text-white bg-gradient-to-br from-buck-green to-emerald-700 shadow-[0_10px_30px_rgba(16,185,129,0.35)] active:scale-[0.98] transition-transform`}
         >
           NEW GAME
         </Link>
