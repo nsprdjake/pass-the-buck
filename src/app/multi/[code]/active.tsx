@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import BuckPile from "@/components/BuckPile";
 import Die from "@/components/Die";
 import DiceTray from "@/components/DiceTray";
+import PotPile from "@/components/PotPile";
 import {
   BUCK_FLY_MS,
   FELT_GRADIENT,
@@ -19,7 +20,7 @@ import {
   SLAM_MS,
   TURN_OUTRO_MS,
 } from "@/components/game/shared";
-import { MoneyBag, Skip } from "@/components/icons";
+import { Skip } from "@/components/icons";
 import { useRemoteGame } from "@/context/RemoteGameContext";
 import { rollCountForBucks } from "@/lib/game-logic";
 import { playSfx, unlockAudio } from "@/lib/sfx";
@@ -249,26 +250,11 @@ export default function ActiveGameView() {
     >
       <FeltBackground />
 
-      {/* Top bar */}
-      <div className="relative z-30 flex items-center justify-between px-4 pt-4 pb-2">
+      {/* Top nav */}
+      <div className="relative z-30 flex items-center justify-between px-4 pt-3 pb-1">
         <div className="text-white/80 text-xs font-black uppercase tracking-widest">
           Round <span className="text-buck-gold">{game.round}</span>
         </div>
-        <motion.div
-          key={displayedPot}
-          initial={{ scale: 1 }}
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 0.35 }}
-          className="flex items-center gap-1.5 bg-black/50 border border-buck-gold/50 rounded-full px-3 py-1 backdrop-blur-sm"
-        >
-          <MoneyBag size={20} />
-          <span className="text-buck-gold font-black text-xs uppercase tracking-widest">
-            Pot
-          </span>
-          <span className="text-white font-black text-base">
-            {displayedPot}
-          </span>
-        </motion.div>
         <button
           onClick={() => {
             if (confirm("Leave this game?")) router.replace("/multi");
@@ -277,6 +263,18 @@ export default function ActiveGameView() {
         >
           Leave
         </button>
+      </div>
+
+      {/* Pot band */}
+      <div
+        className="relative z-20 flex items-center justify-center px-4 py-2 border-y"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.35) 100%)",
+          borderColor: "rgba(251,191,36,0.28)",
+        }}
+      >
+        <PotPile count={displayedPot} />
       </div>
 
       {/* Player count strip */}

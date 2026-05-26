@@ -6,7 +6,7 @@ export function rollOutcome(): RollOutcome {
 }
 
 export function rollCountForBucks(numBucks: number): number {
-  return Math.max(numBucks, 0);
+  return Math.min(Math.max(numBucks, 0), 3);
 }
 
 export function rollTurn(numBucks: number): RollOutcome[] {

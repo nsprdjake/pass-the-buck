@@ -79,7 +79,7 @@ export default function CreateMultiGamePage() {
             />
             <p className="text-white/40 text-xs mt-2">
               Each player starts with this many bucks. They roll one die per
-              buck they hold.
+              buck they hold, up to 3 dice per turn.
             </p>
           </section>
 

@@ -12,9 +12,19 @@ type BuckPileProps = {
   gap?: number;
 };
 
+// Per-bill deterministic jitter for the "casual / hand-tossed" feel.
+function jitter(i: number): { rot: number; dy: number } {
+  const s = i * 53 + 17;
+  return {
+    rot: ((s * 7) % 11) - 5, // -5..5 deg
+    dy: ((s * 13) % 7) - 3, // -3..3 px
+  };
+}
+
 /**
  * Renders a player's bucks.
- *  - 1–3 bucks: shown side-by-side on the table, no stacking.
+ *  - 1–3 bucks: shown side-by-side on the table, no stacking, with a small
+ *    natural-looking jitter so they don't sit ruler-straight.
  *  - 4+ bucks: a single 3-high stack of bills with the total drawn next to it.
  */
 export default function BuckPile({
@@ -24,7 +34,7 @@ export default function BuckPile({
   gap = 6,
 }: BuckPileProps) {
   if (count <= 0) {
-    const w = Math.round(billHeight * 2.3);
+    const w = Math.round(billHeight * 2.35);
     return (
       <div
         className="rounded-md border-2 border-dashed border-white/15 flex items-center justify-center"
@@ -37,24 +47,32 @@ export default function BuckPile({
     );
   }
 
-  const billWidth = Math.round(billHeight * 2.3);
+  const billWidth = Math.round(billHeight * 2.35);
 
-  // 1–3 bucks: lay them flat side-by-side.
+  // 1–3 bucks: lay them flat side-by-side with mild jitter.
   if (count <= 3) {
     return (
-      <div className="flex items-end justify-center" style={{ gap }}>
-        {Array.from({ length: count }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              width: billWidth,
-              height: billHeight,
-              filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.5))",
-            }}
-          >
-            <Buck height={billHeight} />
-          </div>
-        ))}
+      <div
+        className="flex items-end justify-center"
+        style={{ gap, paddingTop: 4, paddingBottom: 4 }}
+      >
+        {Array.from({ length: count }).map((_, i) => {
+          const j = jitter(i);
+          return (
+            <div
+              key={i}
+              style={{
+                width: billWidth,
+                height: billHeight,
+                transform: `translateY(${j.dy}px) rotate(${j.rot}deg)`,
+                transformOrigin: "center",
+                filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.55))",
+              }}
+            >
+              <Buck height={billHeight} />
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -70,23 +88,28 @@ export default function BuckPile({
         className="relative"
         style={{ width: billWidth, height: stackHeight }}
       >
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="absolute left-0"
-            style={{
-              top: i * stackOffset,
-              width: billWidth,
-              height: billHeight,
-              filter: `drop-shadow(0 ${1.5 + i * 0.4}px ${
-                2 + i * 0.3
-              }px rgba(0,0,0,0.5))`,
-              zIndex: i + 1,
-            }}
-          >
-            <Buck height={billHeight} />
-          </div>
-        ))}
+        {[0, 1, 2].map((i) => {
+          const j = jitter(i);
+          return (
+            <div
+              key={i}
+              className="absolute"
+              style={{
+                top: i * stackOffset + j.dy * 0.4,
+                left: j.rot * 0.4, // tiny lateral shimmy
+                width: billWidth,
+                height: billHeight,
+                transform: `rotate(${j.rot * 0.5}deg)`,
+                filter: `drop-shadow(0 ${1.5 + i * 0.4}px ${
+                  2 + i * 0.3
+                }px rgba(0,0,0,0.55))`,
+                zIndex: i + 1,
+              }}
+            >
+              <Buck height={billHeight} />
+            </div>
+          );
+        })}
       </div>
       <div
         className="flex flex-col items-center justify-center font-black"
@@ -95,7 +118,10 @@ export default function BuckPile({
         <span className="text-white/40 text-base leading-none mb-0.5">×</span>
         <span
           className="text-white leading-none"
-          style={{ fontSize: billHeight * 0.95 }}
+          style={{
+            fontSize: billHeight * 0.95,
+            textShadow: "0 2px 0 rgba(0,0,0,0.5)",
+          }}
         >
           {count}
         </span>
