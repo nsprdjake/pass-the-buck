@@ -408,7 +408,7 @@ export default function LocalGamePage() {
         </AnimatePresence>
 
         {/* Buck pile */}
-        <div className="relative mt-6 min-h-[110px] flex items-end justify-center w-full">
+        <div className="relative mt-6 min-h-[130px] flex items-end justify-center w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={`${current.id}-stack`}
@@ -419,7 +419,7 @@ export default function LocalGamePage() {
               className="relative flex flex-col items-center"
             >
               <div className="relative">
-                <BuckPile count={displayedBucks} billHeight={30} />
+                <BuckPile count={displayedBucks} />
                 <AnimatePresence>
                   {phase === "buckfly" && activeOutcome && (
                     <motion.div

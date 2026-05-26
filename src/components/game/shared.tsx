@@ -271,7 +271,7 @@ export function FlyingBuck({
             : "drop-shadow(0 6px 10px rgba(0,0,0,0.55))",
       }}
     >
-      <Buck height={36} />
+      <Buck height={46} />
     </motion.div>
   );
 }

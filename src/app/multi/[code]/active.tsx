@@ -393,7 +393,7 @@ export default function ActiveGameView() {
         </AnimatePresence>
 
         {/* Buck pile */}
-        <div className="relative mt-8 min-h-[140px] flex items-end justify-center w-full">
+        <div className="relative mt-6 min-h-[150px] flex items-end justify-center w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={`${current.id}-stack`}
@@ -404,7 +404,7 @@ export default function ActiveGameView() {
               className="relative flex flex-col items-center"
             >
               <div className="relative">
-                <BuckPile count={displayedBucks} billHeight={30} />
+                <BuckPile count={displayedBucks} />
                 <AnimatePresence>
                   {phase === "buckfly" && activeOutcome && (
                     <motion.div
