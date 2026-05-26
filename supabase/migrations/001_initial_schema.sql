@@ -1,6 +1,6 @@
 -- Players/auth handled by Supabase Auth
 
-create table games (
+create table ptb_games (
   id uuid primary key default gen_random_uuid(),
   code text unique not null, -- 6-char join code
   host_id uuid references auth.users(id),
@@ -14,9 +14,9 @@ create table games (
   updated_at timestamptz default now()
 );
 
-create table players (
+create table ptb_players (
   id uuid primary key default gen_random_uuid(),
-  game_id uuid references games(id) on delete cascade,
+  game_id uuid references ptb_games(id) on delete cascade,
   user_id uuid references auth.users(id),
   display_name text not null,
   bucks int not null default 3,
@@ -25,36 +25,36 @@ create table players (
   created_at timestamptz default now()
 );
 
-create table turns (
+create table ptb_turns (
   id uuid primary key default gen_random_uuid(),
-  game_id uuid references games(id) on delete cascade,
-  player_id uuid references players(id),
+  game_id uuid references ptb_games(id) on delete cascade,
+  player_id uuid references ptb_players(id),
   outcomes jsonb not null, -- array of {die: 1-3, result: "left"|"right"|"center"|"keep"}
   created_at timestamptz default now()
 );
 
 -- Indexes
-create index idx_players_game on players(game_id);
-create index idx_turns_game on turns(game_id);
-create index idx_games_code on games(code);
+create index idx_ptb_players_game on ptb_players(game_id);
+create index idx_ptb_turns_game on ptb_turns(game_id);
+create index idx_ptb_games_code on ptb_games(code);
 
 -- RLS
-alter table games enable row level security;
-alter table players enable row level security;
-alter table turns enable row level security;
+alter table ptb_games enable row level security;
+alter table ptb_players enable row level security;
+alter table ptb_turns enable row level security;
 
 -- Policies: anyone authenticated can read games they're in
-create policy "Players can view their game" on games for select using (
-  id in (select game_id from players where user_id = auth.uid())
+create policy "Players can view their game" on ptb_games for select using (
+  id in (select game_id from ptb_players where user_id = auth.uid())
   or host_id = auth.uid()
 );
 
-create policy "Host can update game" on games for update using (host_id = auth.uid());
+create policy "Host can update game" on ptb_games for update using (host_id = auth.uid());
 
-create policy "Players can view players in their game" on players for select using (
-  game_id in (select game_id from players where user_id = auth.uid())
+create policy "Players can view players in their game" on ptb_players for select using (
+  game_id in (select game_id from ptb_players where user_id = auth.uid())
 );
 
-create policy "Players can view turns in their game" on turns for select using (
-  game_id in (select game_id from players where user_id = auth.uid())
+create policy "Players can view turns in their game" on ptb_turns for select using (
+  game_id in (select game_id from ptb_players where user_id = auth.uid())
 );

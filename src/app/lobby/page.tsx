@@ -57,7 +57,7 @@ export default function LobbyPage() {
 
     async function refresh() {
       const { data } = await supabase
-        .from("players")
+        .from("ptb_players")
         .select("id, display_name, seat_index")
         .eq("game_id", game!.id)
         .order("seat_index");
@@ -72,7 +72,7 @@ export default function LobbyPage() {
         {
           event: "*",
           schema: "public",
-          table: "players",
+          table: "ptb_players",
           filter: `game_id=eq.${game.id}`,
         },
         () => void refresh()
@@ -82,7 +82,7 @@ export default function LobbyPage() {
         {
           event: "UPDATE",
           schema: "public",
-          table: "games",
+          table: "ptb_games",
           filter: `id=eq.${game.id}`,
         },
         (payload) => {
@@ -111,7 +111,7 @@ export default function LobbyPage() {
         turnTimerSeconds: turnTimer || null,
       });
       const { data: g } = await supabase
-        .from("games")
+        .from("ptb_games")
         .select("id, code, host_id, status, buy_in")
         .eq("id", gameId)
         .single();
@@ -134,7 +134,7 @@ export default function LobbyPage() {
         displayName: displayName.trim(),
       });
       const { data: g } = await supabase
-        .from("games")
+        .from("ptb_games")
         .select("id, code, host_id, status, buy_in")
         .eq("id", gameId)
         .single();

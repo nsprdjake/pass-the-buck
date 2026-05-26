@@ -75,7 +75,7 @@ export function useGame(gameId: string | null) {
 
     async function refreshPlayers() {
       const { data } = await supabase
-        .from("players")
+        .from("ptb_players")
         .select("*")
         .eq("game_id", gameId)
         .order("seat_index");
@@ -84,9 +84,9 @@ export function useGame(gameId: string | null) {
 
     async function load() {
       const [{ data: g }, { data: ps }] = await Promise.all([
-        supabase.from("games").select("*").eq("id", gameId).single(),
+        supabase.from("ptb_games").select("*").eq("id", gameId).single(),
         supabase
-          .from("players")
+          .from("ptb_players")
           .select("*")
           .eq("game_id", gameId)
           .order("seat_index"),
@@ -105,7 +105,7 @@ export function useGame(gameId: string | null) {
         {
           event: "*",
           schema: "public",
-          table: "games",
+          table: "ptb_games",
           filter: `id=eq.${gameId}`,
         },
         (payload) => {
@@ -119,7 +119,7 @@ export function useGame(gameId: string | null) {
         {
           event: "*",
           schema: "public",
-          table: "players",
+          table: "ptb_players",
           filter: `game_id=eq.${gameId}`,
         },
         () => {
@@ -167,7 +167,7 @@ export function useGame(gameId: string | null) {
     );
     const w = checkWinner(nextPlayers);
 
-    await supabase.from("turns").insert({
+    await supabase.from("ptb_turns").insert({
       game_id: game.id,
       player_id: currentRow.id,
       outcomes: rolls.map((r, i) => ({ die: i + 1, result: r })),
@@ -176,7 +176,7 @@ export function useGame(gameId: string | null) {
     await Promise.all(
       nextPlayers.map((p) =>
         supabase
-          .from("players")
+          .from("ptb_players")
           .update({ bucks: p.bucks, is_out: p.eliminated })
           .eq("id", p.id)
       )
@@ -185,7 +185,7 @@ export function useGame(gameId: string | null) {
     if (w) {
       const winnerRow = playerRows.find((r) => r.id === w.id);
       await supabase
-        .from("games")
+        .from("ptb_games")
         .update({
           pot: nextPot,
           status: "finished",
@@ -196,7 +196,7 @@ export function useGame(gameId: string | null) {
     } else {
       const nextIdx = getNextActivePlayer(nextPlayers, idx);
       await supabase
-        .from("games")
+        .from("ptb_games")
         .update({
           pot: nextPot,
           current_turn_index: nextIdx,
@@ -214,7 +214,7 @@ export function useGame(gameId: string | null) {
     if (!game) return;
     const nextIdx = getNextActivePlayer(players, game.current_turn_index);
     await supabase
-      .from("games")
+      .from("ptb_games")
       .update({
         current_turn_index: nextIdx,
         updated_at: new Date().toISOString(),
@@ -246,7 +246,7 @@ export async function createGame(opts: {
   const code = makeCode();
 
   const { data: game, error } = await supabase
-    .from("games")
+    .from("ptb_games")
     .insert({
       code,
       host_id: userId,
@@ -260,7 +260,7 @@ export async function createGame(opts: {
     .single();
   if (error || !game) throw error ?? new Error("Failed to create game");
 
-  const { error: pErr } = await supabase.from("players").insert({
+  const { error: pErr } = await supabase.from("ptb_players").insert({
     game_id: game.id,
     user_id: userId,
     display_name: opts.hostName,
@@ -281,7 +281,7 @@ export async function joinGame(opts: {
   const userId = auth.user?.id ?? null;
 
   const { data: game, error } = await supabase
-    .from("games")
+    .from("ptb_games")
     .select("id, buy_in, status")
     .eq("code", opts.code.toUpperCase())
     .single();
@@ -289,7 +289,7 @@ export async function joinGame(opts: {
   if (game.status !== "lobby") throw new Error("Game already started");
 
   const { data: existing } = await supabase
-    .from("players")
+    .from("ptb_players")
     .select("seat_index")
     .eq("game_id", game.id)
     .order("seat_index", { ascending: false })
@@ -297,7 +297,7 @@ export async function joinGame(opts: {
     .maybeSingle();
   const seatIndex = ((existing?.seat_index as number | undefined) ?? -1) + 1;
 
-  const { error: pErr } = await supabase.from("players").insert({
+  const { error: pErr } = await supabase.from("ptb_players").insert({
     game_id: game.id,
     user_id: userId,
     display_name: opts.displayName,
@@ -312,7 +312,7 @@ export async function joinGame(opts: {
 export async function startGame(gameId: string) {
   const supabase = createClient();
   await supabase
-    .from("games")
+    .from("ptb_games")
     .update({
       status: "active",
       current_turn_index: 0,
