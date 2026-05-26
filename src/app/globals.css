@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --color-buck-green: #10B981;
+  --color-buck-dark: #1A1A2E;
+  --color-buck-darker: #12122A;
+  --color-buck-card: #242444;
+  --color-buck-gold: #FBBF24;
+  --color-buck-coral: #F97066;
+  --color-buck-blue: #60A5FA;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  background-color: #1A1A2E;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-16px); }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pop-in {
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-confetti {
+  animation: confettiFall 3s linear forwards;
+}
