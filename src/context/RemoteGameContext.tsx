@@ -83,7 +83,6 @@ export function RemoteGameProvider({
   const refresh = useCallback(async () => {
     try {
       const fetched = await findGame(normalizedCode);
-      setGame(fetched);
       const sb = getSupabase();
       const { data: playerRows, error: pErr } = await sb
         .from("ptb_players")
@@ -91,7 +90,12 @@ export function RemoteGameProvider({
         .eq("game_id", fetched.id)
         .order("seat");
       if (pErr) throw new Error(pErr.message);
+      // Write players FIRST, then game. The animation effect watches
+      // `game?.last_turn?.id` — by setting players first we guarantee the
+      // roster is already populated when the game update flushes through
+      // React 18's automatic batching.
       setPlayers((playerRows as PlayerRow[]) ?? []);
+      setGame(fetched);
       setError(null);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Couldn't load game";

@@ -81,25 +81,18 @@ export default function ActiveGameView() {
     animatingRef.current = true;
 
     async function play() {
-      // Start from the pre-roll counts (use server data minus what's been transferred).
-      // Simplest: server state at time of last_turn is current.bucks + everything transferred from them,
-      // and pot is game.pot minus center transfers. But since we update displayedBucks/Pot at start,
-      // we use the current bucks of the rolling player as the starting state.
+      // Pre-roll snapshot the server captured at the moment the roll
+      // happened. Using these instead of reconstructing from the
+      // currently-rendered state avoids visual overshoot when the per-player
+      // realtime UPDATE arrives after the game UPDATE that carried last_turn.
       const rollerSeat =
         players.find((p) => p.id === turn.playerId)?.seat ?? null;
-      const rollerCount = turn.transfers.filter(
-        (t) => t.outcome !== "keep"
-      ).length;
-      // Reconstruct starting bucks by adding back the transferred ones to the
-      // roller's current count. (Their server bucks have already been decremented.)
-      const rollerNow =
-        players.find((p) => p.id === turn.playerId)?.bucks ?? 0;
-      const startBucks = rollerNow + rollerCount;
-
-      const potCount = turn.transfers.filter(
-        (t) => t.outcome === "center"
-      ).length;
-      const startPot = (game?.pot ?? 0) - potCount;
+      const startBucks =
+        turn.bucksBefore?.[turn.playerId] ??
+        // Fallback for older turns saved before bucksBefore existed
+        (players.find((p) => p.id === turn.playerId)?.bucks ?? 0) +
+          turn.transfers.filter((t) => t.outcome !== "keep").length;
+      const startPot = turn.potBefore;
 
       // If the viewer is looking at the rolling player's stage, show their pile shrinking.
       if (rollerSeat === currentSeat) {

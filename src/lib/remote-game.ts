@@ -47,7 +47,14 @@ export type ServerTurn = {
   playerId: string;
   outcomes: RollOutcome[];
   transfers: ServerTransfer[];
+  /** Pre-roll pot value, so observers can roll back their displayed pot
+   *  to the starting state regardless of realtime event ordering. */
   potBefore: number;
+  /** Pre-roll bucks for every player in the game, keyed by player id. Lets
+   *  observers compute the starting state without relying on whether the
+   *  per-player UPDATE events arrived before or after this turn's GAME
+   *  UPDATE. */
+  bucksBefore: Record<string, number>;
 };
 
 // =================================================================
@@ -215,14 +222,45 @@ export async function joinGame(opts: {
 
 /**
  * Remove a player from the lobby. Host can remove any; non-host only themselves.
+ *
+ * If the player being removed was in a lobby and there are no players left
+ * after the delete, also delete the game row so we don't leave stale lobbies
+ * sitting around in the DB indefinitely.
  */
 export async function leaveOrKick(opts: { playerId: string }) {
   const sb = getSupabase();
+  // Look up the game first so we can clean it up if this was the last player
+  const { data: removed } = await sb
+    .from("ptb_players")
+    .select("game_id")
+    .eq("id", opts.playerId)
+    .maybeSingle<{ game_id: string }>();
+
   const { error } = await sb
     .from("ptb_players")
     .delete()
     .eq("id", opts.playerId);
   if (error) throw new Error(error.message);
+
+  if (!removed?.game_id) return;
+
+  const [{ data: gameRow }, { count: remaining }] = await Promise.all([
+    sb
+      .from("ptb_games")
+      .select("status")
+      .eq("id", removed.game_id)
+      .maybeSingle<{ status: string }>(),
+    sb
+      .from("ptb_players")
+      .select("id", { count: "exact", head: true })
+      .eq("game_id", removed.game_id),
+  ]);
+
+  // Only auto-clean lobbies. If a game is already active or finished we
+  // leave the row so other players can still see the final state.
+  if (gameRow?.status === "lobby" && (remaining ?? 0) === 0) {
+    await sb.from("ptb_games").delete().eq("id", removed.game_id);
+  }
 }
 
 /**
@@ -330,12 +368,16 @@ export async function rollForActivePlayer(opts: {
     .single<{ id: string }>();
   if (tErr || !turnRow) throw new Error(tErr?.message ?? "Couldn't log turn");
 
+  const bucksBefore: Record<string, number> = {};
+  for (const p of sorted) bucksBefore[p.id] = p.bucks;
+
   const serverTurn: ServerTurn = {
     id: turnRow.id,
     playerId: current.id,
     outcomes,
     transfers,
     potBefore: game.pot,
+    bucksBefore,
   };
 
   // Persist bucks per player (one update per row — they're indexed by PK)
@@ -361,16 +403,36 @@ export async function rollForActivePlayer(opts: {
 /**
  * Called by the active player AFTER their local animation finishes.
  * Advances current_seat to the next active player (or sets winner/finished).
+ *
+ * Re-fetches the authoritative game + players from the DB before deciding,
+ * so an out-of-date snapshot on the caller can't cause a missed or false
+ * winner detection.
  */
 export async function endTurnRemote(opts: {
   gameId: string;
-  players: PlayerRow[];
-  currentSeat: number;
-  currentRound: number;
+  /** Caller-provided fallback if the re-fetch fails — used purely for seat math */
+  players?: PlayerRow[];
+  /** Caller-provided fallback. Re-fetched authoritative values take precedence. */
+  currentSeat?: number;
+  currentRound?: number;
 }) {
   const sb = getSupabase();
-  const sorted = [...opts.players].sort((a, b) => a.seat - b.seat);
+
+  // Re-fetch the authoritative state. We use this for the winner check
+  // because local realtime state could be stale.
+  const [gameRes, playersRes] = await Promise.all([
+    sb.from("ptb_games").select("*").eq("id", opts.gameId).maybeSingle<GameRow>(),
+    sb.from("ptb_players").select("*").eq("game_id", opts.gameId).order("seat"),
+  ]);
+
+  const freshGame = gameRes.data;
+  const freshPlayers = ((playersRes.data as PlayerRow[]) ?? []).slice();
+  // If the fetch failed for any reason, fall back to whatever the caller knew.
+  const sorted = freshPlayers.length
+    ? freshPlayers.sort((a, b) => a.seat - b.seat)
+    : (opts.players ?? []).slice().sort((a, b) => a.seat - b.seat);
   const n = sorted.length;
+  if (n === 0) return;
 
   const localShape = sorted.map((p) => ({
     id: p.id,
@@ -395,10 +457,10 @@ export async function endTurnRemote(opts: {
     return;
   }
 
-  // Advance to next seat (regardless of buck count — UI handles skip flash)
-  const nextSeat = (opts.currentSeat + 1) % n;
-  const nextRound =
-    nextSeat <= opts.currentSeat ? opts.currentRound + 1 : opts.currentRound;
+  const currentSeat = freshGame?.current_seat ?? opts.currentSeat ?? 0;
+  const currentRound = freshGame?.round ?? opts.currentRound ?? 1;
+  const nextSeat = (currentSeat + 1) % n;
+  const nextRound = nextSeat <= currentSeat ? currentRound + 1 : currentRound;
 
   await sb
     .from("ptb_games")
