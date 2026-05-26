@@ -494,6 +494,60 @@ export function NoEntry({ size = 64, color = "#F97066", className }: IconProps) 
 }
 
 // =========================================================
+// Bell (used for the "nudge" button)
+// =========================================================
+export function Bell({ size = 24, color = "#FFE3A0", className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <defs>
+        <linearGradient id="bell-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#ffe3a0" />
+          <stop offset="60%" stopColor={color} />
+          <stop offset="100%" stopColor="#8a6720" />
+        </linearGradient>
+      </defs>
+      {/* yoke ring at top */}
+      <rect x="14" y="2" width="4" height="3" rx="1" fill="#2a1a0a" />
+      {/* bell body */}
+      <path
+        d="M 8 22
+           Q 8 10 16 8
+           Q 24 10 24 22
+           L 26 25
+           L 6 25 Z"
+        fill="url(#bell-grad)"
+        stroke="#2a1a0a"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      {/* slot lines */}
+      <line x1="11" y1="16" x2="11" y2="22" stroke="#2a1a0a" strokeOpacity={0.4} strokeWidth="0.8" />
+      <line x1="21" y1="16" x2="21" y2="22" stroke="#2a1a0a" strokeOpacity={0.4} strokeWidth="0.8" />
+      {/* highlight */}
+      <path
+        d="M 11 12 Q 14 9 16 9"
+        stroke="#ffffff"
+        strokeOpacity={0.6}
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* clapper */}
+      <circle cx="16" cy="27" r="2.4" fill="url(#bell-grad)" stroke="#2a1a0a" strokeWidth="1" />
+      {/* tiny motion lines */}
+      <path d="M 5 14 L 3 13 M 5 18 L 2 18" stroke="#FFE3A0" strokeWidth="1.1" strokeLinecap="round" opacity={0.7} />
+      <path d="M 27 14 L 29 13 M 27 18 L 30 18" stroke="#FFE3A0" strokeWidth="1.1" strokeLinecap="round" opacity={0.7} />
+    </svg>
+  );
+}
+
+// =========================================================
 // MoneyBag (for pot label / 💰)
 // =========================================================
 export function MoneyBag({ size = 28, className }: IconProps) {

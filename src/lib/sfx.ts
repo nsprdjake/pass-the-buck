@@ -20,7 +20,8 @@ export type SfxName =
   | "keep"
   | "winner"
   | "pass"
-  | "joinClick";
+  | "joinClick"
+  | "nudge";
 
 const MASTER_VOLUME = 0.7;
 
@@ -378,6 +379,33 @@ function sfxJoinClick(c: AudioContext) {
   });
 }
 
+function sfxNudge(c: AudioContext) {
+  // Sharp attention "ding-ding" — bell-like triangle wave doubled up
+  [0, 0.13].forEach((delay, i) => {
+    playTone(c, {
+      freq: i === 0 ? 1320 : 1760,
+      type: "triangle",
+      dur: 0.32,
+      startVolume: 0.55,
+      delay,
+    });
+    playTone(c, {
+      freq: i === 0 ? 2640 : 3520,
+      type: "sine",
+      dur: 0.22,
+      startVolume: 0.18,
+      delay,
+    });
+  });
+  // small noise burst for the bell hammer
+  playNoise(c, {
+    dur: 0.04,
+    freq: 4000,
+    q: 4,
+    volume: 0.35,
+  });
+}
+
 // =================================================================
 // Public API
 // =================================================================
@@ -410,6 +438,8 @@ export function playSfx(name: SfxName) {
         return sfxPass(c);
       case "joinClick":
         return sfxJoinClick(c);
+      case "nudge":
+        return sfxNudge(c);
     }
   } catch {
     // synth errors silently fail

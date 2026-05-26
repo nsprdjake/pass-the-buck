@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { getDeviceId, getMembership } from "@/lib/identity";
 import {
   endTurnRemote,
@@ -19,6 +20,17 @@ import {
   type PlayerRow,
 } from "@/lib/remote-game";
 import { getSupabase } from "@/lib/supabase";
+
+export type Nudge = {
+  /** sender's display name */
+  fromName: string;
+  /** sender's player color */
+  fromColor: string;
+  /** seat number of the player being nudged (the active seat at send time) */
+  toSeat: number;
+  /** local timestamp when the nudge arrived */
+  at: number;
+};
 
 type RemoteGameValue = {
   loading: boolean;
@@ -39,6 +51,12 @@ type RemoteGameValue = {
   endTurn: () => Promise<void>;
   /** Force a fresh fetch of game + players */
   refresh: () => Promise<void>;
+  /** Broadcast a nudge to every connected device in this game. Consumers
+   *  whose `me.seat === game.current_seat` should react with feedback. */
+  sendNudge: () => void;
+  /** The most recently received nudge (or null). Consumers can watch
+   *  `lastNudge?.at` for changes. */
+  lastNudge: Nudge | null;
 };
 
 const Ctx = createContext<RemoteGameValue | null>(null);
@@ -55,6 +73,8 @@ export function RemoteGameProvider({
   const [players, setPlayers] = useState<PlayerRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastNudge, setLastNudge] = useState<Nudge | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
   const deviceId = useRef<string | null>(null);
 
   if (deviceId.current === null && typeof window !== "undefined") {
@@ -166,9 +186,27 @@ export function RemoteGameProvider({
             }
           }
         )
+        .on("broadcast", { event: "nudge" }, ({ payload }) => {
+          if (cancelled) return;
+          if (
+            !payload ||
+            typeof payload.fromName !== "string" ||
+            typeof payload.toSeat !== "number"
+          ) {
+            return;
+          }
+          setLastNudge({
+            fromName: payload.fromName,
+            fromColor: payload.fromColor ?? "#FBBF24",
+            toSeat: payload.toSeat,
+            at: Date.now(),
+          });
+        })
         .subscribe();
 
+      channelRef.current = channel;
       cleanup = () => {
+        channelRef.current = null;
         sb.removeChannel(channel);
       };
     };
@@ -204,6 +242,22 @@ export function RemoteGameProvider({
     });
   }, [game, sortedPlayers]);
 
+  const sendNudge = useCallback(() => {
+    const channel = channelRef.current;
+    if (!channel || !game || !me) return;
+    // Snapshot the active seat at send time so a stale receiver still
+    // matches against the right seat.
+    channel.send({
+      type: "broadcast",
+      event: "nudge",
+      payload: {
+        fromName: me.display_name,
+        fromColor: me.color,
+        toSeat: game.current_seat,
+      },
+    });
+  }, [game, me]);
+
   const value: RemoteGameValue = {
     loading,
     error,
@@ -218,6 +272,8 @@ export function RemoteGameProvider({
     roll,
     endTurn,
     refresh,
+    sendNudge,
+    lastNudge,
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

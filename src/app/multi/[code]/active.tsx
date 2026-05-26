@@ -18,8 +18,8 @@ import {
   SLAM_MS,
   TURN_OUTRO_MS,
 } from "@/components/game/shared";
-import { Skip } from "@/components/icons";
-import { useRemoteGame } from "@/context/RemoteGameContext";
+import { Bell, Skip } from "@/components/icons";
+import { useRemoteGame, type Nudge } from "@/context/RemoteGameContext";
 import { rollCountForBucks } from "@/lib/game-logic";
 import { playSfx, unlockAudio } from "@/lib/sfx";
 import type { RollOutcome } from "@/lib/types";
@@ -37,9 +37,11 @@ function sleep(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
 }
 
+const NUDGE_COOLDOWN_MS = 10_000;
+
 export default function ActiveGameView() {
   const router = useRouter();
-  const { game, players, me, current, isMyTurn, roll, endTurn } =
+  const { game, players, me, current, isMyTurn, roll, endTurn, sendNudge, lastNudge } =
     useRemoteGame();
 
   const [displayedBucks, setDisplayedBucks] = useState(0);
@@ -48,8 +50,11 @@ export default function ActiveGameView() {
   const [outcomeIdx, setOutcomeIdx] = useState(0);
   const [err, setErr] = useState<string | null>(null);
   const [playedTurnId, setPlayedTurnId] = useState<string | null>(null);
+  const [nudgeSentAt, setNudgeSentAt] = useState<number>(0);
+  const [nudgeFlash, setNudgeFlash] = useState<Nudge | null>(null);
   const animatingRef = useRef(false);
   const endingRef = useRef(false);
+  const lastShownNudgeAtRef = useRef<number>(0);
 
   const n = players.length;
   const currentSeat = game?.current_seat ?? 0;
@@ -205,6 +210,55 @@ export default function ActiveGameView() {
   }, [isSkipping, endTurn]);
 
   // === Roll handler ===
+  // === Nudge: when I'm the active player and a fresh nudge arrives, react ===
+  useEffect(() => {
+    if (!lastNudge) return;
+    if (lastNudge.at === lastShownNudgeAtRef.current) return;
+    // Only react if the nudge targets the seat I'm currently sitting in.
+    if (!me || me.seat !== lastNudge.toSeat) return;
+    lastShownNudgeAtRef.current = lastNudge.at;
+    setNudgeFlash(lastNudge);
+    playSfx("nudge");
+    // Haptic on supporting devices (Android Chrome). iOS Safari ignores this.
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        (navigator as Navigator).vibrate?.([120, 80, 120, 80, 200]);
+      } catch {
+        // ignore
+      }
+    }
+    const t = setTimeout(() => setNudgeFlash(null), 1800);
+    return () => clearTimeout(t);
+  }, [lastNudge, me]);
+
+  const nudgeCooldownRemaining = Math.max(
+    0,
+    nudgeSentAt + NUDGE_COOLDOWN_MS - Date.now()
+  );
+  const canNudge =
+    !isMyTurn &&
+    !!current &&
+    !!me &&
+    nudgeCooldownRemaining === 0 &&
+    game?.status === "active";
+
+  const onNudge = useCallback(() => {
+    if (!canNudge) return;
+    unlockAudio();
+    playSfx("joinClick");
+    sendNudge();
+    setNudgeSentAt(Date.now());
+  }, [canNudge, sendNudge]);
+
+  // Tick once a second while a cooldown is active so the button label
+  // updates without needing a re-render trigger.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (nudgeCooldownRemaining === 0) return;
+    const id = setInterval(() => setTick((t) => t + 1), 500);
+    return () => clearInterval(id);
+  }, [nudgeCooldownRemaining]);
+
   const onRoll = useCallback(async () => {
     if (!isMyTurn || phase !== "idle") return;
     if (!current || current.bucks <= 0) return;
@@ -469,49 +523,85 @@ export default function ActiveGameView() {
               bucks={current.bucks}
             />
           ) : (
-            <div
-              className="wood-grain w-full px-6 py-5 text-center relative"
-              style={{
-                borderRadius: 10,
-                border: "3px solid #2a1a0a",
-                boxShadow:
-                  "inset 0 2px 0 rgba(255,255,255,0.12), inset 0 -3px 0 rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.5)",
-              }}
-            >
+            <>
               <div
-                className="text-[10px] uppercase tracking-[0.4em] text-parchment"
+                className="wood-grain w-full px-6 py-5 text-center relative"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
-                  color: "#f4e4b7",
-                  opacity: 0.8,
+                  borderRadius: 10,
+                  border: "3px solid #2a1a0a",
+                  boxShadow:
+                    "inset 0 2px 0 rgba(255,255,255,0.12), inset 0 -3px 0 rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.5)",
                 }}
               >
-                Waitin' on
+                <div
+                  className="text-[10px] uppercase tracking-[0.4em] text-parchment"
+                  style={{
+                    fontFamily: "var(--font-fell), Georgia, serif",
+                    color: "#f4e4b7",
+                    opacity: 0.8,
+                  }}
+                >
+                  Waitin' on
+                </div>
+                <div
+                  className="mt-1"
+                  style={{
+                    fontFamily: "var(--font-rye), Georgia, serif",
+                    color: stageColor,
+                    fontSize: 28,
+                    textShadow: "0 2px 0 rgba(0,0,0,0.7)",
+                  }}
+                >
+                  {current.display_name}
+                </div>
+                <div
+                  className="text-[11px] uppercase tracking-widest mt-1"
+                  style={{
+                    color: "#f4e4b7",
+                    opacity: 0.7,
+                    fontFamily: "var(--font-fell), Georgia, serif",
+                  }}
+                >
+                  {phase === "rolling" || phase === "reveal" || phase === "buckfly"
+                    ? "to make their roll…"
+                    : "to step up to the table"}
+                </div>
               </div>
-              <div
-                className="mt-1"
+
+              {/* Nudge button — visible to non-active members */}
+              <motion.button
+                whileTap={canNudge ? { scale: 0.94 } : {}}
+                onClick={onNudge}
+                disabled={!canNudge}
+                className="mt-3 w-full flex items-center justify-center gap-2 py-3 disabled:cursor-not-allowed"
                 style={{
-                  fontFamily: "var(--font-rye), Georgia, serif",
-                  color: stageColor,
-                  fontSize: 28,
-                  textShadow: "0 2px 0 rgba(0,0,0,0.7)",
+                  borderRadius: 8,
+                  border: "2px solid #2a1a0a",
+                  background: canNudge
+                    ? "linear-gradient(180deg, #a16207 0%, #6b4209 100%)"
+                    : "linear-gradient(180deg, #3a2410 0%, #2a1a0a 100%)",
+                  boxShadow: canNudge
+                    ? "0 4px 0 #2a1a0a, 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,225,170,0.25)"
+                    : "0 2px 0 #1a0c04, 0 2px 6px rgba(0,0,0,0.45)",
+                  opacity: canNudge ? 1 : 0.55,
                 }}
               >
-                {current.display_name}
-              </div>
-              <div
-                className="text-[11px] uppercase tracking-widest mt-1"
-                style={{
-                  color: "#f4e4b7",
-                  opacity: 0.7,
-                  fontFamily: "var(--font-fell), Georgia, serif",
-                }}
-              >
-                {phase === "rolling" || phase === "reveal" || phase === "buckfly"
-                  ? "to make their roll…"
-                  : "to step up to the table"}
-              </div>
-            </div>
+                <Bell size={22} color={canNudge ? "#FFE3A0" : "#7a5c2e"} />
+                <span
+                  style={{
+                    fontFamily: "var(--font-rye), Georgia, serif",
+                    color: "#FFE3A0",
+                    fontSize: 16,
+                    letterSpacing: "0.04em",
+                    textShadow: "0 1px 0 #2a1a0a",
+                  }}
+                >
+                  {nudgeCooldownRemaining > 0
+                    ? `Nudged! (${Math.ceil(nudgeCooldownRemaining / 1000)}s)`
+                    : `Nudge ${current.display_name}`}
+                </span>
+              </motion.button>
+            </>
           )}
         </div>
       </div>
@@ -554,6 +644,86 @@ export default function ActiveGameView() {
                 style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
               >
                 Plumb broke — skip 'em!
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* NUDGE flash overlay — only fires on the active player's device */}
+      <AnimatePresence>
+        {nudgeFlash && (
+          <motion.div
+            key={`nudge-${nudgeFlash.at}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] pointer-events-none flex items-start justify-center pt-24"
+          >
+            {/* Edge flash — pulsing gold border */}
+            <motion.div
+              aria-hidden
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.85, 0.4, 0.85, 0] }}
+              transition={{ duration: 1.6, times: [0, 0.1, 0.5, 0.7, 1] }}
+              className="absolute inset-0"
+              style={{
+                boxShadow:
+                  "inset 0 0 0 8px #FFE3A0, inset 0 0 64px rgba(255,227,160,0.65)",
+              }}
+            />
+            {/* Centered ping */}
+            <motion.div
+              initial={{ scale: 0.5, y: -20, rotate: -6 }}
+              animate={{ scale: [0.5, 1.1, 1, 1.05, 1], y: 0, rotate: [-6, 4, -2, 1, 0] }}
+              exit={{ scale: 0.85, opacity: 0, y: -10 }}
+              transition={{ duration: 0.5, times: [0, 0.4, 0.6, 0.8, 1] }}
+              className="parchment relative px-6 pt-3 pb-4 text-center"
+              style={{
+                border: "3px solid #2a1a0a",
+                borderRadius: 4,
+                boxShadow:
+                  "0 14px 32px rgba(0,0,0,0.6), 0 0 60px rgba(255,227,160,0.55)",
+                minWidth: 240,
+              }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Bell size={28} color="#a16207" />
+                <span
+                  style={{
+                    fontFamily: "var(--font-rye), Georgia, serif",
+                    color: "#2a1a0a",
+                    fontSize: 26,
+                  }}
+                >
+                  NUDGE!
+                </span>
+                <Bell size={28} color="#a16207" />
+              </div>
+              <div
+                className="mt-1 text-sm"
+                style={{
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                  color: "#2a1a0a",
+                }}
+              >
+                <span className="italic opacity-70">from </span>
+                <span
+                  className="font-black"
+                  style={{ color: nudgeFlash.fromColor }}
+                >
+                  {nudgeFlash.fromName}
+                </span>
+              </div>
+              <div
+                className="mt-1 text-[10px] uppercase tracking-[0.3em]"
+                style={{
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                  color: "#2a1a0a",
+                  opacity: 0.6,
+                }}
+              >
+                yer turn, partner!
               </div>
             </motion.div>
           </motion.div>
