@@ -5,8 +5,12 @@ export function rollOutcome(): RollOutcome {
   return OUTCOMES[Math.floor(Math.random() * OUTCOMES.length)];
 }
 
+export function rollCountForBucks(numBucks: number): number {
+  return Math.min(Math.max(numBucks, 0), 3);
+}
+
 export function rollTurn(numBucks: number): RollOutcome[] {
-  const rolls = Math.min(Math.max(numBucks, 0), 3);
+  const rolls = rollCountForBucks(numBucks);
   const results: RollOutcome[] = [];
   for (let i = 0; i < rolls; i++) {
     results.push(rollOutcome());
@@ -63,30 +67,25 @@ export function applyTurn(
     }
   }
 
-  // Eliminated is dynamic: a player with bucks > 0 is back in the game.
-  for (const p of updated) {
-    p.eliminated = p.bucks <= 0;
-  }
-
   return { players: updated, pot: newPot };
 }
 
+// Game ends when exactly one player holds all remaining (non-pot) bucks —
+// i.e. one player has > 0 and everyone else has 0.
 export function checkWinner(players: Player[]): Player | null {
-  const alive = players.filter((p) => p.bucks > 0);
-  if (alive.length === 1) return alive[0];
+  const withBucks = players.filter((p) => p.bucks > 0);
+  if (withBucks.length === 1) return withBucks[0];
   return null;
 }
 
+// Advance to the next seat in order. Players with 0 bucks are NOT removed;
+// they remain seated and can receive bucks from neighbors. The UI is
+// responsible for auto-skipping a 0-buck seat with a brief message.
 export function getNextActivePlayer(
   players: Player[],
   currentIdx: number
 ): number {
   const n = players.length;
-  let idx = (currentIdx + 1) % n;
-  let safety = 0;
-  while (players[idx].bucks <= 0 && safety < n) {
-    idx = (idx + 1) % n;
-    safety++;
-  }
-  return idx;
+  if (n === 0) return 0;
+  return (currentIdx + 1) % n;
 }

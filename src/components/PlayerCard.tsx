@@ -41,7 +41,7 @@ export default function PlayerCard({ player, active = false }: PlayerCardProps) 
           </div>
           <div className="text-xs text-white/60">
             {isOut
-              ? "Out — needs a pass"
+              ? "0 bucks — skipping turn"
               : `${player.bucks} buck${player.bucks === 1 ? "" : "s"}`}
           </div>
         </div>

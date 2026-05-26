@@ -7,7 +7,10 @@ import BuckRow from "@/components/BuckRow";
 import PlayerCard from "@/components/PlayerCard";
 import GameHeader from "@/components/GameHeader";
 import { useLocalGame } from "@/context/LocalGameContext";
+import { rollCountForBucks } from "@/lib/game-logic";
 import type { RollOutcome } from "@/lib/types";
+
+const SKIP_DISPLAY_MS = 1200;
 
 const OUTCOME_META: Record<
   RollOutcome,
@@ -140,6 +143,23 @@ export default function LocalGamePage() {
   }, [lastTurn, endTurn, winnerId]);
 
   const current = players[currentIdx];
+  const isSkipping =
+    status === "active" &&
+    !!current &&
+    current.bucks <= 0 &&
+    !lastTurn &&
+    !rolling &&
+    !winnerId;
+
+  // If the seated player has 0 bucks, show a brief skip message and advance.
+  // They stay in the game — a neighbor can pass them a buck before their next turn.
+  useEffect(() => {
+    if (!isSkipping) return;
+    const t = setTimeout(() => {
+      endTurn();
+    }, SKIP_DISPLAY_MS);
+    return () => clearTimeout(t);
+  }, [isSkipping, endTurn]);
 
   if (status === "finished") {
     const winner = players.find((p) => p.bucks > 0) ?? players[0];
@@ -207,7 +227,7 @@ export default function LocalGamePage() {
   }
 
   const canRoll = !rolling && !lastTurn && current.bucks > 0;
-  const rollCount = Math.min(current.bucks, 3);
+  const rollCount = rollCountForBucks(current.bucks);
 
   return (
     <main className="min-h-screen px-4 pt-5 pb-32 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark">
@@ -243,8 +263,15 @@ export default function LocalGamePage() {
                 <div className="text-left">
                   <div className="text-2xl font-black">{current.name}</div>
                   <div className="text-white/60 text-sm">
-                    {current.bucks} buck{current.bucks === 1 ? "" : "s"} ·{" "}
-                    {rollCount} roll{rollCount === 1 ? "" : "s"}
+                    {current.bucks} buck{current.bucks === 1 ? "" : "s"}
+                    {current.bucks > 0 && (
+                      <>
+                        {" — "}
+                        <span className="text-buck-gold font-bold">
+                          {rollCount} roll{rollCount === 1 ? "" : "s"}!
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -260,12 +287,28 @@ export default function LocalGamePage() {
             </div>
 
             <div className="mt-5 min-h-[76px] flex items-center justify-center gap-3 flex-wrap">
-              {!showRolls && canRoll && (
+              {isSkipping && (
+                <motion.div
+                  key="skip"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center"
+                >
+                  <div className="text-3xl mb-1">⏭️</div>
+                  <div className="text-buck-coral font-black text-sm uppercase tracking-widest">
+                    Skipped — no bucks
+                  </div>
+                  <div className="text-white/40 text-xs mt-1">
+                    Hang tight — a neighbor can pass you one
+                  </div>
+                </motion.div>
+              )}
+              {!isSkipping && !showRolls && canRoll && (
                 <div className="text-white/40 text-sm">
-                  Tap below to roll the dice
+                  Tap below to roll {rollCount} {rollCount === 1 ? "die" : "dice"}
                 </div>
               )}
-              {showRolls && lastTurn && (
+              {!isSkipping && showRolls && lastTurn && (
                 <>
                   {lastTurn.outcomes.map((o, i) => (
                     <RollDie
@@ -331,8 +374,8 @@ export default function LocalGamePage() {
                 {rolling
                   ? "ROLLING…"
                   : current.bucks <= 0
-                  ? "OUT — WAITING"
-                  : "PASS THE BUCK"}
+                  ? "SKIPPING…"
+                  : `PASS THE BUCK · ${rollCount} ROLL${rollCount === 1 ? "" : "S"}`}
               </span>
               <motion.span
                 animate={rolling ? { rotate: [0, -360] } : { rotate: 0 }}
