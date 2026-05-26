@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
-import BuckRow from "@/components/BuckRow";
-import PlayerCard from "@/components/PlayerCard";
-import GameHeader from "@/components/GameHeader";
-import { useLocalGame } from "@/context/LocalGameContext";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import PlayerSpot from "@/components/PlayerSpot";
+import PotPile from "@/components/PotPile";
+import { useLocalGame, type LocalPlayer } from "@/context/LocalGameContext";
 import { rollCountForBucks } from "@/lib/game-logic";
 import type { RollOutcome } from "@/lib/types";
 
-const SKIP_DISPLAY_MS = 1200;
+const ROLL_SPIN_MS = 900;
+const REVEAL_PAUSE_MS = 700;
+const TRANSFER_STEP_MS = 520;
+const SKIP_DISPLAY_MS = 1100;
 
 const OUTCOME_META: Record<
   RollOutcome,
@@ -22,8 +24,40 @@ const OUTCOME_META: Record<
   keep: { emoji: "✊", label: "Keep", color: "#10B981" },
 };
 
-const ROLL_SPIN_MS = 700;
-const REVEAL_STAGGER_MS = 220;
+// Computes fixed positions around an ellipse for N seats. Seats don't move
+// during the game — only the spotlight moves. Seat 0 is placed at the bottom
+// (the "host" seat) and the rest are arranged CLOCKWISE so that seat i+1
+// (the "right" outcome destination) is visually to the right of seat i.
+function seatPositions(n: number) {
+  const positions: { x: number; y: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    // -i / n goes clockwise on screen; +π/2 anchors seat 0 at the bottom.
+    const rawAngle = -(i / n) * Math.PI * 2 + Math.PI / 2;
+    const rx = 36;
+    const ry = 36;
+    const x = 50 + rx * Math.cos(rawAngle);
+    const y = 50 + ry * Math.sin(rawAngle);
+    positions.push({ x, y });
+  }
+  return positions;
+}
+
+let chipIdCounter = 0;
+const newChipId = () => `c${(++chipIdCounter).toString(36)}`;
+
+type DisplayedBucks = {
+  players: Record<string, string[]>;
+  pot: string[];
+};
+
+function freshDisplayedBucks(players: LocalPlayer[], pot: number): DisplayedBucks {
+  const out: DisplayedBucks = { players: {}, pot: [] };
+  for (const p of players) {
+    out.players[p.id] = Array.from({ length: p.bucks }, () => newChipId());
+  }
+  out.pot = Array.from({ length: pot }, () => newChipId());
+  return out;
+}
 
 function Confetti() {
   const pieces = useMemo(
@@ -70,35 +104,58 @@ function Confetti() {
   );
 }
 
-function RollDie({ delay, outcome }: { delay: number; outcome: RollOutcome }) {
+function RollDie({
+  delay,
+  outcome,
+  highlighted,
+}: {
+  delay: number;
+  outcome: RollOutcome;
+  highlighted: boolean;
+}) {
   const meta = OUTCOME_META[outcome];
+  // Spin only runs once on mount. Highlight is a CSS transition on the
+  // outer wrapper so toggling it never re-triggers the die spin.
   return (
-    <motion.div
-      initial={{ rotate: 0, scale: 0.6, opacity: 0 }}
-      animate={{
-        rotate: [0, 360, 720, 720],
-        scale: [0.6, 1.15, 1, 1],
-        opacity: [0, 1, 1, 1],
+    <div
+      className="rounded-xl px-2.5 py-1.5 flex flex-col items-center min-w-[52px] border transition-all duration-200"
+      style={{
+        background: "linear-gradient(180deg, #1f1f3a, #12122a)",
+        borderColor: highlighted ? meta.color : "rgba(255,255,255,0.12)",
+        boxShadow: highlighted
+          ? `0 0 18px ${meta.color}aa, 0 4px 12px rgba(0,0,0,0.5)`
+          : `0 4px 12px rgba(0,0,0,0.5)`,
+        transform: highlighted ? "scale(1.15)" : "scale(1)",
       }}
-      transition={{
-        duration: ROLL_SPIN_MS / 1000,
-        delay: delay / 1000,
-        ease: "easeOut",
-        times: [0, 0.5, 0.8, 1],
-      }}
-      className="bg-buck-darker border border-white/10 rounded-2xl px-3 py-2 flex flex-col items-center min-w-[64px]"
-      style={{ boxShadow: `0 6px 24px ${meta.color}33` }}
     >
-      <span className="text-3xl leading-none">{meta.emoji}</span>
-      <span
-        className="text-[10px] uppercase tracking-widest font-black mt-1"
-        style={{ color: meta.color }}
+      <motion.div
+        initial={{ rotate: 0, scale: 0.4, opacity: 0 }}
+        animate={{
+          rotate: [0, 360, 720, 720],
+          scale: [0.4, 1.15, 1, 1],
+          opacity: [0, 1, 1, 1],
+        }}
+        transition={{
+          duration: ROLL_SPIN_MS / 1000,
+          delay: delay / 1000,
+          ease: "easeOut",
+          times: [0, 0.5, 0.8, 1],
+        }}
+        className="flex flex-col items-center"
       >
-        {meta.label}
-      </span>
-    </motion.div>
+        <span className="text-2xl leading-none">{meta.emoji}</span>
+        <span
+          className="text-[9px] uppercase tracking-widest font-black mt-0.5"
+          style={{ color: meta.color }}
+        >
+          {meta.label}
+        </span>
+      </motion.div>
+    </div>
   );
 }
+
+type Phase = "idle" | "rolling" | "reveal" | "animate" | "skip";
 
 export default function LocalGamePage() {
   const router = useRouter();
@@ -117,7 +174,16 @@ export default function LocalGamePage() {
     newGame,
   } = useLocalGame();
 
-  const [showRolls, setShowRolls] = useState(false);
+  // Local UI state: per-spot chip IDs. These get mutated during the animation
+  // phase as we play back transfers one at a time. When no animation is
+  // running, we keep them in sync with the authoritative game state.
+  const [displayed, setDisplayed] = useState<DisplayedBucks>(() =>
+    freshDisplayedBucks(players, pot)
+  );
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [revealedDice, setRevealedDice] = useState(0); // how many dice have been "consumed" so far
+  const [pulseSpot, setPulseSpot] = useState<string | null>(null);
+  const animatingRef = useRef(false);
 
   // Redirect to lobby if there's no game in progress.
   useEffect(() => {
@@ -126,20 +192,96 @@ export default function LocalGamePage() {
     }
   }, [status, players.length, router]);
 
-  // After a roll lands, auto-advance the turn after a short pause.
+  // Sync displayed bucks with authoritative game state ONLY when we're not
+  // mid-animation. This handles new games, rematches, and the initial mount.
+  useEffect(() => {
+    if (animatingRef.current) return;
+    if (lastTurn) return; // wait for animation to start/finish
+    setDisplayed((prev) => {
+      const totalDisplayed =
+        Object.values(prev.players).reduce((s, a) => s + a.length, 0) +
+        prev.pot.length;
+      const totalGame =
+        players.reduce((s, p) => s + p.bucks, 0) + pot;
+      const sameIds =
+        players.every((p) => (prev.players[p.id]?.length ?? -1) === p.bucks) &&
+        prev.pot.length === pot &&
+        totalDisplayed === totalGame;
+      if (sameIds) return prev;
+      return freshDisplayedBucks(players, pot);
+    });
+  }, [players, pot, lastTurn]);
+
+  // When a roll happens, run the reveal → animate sequence.
   useEffect(() => {
     if (!lastTurn) {
-      setShowRolls(false);
+      setPhase("idle");
+      setRevealedDice(0);
       return;
     }
-    setShowRolls(true);
-    const totalRevealMs =
-      ROLL_SPIN_MS + REVEAL_STAGGER_MS * Math.max(lastTurn.outcomes.length - 1, 0);
-    const pauseAfterReveal = winnerId ? 1200 : 1400;
-    const t = setTimeout(() => {
+    let cancelled = false;
+    animatingRef.current = true;
+
+    async function play() {
+      setPhase("rolling");
+      setRevealedDice(0);
+      // Wait for dice to settle. Each die spins in ROLL_SPIN_MS; we run them
+      // simultaneously but staggered a tiny bit (handled by RollDie delays).
+      await sleep(ROLL_SPIN_MS + 100);
+      if (cancelled) return;
+      setPhase("reveal");
+      await sleep(REVEAL_PAUSE_MS);
+      if (cancelled) return;
+
+      setPhase("animate");
+      const turn = lastTurn!;
+      for (let i = 0; i < turn.transfers.length; i++) {
+        if (cancelled) return;
+        const t = turn.transfers[i];
+        setRevealedDice(i + 1);
+
+        if (t.outcome === "keep") {
+          // No movement — pulse the player's stack.
+          setPulseSpot(t.fromId);
+          await sleep(TRANSFER_STEP_MS);
+          if (cancelled) return;
+          setPulseSpot(null);
+        } else {
+          // Pop one chip from the source player and push to destination.
+          setDisplayed((prev) => {
+            const next: DisplayedBucks = {
+              players: { ...prev.players },
+              pot: [...prev.pot],
+            };
+            const fromList = [...(next.players[t.fromId] ?? [])];
+            const chipId = fromList.pop();
+            next.players[t.fromId] = fromList;
+            if (!chipId) return prev;
+            if (t.toId === "pot") {
+              next.pot = [...next.pot, chipId];
+            } else {
+              const toList = [...(next.players[t.toId] ?? []), chipId];
+              next.players[t.toId] = toList;
+            }
+            return next;
+          });
+          await sleep(TRANSFER_STEP_MS);
+        }
+      }
+
+      if (cancelled) return;
+      // Brief breath before advancing
+      await sleep(winnerId ? 900 : 500);
+      if (cancelled) return;
+      animatingRef.current = false;
       endTurn();
-    }, totalRevealMs + pauseAfterReveal);
-    return () => clearTimeout(t);
+    }
+
+    play();
+    return () => {
+      cancelled = true;
+      animatingRef.current = false;
+    };
   }, [lastTurn, endTurn, winnerId]);
 
   const current = players[currentIdx];
@@ -152,14 +294,21 @@ export default function LocalGamePage() {
     !winnerId;
 
   // If the seated player has 0 bucks, show a brief skip message and advance.
-  // They stay in the game — a neighbor can pass them a buck before their next turn.
   useEffect(() => {
     if (!isSkipping) return;
+    setPhase("skip");
     const t = setTimeout(() => {
+      setPhase("idle");
       endTurn();
     }, SKIP_DISPLAY_MS);
     return () => clearTimeout(t);
   }, [isSkipping, endTurn]);
+
+  const onRoll = useCallback(() => {
+    if (rolling) return;
+    if (!current || current.bucks <= 0) return;
+    rollDice();
+  }, [rolling, current, rollDice]);
 
   if (status === "finished") {
     const winner = players.find((p) => p.bucks > 0) ?? players[0];
@@ -226,144 +375,175 @@ export default function LocalGamePage() {
     );
   }
 
-  const canRoll = !rolling && !lastTurn && current.bucks > 0;
+  const canRoll = !rolling && !lastTurn && current.bucks > 0 && phase === "idle";
   const rollCount = rollCountForBucks(current.bucks);
+  const positions = seatPositions(players.length);
+  const showDice = phase === "rolling" || phase === "reveal" || phase === "animate";
 
   return (
-    <main className="min-h-screen px-4 pt-5 pb-32 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark">
-      <div className="max-w-md mx-auto">
-        <GameHeader round={round} pot={pot} />
+    <main className="min-h-screen flex flex-col bg-gradient-to-b from-[#1a0f08] via-[#0f0805] to-[#1a0f08] overflow-hidden">
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 z-20">
+        <div className="text-white/70 text-xs font-black uppercase tracking-widest">
+          Round <span className="text-buck-gold">{round}</span>
+        </div>
+        <button
+          onClick={() => {
+            if (confirm("Quit this game?")) {
+              newGame();
+              router.push("/");
+            }
+          }}
+          className="text-white/40 text-xs font-bold uppercase tracking-wider hover:text-white/80"
+        >
+          Quit
+        </button>
+      </div>
 
-        <section className="mt-5 bg-buck-card border border-white/10 rounded-3xl p-5 text-center relative overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-40 pointer-events-none"
-            style={{
-              background: `radial-gradient(circle at 50% 0%, ${current.color}44 0%, transparent 70%)`,
-            }}
-          />
-          <div className="relative">
-            <div className="text-xs uppercase tracking-widest text-white/60 font-bold">
+      {/* The table */}
+      <div className="flex-1 flex items-center justify-center px-3 py-2 min-h-0">
+        <div
+          className="table-rail relative rounded-[44%/30%] w-full h-full max-w-md p-3"
+          style={{
+            maxHeight: "min(720px, calc(100vh - 200px))",
+          }}
+        >
+          <div className="table-felt relative w-full h-full rounded-[42%/28%] overflow-visible">
+            <LayoutGroup>
+              {/* Player spots positioned around the felt */}
+              {players.map((p, i) => {
+                const pos = positions[i];
+                const active = i === currentIdx && status === "active";
+                const bucks = displayed.players[p.id] ?? [];
+                return (
+                  <div
+                    key={p.id}
+                    className={pulseSpot === p.id ? "chip-pulse" : ""}
+                  >
+                    <PlayerSpot
+                      player={p}
+                      bucks={bucks}
+                      active={active}
+                      x={pos.x}
+                      y={pos.y}
+                    />
+                  </div>
+                );
+              })}
+
+              {/* Center: pot + (during a turn) dice tray overlay */}
+              <div
+                className="absolute"
+                style={{
+                  left: "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <PotPile bucks={displayed.pot} />
+              </div>
+
+              {/* Dice tray sits above the pot label during a turn */}
+              <AnimatePresence>
+                {showDice && lastTurn && (
+                  <motion.div
+                    key="dice"
+                    initial={{ opacity: 0, y: -12, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.9 }}
+                    transition={{ duration: 0.25 }}
+                    className="absolute z-30 flex items-center gap-2"
+                    style={{
+                      left: "50%",
+                      top: "30%",
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    {lastTurn.outcomes.map((o, i) => (
+                      <RollDie
+                        key={i}
+                        outcome={o}
+                        delay={i * 120}
+                        highlighted={phase === "animate" && revealedDice === i + 1}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Skip message */}
+              <AnimatePresence>
+                {phase === "skip" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="absolute z-30 text-center"
+                    style={{
+                      left: "50%",
+                      top: "30%",
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    <div className="text-2xl mb-1">⏭️</div>
+                    <div className="text-buck-coral font-black text-xs uppercase tracking-widest">
+                      Skipped — no bucks
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </LayoutGroup>
+          </div>
+        </div>
+      </div>
+
+      {/* Roll button area */}
+      <div className="px-4 pb-5 pt-2 z-20">
+        <div className="max-w-md mx-auto">
+          {/* Current player banner */}
+          <div className="mb-2 text-center">
+            <div className="text-[10px] uppercase tracking-widest text-white/50 font-bold">
               Pass the device to
             </div>
             <AnimatePresence mode="wait">
               <motion.div
                 key={current.id}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.22 }}
-                className="mt-2 flex items-center justify-center gap-3"
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2 }}
+                className="font-black text-xl leading-tight"
+                style={{ color: current.color }}
               >
-                <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-2xl"
-                  style={{ backgroundColor: current.color }}
-                >
-                  {current.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="text-left">
-                  <div className="text-2xl font-black">{current.name}</div>
-                  <div className="text-white/60 text-sm">
-                    {current.bucks} buck{current.bucks === 1 ? "" : "s"}
-                    {current.bucks > 0 && (
-                      <>
-                        {" — "}
-                        <span className="text-buck-gold font-bold">
-                          {rollCount} roll{rollCount === 1 ? "" : "s"}!
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
+                {current.name}
+                {current.bucks > 0 && (
+                  <span className="ml-2 text-buck-gold/90 text-sm">
+                    · {rollCount} roll{rollCount === 1 ? "" : "s"}
+                  </span>
+                )}
               </motion.div>
             </AnimatePresence>
-
-            <div className="mt-4 flex justify-center">
-              <BuckRow
-                count={current.bucks}
-                max={9}
-                color={current.color}
-                size={20}
-              />
-            </div>
-
-            <div className="mt-5 min-h-[76px] flex items-center justify-center gap-3 flex-wrap">
-              {isSkipping && (
-                <motion.div
-                  key="skip"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center"
-                >
-                  <div className="text-3xl mb-1">⏭️</div>
-                  <div className="text-buck-coral font-black text-sm uppercase tracking-widest">
-                    Skipped — no bucks
-                  </div>
-                  <div className="text-white/40 text-xs mt-1">
-                    Hang tight — a neighbor can pass you one
-                  </div>
-                </motion.div>
-              )}
-              {!isSkipping && !showRolls && canRoll && (
-                <div className="text-white/40 text-sm">
-                  Tap below to roll {rollCount} {rollCount === 1 ? "die" : "dice"}
-                </div>
-              )}
-              {!isSkipping && showRolls && lastTurn && (
-                <>
-                  {lastTurn.outcomes.map((o, i) => (
-                    <RollDie
-                      key={`${lastTurn.playerId}-${i}`}
-                      outcome={o}
-                      delay={i * REVEAL_STAGGER_MS}
-                    />
-                  ))}
-                </>
-              )}
-            </div>
           </div>
-        </section>
 
-        <section className="mt-5">
-          <h2 className="text-xs uppercase tracking-widest text-white/60 font-bold mb-3">
-            Players
-          </h2>
-          <motion.div layout className="grid grid-cols-2 gap-3">
-            {players.map((p, i) => (
-              <motion.div
-                key={p.id}
-                layout
-                animate={{
-                  scale: i === currentIdx ? 1.02 : 1,
-                }}
-                transition={{ duration: 0.2 }}
-              >
-                <PlayerCard
-                  player={p}
-                  active={i === currentIdx && status === "active"}
-                />
-              </motion.div>
-            ))}
-          </motion.div>
-        </section>
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-4 bg-gradient-to-t from-buck-dark via-buck-dark/95 to-transparent">
-        <div className="max-w-md mx-auto">
           <motion.button
             whileTap={canRoll ? { scale: 0.97 } : {}}
-            onClick={() => rollDice()}
+            onClick={onRoll}
             disabled={!canRoll}
-            className="w-full py-5 rounded-2xl font-black text-lg tracking-wide text-white transition-all shadow-[0_8px_32px_rgba(0,0,0,0.45)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 rounded-2xl font-black text-base tracking-wide text-white transition-all shadow-[0_8px_32px_rgba(0,0,0,0.6)] disabled:opacity-50 disabled:cursor-not-allowed border border-white/15"
             style={{
-              background: `linear-gradient(135deg, ${current.color} 0%, ${current.color}cc 60%, #12122A 140%)`,
+              background: canRoll
+                ? `linear-gradient(135deg, ${current.color} 0%, ${current.color}cc 60%, #12122A 140%)`
+                : `linear-gradient(135deg, #2a2a3a 0%, #1a1a2e 100%)`,
             }}
           >
-            <span className="inline-flex items-center justify-center gap-3">
+            <span className="inline-flex items-center justify-center gap-2.5">
               <motion.span
-                animate={rolling ? { rotate: [0, 360] } : { rotate: 0 }}
+                animate={
+                  phase === "rolling" ? { rotate: [0, 360] } : { rotate: 0 }
+                }
                 transition={{
                   duration: 0.6,
-                  repeat: rolling ? Infinity : 0,
+                  repeat: phase === "rolling" ? Infinity : 0,
                   ease: "linear",
                 }}
                 className="inline-block"
@@ -371,17 +551,23 @@ export default function LocalGamePage() {
                 🎲
               </motion.span>
               <span>
-                {rolling
+                {phase === "rolling"
                   ? "ROLLING…"
-                  : current.bucks <= 0
+                  : phase === "reveal" || phase === "animate"
+                  ? "PASSING THE BUCK…"
+                  : phase === "skip"
                   ? "SKIPPING…"
-                  : `PASS THE BUCK · ${rollCount} ROLL${rollCount === 1 ? "" : "S"}`}
+                  : current.bucks <= 0
+                  ? "WAITING FOR BUCKS"
+                  : `ROLL ${rollCount} DI${rollCount === 1 ? "E" : "CE"}`}
               </span>
               <motion.span
-                animate={rolling ? { rotate: [0, -360] } : { rotate: 0 }}
+                animate={
+                  phase === "rolling" ? { rotate: [0, -360] } : { rotate: 0 }
+                }
                 transition={{
                   duration: 0.6,
-                  repeat: rolling ? Infinity : 0,
+                  repeat: phase === "rolling" ? Infinity : 0,
                   ease: "linear",
                 }}
                 className="inline-block"
@@ -394,4 +580,8 @@ export default function LocalGamePage() {
       </div>
     </main>
   );
+}
+
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }

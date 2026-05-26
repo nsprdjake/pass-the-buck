@@ -8,6 +8,10 @@
   --color-buck-gold: #FBBF24;
   --color-buck-coral: #F97066;
   --color-buck-blue: #60A5FA;
+  --color-felt: #0d5c3f;
+  --color-felt-dark: #08321f;
+  --color-rail: #3d2817;
+  --color-rail-light: #6b4423;
 }
 
 *,
@@ -58,4 +62,78 @@ body {
 
 .animate-confetti {
   animation: confettiFall 3s linear forwards;
+}
+
+/* === Skeuomorphic poker-table styles === */
+
+/* Wooden rail around the felt. Layered radial highlights give a varnished
+   shine; inset shadow burns the inner edge into the felt. */
+.table-rail {
+  background:
+    radial-gradient(ellipse at 50% 0%, #8a5a2b 0%, #5a3818 35%, #3d2817 70%, #2a1a0e 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 0, 0, 0.5),
+    inset 0 0 16px rgba(0, 0, 0, 0.55),
+    0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+/* The green felt surface — radial spotlight in the center, darker at edges.
+   The repeating noise pattern simulates felt fibers. */
+.table-felt {
+  background:
+    radial-gradient(ellipse at 50% 45%, #1a7551 0%, #0d5c3f 45%, #073d28 100%),
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0.012) 0deg 2deg,
+      transparent 2deg 4deg
+    );
+  background-blend-mode: overlay, normal;
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.6),
+    inset 0 0 80px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+.table-felt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  /* Faint warm spotlight from above */
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(251, 191, 36, 0.08) 0%,
+    transparent 55%
+  );
+}
+
+/* Tiny dotted texture for felt fibers */
+.table-felt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.25;
+  background-image: radial-gradient(
+    rgba(0, 0, 0, 0.4) 0.5px,
+    transparent 0.5px
+  );
+  background-size: 4px 4px;
+  mix-blend-mode: multiply;
+}
+
+@keyframes chipGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+  }
+  50% {
+    box-shadow: 0 0 32px 8px rgba(251, 191, 36, 0.55);
+  }
+}
+
+.chip-pulse {
+  border-radius: 16px;
+  animation: chipGlow 0.55s ease-in-out;
 }
