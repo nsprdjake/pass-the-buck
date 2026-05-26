@@ -2,13 +2,13 @@
 
 import { use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import GameHeader from "@/components/GameHeader";
 import PlayerCard from "@/components/PlayerCard";
 import RollButton from "@/components/RollButton";
 import BuckRow from "@/components/BuckRow";
 import { useGame } from "@/hooks/useGame";
-import { PLAYER_COLORS, STARTING_BALANCE } from "@/lib/constants";
-import type { Player, RollOutcome } from "@/lib/types";
+import type { RollOutcome } from "@/lib/types";
 
 const OUTCOME_META: Record<RollOutcome, { emoji: string; label: string }> = {
   left: { emoji: "⬅️", label: "Left" },
@@ -16,25 +16,6 @@ const OUTCOME_META: Record<RollOutcome, { emoji: string; label: string }> = {
   center: { emoji: "⬇️", label: "Center" },
   keep: { emoji: "✊", label: "Keep" },
 };
-
-type GameConfig = {
-  id: string;
-  buyIn: number;
-  turnTimer: number | null;
-  players: Player[];
-};
-
-function buildFallback(id: string): GameConfig {
-  const players: Player[] = Array.from({ length: 3 }, (_, i) => ({
-    id: `p${i}`,
-    name: i === 0 ? "You" : `Player ${i + 1}`,
-    bucks: STARTING_BALANCE,
-    eliminated: false,
-    color: PLAYER_COLORS[i % PLAYER_COLORS.length],
-    order: i,
-  }));
-  return { id, buyIn: 5, turnTimer: null, players };
-}
 
 function Confetti() {
   const pieces = useMemo(
@@ -84,20 +65,27 @@ export default function GamePage({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const [config, setConfig] = useState<GameConfig | null>(null);
+  const supabase = useMemo(() => createClient(), []);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    let loaded: GameConfig | null = null;
-    try {
-      const raw = sessionStorage.getItem(`ptb:game:${id}`);
-      if (raw) loaded = JSON.parse(raw) as GameConfig;
-    } catch {
-      loaded = null;
-    }
-    setConfig(loaded ?? buildFallback(id));
-  }, [id]);
+    void supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+    });
+  }, [supabase]);
 
-  if (!config) {
+  const {
+    game,
+    players,
+    playerRows,
+    outcomes,
+    rolling,
+    loading,
+    winner,
+    rollDice,
+  } = useGame(id);
+
+  if (loading || !game) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-buck-dark">
         <div className="text-white/60 font-bold">Loading game…</div>
@@ -105,31 +93,7 @@ export default function GamePage({
     );
   }
 
-  return <GameView config={config} onPlayAgain={() => router.push("/lobby")} />;
-}
-
-function GameView({
-  config,
-  onPlayAgain,
-}: {
-  config: GameConfig;
-  onPlayAgain: () => void;
-}) {
-  const {
-    players,
-    currentIdx,
-    pot,
-    round,
-    rolling,
-    outcomes,
-    gameOver,
-    winner,
-    doRoll,
-  } = useGame({ players: config.players, buyIn: config.buyIn });
-
-  const current = players[currentIdx];
-
-  if (gameOver && winner) {
+  if (game.status === "finished" && winner) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark relative">
         <Confetti />
@@ -144,14 +108,14 @@ function GameView({
           <div className="mt-6 inline-flex items-center gap-2 bg-buck-gold/15 border border-buck-gold/40 rounded-full px-5 py-3">
             <span className="text-buck-gold text-2xl">💰</span>
             <span className="text-buck-gold font-black text-2xl">
-              ${pot * config.buyIn}
+              ${game.pot * game.buy_in}
             </span>
           </div>
           <p className="mt-3 text-white/70">
-            Pot of {pot} buck{pot === 1 ? "" : "s"}
+            Pot of {game.pot} buck{game.pot === 1 ? "" : "s"}
           </p>
           <button
-            onClick={onPlayAgain}
+            onClick={() => router.push("/lobby")}
             className="mt-10 w-full py-5 rounded-2xl font-black text-lg text-white bg-gradient-to-br from-buck-green to-emerald-700 shadow-[0_10px_30px_rgba(16,185,129,0.35)] active:scale-[0.98] transition-transform"
           >
             PLAY AGAIN
@@ -161,10 +125,24 @@ function GameView({
     );
   }
 
+  const currentIdx = game.current_turn_index;
+  const current = players[currentIdx];
+  if (!current) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-buck-dark">
+        <div className="text-white/60 font-bold">Waiting for players…</div>
+      </main>
+    );
+  }
+
+  const currentRow = playerRows[currentIdx];
+  const isMyTurn = !!userId && currentRow?.user_id === userId;
+  const round = 1;
+
   return (
     <main className="min-h-screen px-4 pt-5 pb-32 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark">
       <div className="max-w-md mx-auto">
-        <GameHeader round={round} pot={pot} />
+        <GameHeader round={round} pot={game.pot} />
 
         <section className="mt-5 bg-buck-card border border-white/10 rounded-3xl p-5 text-center relative overflow-hidden">
           <div
@@ -175,7 +153,7 @@ function GameView({
           />
           <div className="relative">
             <div className="text-xs uppercase tracking-widest text-white/60 font-bold">
-              Current turn
+              {isMyTurn ? "Your turn" : "Current turn"}
             </div>
             <div className="mt-2 flex items-center justify-center gap-3">
               <div
@@ -205,7 +183,9 @@ function GameView({
             <div className="mt-5 min-h-[68px] flex items-center justify-center gap-3 flex-wrap">
               {outcomes.length === 0 && !rolling && (
                 <div className="text-white/40 text-sm">
-                  Tap below to roll the dice
+                  {isMyTurn
+                    ? "Tap below to roll the dice"
+                    : `Waiting on ${current.name}…`}
                 </div>
               )}
               {rolling && outcomes.length === 0 && (
@@ -238,23 +218,25 @@ function GameView({
               <PlayerCard
                 key={p.id}
                 player={p}
-                active={i === currentIdx && !gameOver}
+                active={i === currentIdx && game.status === "active"}
               />
             ))}
           </div>
         </section>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-4 bg-gradient-to-t from-buck-dark via-buck-dark/95 to-transparent">
-        <div className="max-w-md mx-auto">
-          <RollButton
-            onRoll={() => void doRoll()}
-            rolling={rolling}
-            disabled={gameOver || current.bucks <= 0}
-            color={current.color}
-          />
+      {isMyTurn && (
+        <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-4 bg-gradient-to-t from-buck-dark via-buck-dark/95 to-transparent">
+          <div className="max-w-md mx-auto">
+            <RollButton
+              onRoll={() => void rollDice()}
+              rolling={rolling}
+              disabled={game.status !== "active" || current.bucks <= 0}
+              color={current.color}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </main>
   );
 }
