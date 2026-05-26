@@ -88,7 +88,8 @@ export default function LobbyPage() {
             className="w-full accent-buck-green"
           />
           <p className="text-white/40 text-xs mt-2">
-            Each player starts with this many bucks. Roll one die per buck (max 3).
+            Each player starts with this many bucks. They roll one die per
+            buck they hold.
           </p>
         </section>
 

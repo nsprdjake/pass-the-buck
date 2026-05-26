@@ -6,7 +6,7 @@ export function rollOutcome(): RollOutcome {
 }
 
 export function rollCountForBucks(numBucks: number): number {
-  return Math.min(Math.max(numBucks, 0), 3);
+  return Math.max(numBucks, 0);
 }
 
 export function rollTurn(numBucks: number): RollOutcome[] {
@@ -70,12 +70,14 @@ export function applyTurn(
   return { players: updated, pot: newPot };
 }
 
-// Game ends when exactly one player holds all remaining (non-pot) bucks —
-// i.e. one player has > 0 and everyone else has 0.
+// Game ends when only ONE buck remains outside the pot. The player holding
+// that last buck is the winner (and collects the pot). If a player has 2+
+// bucks and everyone else has 0, the game continues — they must keep rolling
+// until the chips are either redistributed or fed into the pot.
 export function checkWinner(players: Player[]): Player | null {
-  const withBucks = players.filter((p) => p.bucks > 0);
-  if (withBucks.length === 1) return withBucks[0];
-  return null;
+  const total = players.reduce((s, p) => s + p.bucks, 0);
+  if (total !== 1) return null;
+  return players.find((p) => p.bucks === 1) ?? null;
 }
 
 // Advance to the next seat in order. Players with 0 bucks are NOT removed;

@@ -3,26 +3,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, type TargetAndTransition } from "framer-motion";
-import BuckChip from "@/components/BuckChip";
+import Buck from "@/components/Buck";
+import BuckPile from "@/components/BuckPile";
 import { useLocalGame } from "@/context/LocalGameContext";
 import { getNextActivePlayer, rollCountForBucks } from "@/lib/game-logic";
 import type { RollOutcome } from "@/lib/types";
 
 // === Timing ===
-const SLAM_MS = 220;
-const ROLLING_MS = 600;
-const REVEAL_HOLD_MS = 650; // big outcome card stays this long before chip moves
-const CHIP_FLY_MS = 620;
-const OUTCOME_GAP_MS = 180;
-const TURN_OUTRO_MS = 450;
+const SLAM_MS = 200;
+const ROLLING_MS = 520;
+const REVEAL_HOLD_MS = 360;
+const BUCK_FLY_MS = 460;
+const OUTCOME_GAP_MS = 80;
+const TURN_OUTRO_MS = 380;
 
 type OutcomeMeta = {
   emoji: string;
   label: string;
-  /** Card background gradient */
   cardFrom: string;
   cardTo: string;
-  /** Border/glow */
   accent: string;
 };
 
@@ -61,10 +60,10 @@ type Phase =
   | "idle"
   | "slam"
   | "rolling"
-  | "reveal" // showing card for current outcome
-  | "chipfly" // chip is animating for current outcome
-  | "outro" // brief pause after all outcomes resolve
-  | "pass" // "Pass to next player" screen
+  | "reveal"
+  | "buckfly"
+  | "outro"
+  | "pass"
   | "skip"
   | "finished";
 
@@ -73,7 +72,7 @@ function sleep(ms: number) {
 }
 
 // ============================================================
-// Confetti for winner screen
+// Confetti
 // ============================================================
 function Confetti() {
   const pieces = useMemo(
@@ -90,12 +89,7 @@ function Confetti() {
           "#A78BFA",
           "#F472B6",
         ];
-        return {
-          left,
-          delay,
-          duration,
-          color: colors[i % colors.length],
-        };
+        return { left, delay, duration, color: colors[i % colors.length] };
       }),
     []
   );
@@ -121,61 +115,7 @@ function Confetti() {
 }
 
 // ============================================================
-// Stack of chips, slightly offset like a real casino stack
-// ============================================================
-function ChipStack({
-  count,
-  size = 56,
-  offsetY = 6,
-  hideTop = 0,
-}: {
-  count: number;
-  size?: number;
-  offsetY?: number;
-  /** Hide the top N chips (so chip-fly overlay reads cleanly) */
-  hideTop?: number;
-}) {
-  if (count <= 0) {
-    return (
-      <div
-        className="rounded-full border-2 border-dashed border-white/15 flex items-center justify-center"
-        style={{ width: size + 12, height: size + 12 }}
-      >
-        <span className="text-white/30 text-xs font-bold uppercase tracking-widest">
-          empty
-        </span>
-      </div>
-    );
-  }
-  const visible = Math.max(count - hideTop, 0);
-  const stackHeight = size + Math.max(visible - 1, 0) * offsetY;
-  return (
-    <div
-      className="relative"
-      style={{ width: size, height: stackHeight }}
-    >
-      {Array.from({ length: visible }).map((_, i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{
-            bottom: i * offsetY,
-            left: 0,
-            width: size,
-            height: size,
-            filter: `drop-shadow(0 ${2 + i * 0.3}px ${3 + i * 0.4}px rgba(0,0,0,0.55))`,
-            zIndex: i,
-          }}
-        >
-          <BuckChip size={size} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ============================================================
-// Big outcome card (slot machine reveal)
+// Big outcome card
 // ============================================================
 function OutcomeCard({
   outcome,
@@ -193,23 +133,21 @@ function OutcomeCard({
       initial={{ scale: 0.4, opacity: 0, rotateX: -45 }}
       animate={{ scale: 1, opacity: 1, rotateX: 0 }}
       exit={{ scale: 0.85, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 400, damping: 22 }}
-      className="relative rounded-2xl px-6 py-5 text-center"
+      transition={{ type: "spring", stiffness: 480, damping: 22 }}
+      className="relative rounded-2xl px-6 py-4 text-center"
       style={{
         background: `linear-gradient(135deg, ${meta.cardFrom} 0%, ${meta.cardTo} 100%)`,
         boxShadow: `0 0 40px ${meta.accent}66, 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.25)`,
         border: `2px solid ${meta.accent}`,
-        minWidth: 240,
+        minWidth: 220,
       }}
     >
-      <div className="text-5xl mb-1 leading-none">{meta.emoji}</div>
-      <div
-        className="font-black text-3xl tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
-      >
+      <div className="text-4xl mb-0.5 leading-none">{meta.emoji}</div>
+      <div className="font-black text-3xl tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
         {meta.label}
       </div>
       {recipientName && (
-        <div className="mt-1 text-sm font-black uppercase tracking-widest">
+        <div className="mt-1 text-xs font-black uppercase tracking-widest">
           <span className="text-white/70">to </span>
           <span style={{ color: recipientColor ?? "#fff" }}>
             {recipientName}
@@ -221,46 +159,44 @@ function OutcomeCard({
 }
 
 // ============================================================
-// Flying chip — animates from the stack to the destination
+// Flying buck (bill)
 // ============================================================
-function FlyingChip({
+function FlyingBuck({
   direction,
 }: {
   direction: "left" | "right" | "up" | "keep";
 }) {
-  // Animation values
   let animate: TargetAndTransition = {};
   if (direction === "left") {
     animate = {
-      x: [-0, -90, -260],
-      y: [0, -20, -8],
+      x: [0, -90, -280],
+      y: [0, -10, 10],
       opacity: [1, 1, 0],
-      rotate: [0, -120, -280],
-      scale: [1, 0.95, 0.7],
+      rotate: [0, -90, -240],
+      scale: [1, 0.95, 0.8],
     };
   } else if (direction === "right") {
     animate = {
-      x: [0, 90, 260],
-      y: [0, -20, -8],
+      x: [0, 90, 280],
+      y: [0, -10, 10],
       opacity: [1, 1, 0],
-      rotate: [0, 120, 280],
-      scale: [1, 0.95, 0.7],
+      rotate: [0, 90, 240],
+      scale: [1, 0.95, 0.8],
     };
   } else if (direction === "up") {
-    // fly up to the pot counter at top
     animate = {
-      x: [0, 0, -100],
-      y: [0, -120, -340],
+      x: [0, 0, -110],
+      y: [0, -100, -320],
       opacity: [1, 1, 0],
-      rotate: [0, 360, 720],
-      scale: [1, 0.8, 0.35],
+      rotate: [0, 180, 540],
+      scale: [1, 0.85, 0.4],
     };
   } else {
     // keep — happy bounce in place
     animate = {
-      y: [0, -28, 0, -14, 0],
-      scale: [1, 1.15, 1, 1.05, 1],
-      rotate: [0, -8, 8, -4, 0],
+      y: [0, -24, 0, -12, 0],
+      scale: [1, 1.18, 1, 1.06, 1],
+      rotate: [0, -6, 6, -3, 0],
     };
   }
 
@@ -269,26 +205,24 @@ function FlyingChip({
       initial={{ x: 0, y: 0, opacity: 1, scale: 1, rotate: 0 }}
       animate={animate}
       transition={{
-        duration: CHIP_FLY_MS / 1000,
+        duration: BUCK_FLY_MS / 1000,
         times: direction === "keep" ? [0, 0.25, 0.5, 0.75, 1] : [0, 0.4, 1],
         ease: direction === "keep" ? "easeInOut" : "easeOut",
       }}
       style={{
-        width: 64,
-        height: 64,
         filter:
           direction === "keep"
-            ? "drop-shadow(0 0 24px rgba(251,191,36,0.85)) drop-shadow(0 4px 6px rgba(0,0,0,0.55))"
+            ? "drop-shadow(0 0 22px rgba(251,191,36,0.85)) drop-shadow(0 4px 6px rgba(0,0,0,0.55))"
             : "drop-shadow(0 6px 10px rgba(0,0,0,0.55))",
       }}
     >
-      <BuckChip size={64} />
+      <Buck height={36} />
     </motion.div>
   );
 }
 
 // ============================================================
-// Recipient name flash (appears at the screen edge when chip flies)
+// Recipient name flash at edge
 // ============================================================
 function RecipientFlash({
   side,
@@ -305,11 +239,9 @@ function RecipientFlash({
       initial={{ opacity: 0, x: fromX, scale: 0.8 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: -fromX / 2 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.22 }}
       className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
-      style={{
-        [side]: 8,
-      } as React.CSSProperties}
+      style={{ [side]: 8 } as React.CSSProperties}
     >
       <div
         className="rounded-xl px-3 py-2 border-2 backdrop-blur-sm"
@@ -353,14 +285,10 @@ export default function LocalGamePage() {
     newGame,
   } = useLocalGame();
 
-  // === local presentation state ===
-  // We mirror the active player's chip count locally so we can decrement it
-  // visually as each chip flies off, before the authoritative state catches
-  // up at endTurn.
   const [displayedBucks, setDisplayedBucks] = useState<number>(0);
   const [displayedPot, setDisplayedPot] = useState<number>(0);
   const [phase, setPhase] = useState<Phase>("idle");
-  const [outcomeIdx, setOutcomeIdx] = useState(0); // which outcome is being shown
+  const [outcomeIdx, setOutcomeIdx] = useState(0);
   const [showPass, setShowPass] = useState(false);
   const animatingRef = useRef(false);
 
@@ -375,14 +303,12 @@ export default function LocalGamePage() {
   }, [players, currentIdx, status, current]);
   const nextPlayer = players[nextActiveIdx];
 
-  // Redirect to lobby if there's no game in progress.
   useEffect(() => {
     if (status === "lobby" && players.length === 0) {
       router.replace("/lobby");
     }
   }, [status, players.length, router]);
 
-  // Keep displayed counts in sync when idle (between turns / fresh game).
   useEffect(() => {
     if (animatingRef.current) return;
     if (lastTurn) return;
@@ -390,7 +316,7 @@ export default function LocalGamePage() {
     setDisplayedPot(pot);
   }, [current?.bucks, pot, lastTurn]);
 
-  // === The roll → reveal → animate → pass sequence ===
+  // === Roll → reveal → animate → pass sequence ===
   useEffect(() => {
     if (!lastTurn) return;
     let cancelled = false;
@@ -399,38 +325,33 @@ export default function LocalGamePage() {
     const turn = lastTurn;
 
     async function play() {
-      // brief "rolling" feel
       setPhase("rolling");
       setOutcomeIdx(0);
       await sleep(ROLLING_MS);
       if (cancelled) return;
 
-      // walk through outcomes one at a time
       for (let i = 0; i < turn.outcomes.length; i++) {
         if (cancelled) return;
         setOutcomeIdx(i);
         setPhase("reveal");
         await sleep(REVEAL_HOLD_MS);
         if (cancelled) return;
-        setPhase("chipfly");
-        // decrement player's stack as the chip leaves (for non-keep)
+        setPhase("buckfly");
         const outcome = turn.outcomes[i];
         if (outcome !== "keep") {
-          // schedule mid-flight: drop visible chip from stack right as it flies
-          await sleep(160);
+          await sleep(140);
           if (cancelled) return;
           setDisplayedBucks((b) => Math.max(b - 1, 0));
           if (outcome === "center") {
-            // Wait until near end of flight to bump pot count
-            await sleep(CHIP_FLY_MS - 280);
+            await sleep(BUCK_FLY_MS - 240);
             if (cancelled) return;
             setDisplayedPot((p) => p + 1);
             await sleep(80);
           } else {
-            await sleep(CHIP_FLY_MS - 160);
+            await sleep(BUCK_FLY_MS - 140);
           }
         } else {
-          await sleep(CHIP_FLY_MS);
+          await sleep(BUCK_FLY_MS);
         }
         if (cancelled) return;
         await sleep(OUTCOME_GAP_MS);
@@ -440,16 +361,13 @@ export default function LocalGamePage() {
       setPhase("outro");
       await sleep(TURN_OUTRO_MS);
       if (cancelled) return;
-
       animatingRef.current = false;
 
-      // If this was the winning turn, jump straight to finished via endTurn.
       if (winnerId) {
         endTurn();
         return;
       }
 
-      // Otherwise show pass-the-phone overlay; tapping calls endTurn.
       setPhase("pass");
       setShowPass(true);
     }
@@ -459,11 +377,9 @@ export default function LocalGamePage() {
       cancelled = true;
       animatingRef.current = false;
     };
-    // We deliberately only depend on lastTurn so the sequence runs once per turn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastTurn]);
 
-  // Skip 0-chip players automatically
   const isSkipping =
     status === "active" &&
     !!current &&
@@ -483,7 +399,6 @@ export default function LocalGamePage() {
     return () => clearTimeout(t);
   }, [isSkipping]);
 
-  // === Roll handler ===
   const onRoll = useCallback(async () => {
     if (rolling || phase !== "idle") return;
     if (!current || current.bucks <= 0) return;
@@ -510,7 +425,6 @@ export default function LocalGamePage() {
         }}
       >
         <Confetti />
-        {/* raining chips */}
         <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
           {Array.from({ length: 14 }).map((_, i) => (
             <motion.div
@@ -533,9 +447,8 @@ export default function LocalGamePage() {
                 ease: "linear",
               }}
               className="absolute"
-              style={{ width: 36, height: 36 }}
             >
-              <BuckChip size={36} />
+              <Buck height={28} />
             </motion.div>
           ))}
         </div>
@@ -568,11 +481,11 @@ export default function LocalGamePage() {
           <div className="mt-6 inline-flex items-center gap-2 bg-buck-gold/15 border-2 border-buck-gold/40 rounded-full px-5 py-3">
             <span className="text-buck-gold text-2xl">💰</span>
             <span className="text-buck-gold font-black text-2xl">
-              {winner.bucks + pot} chip{winner.bucks + pot === 1 ? "" : "s"}
+              {winner.bucks + pot} buck{winner.bucks + pot === 1 ? "" : "s"}
             </span>
           </div>
           <p className="mt-3 text-white/70">
-            Including the pot of {pot} chip{pot === 1 ? "" : "s"}
+            Pot of {pot} buck{pot === 1 ? "" : "s"} + their last {winner.bucks}
           </p>
           <button
             onClick={() => {
@@ -609,18 +522,9 @@ export default function LocalGamePage() {
     !rolling && !lastTurn && current.bucks > 0 && phase === "idle";
   const rollCount = rollCountForBucks(current.bucks);
 
-  // Active outcome (during reveal/chipfly)
   const activeOutcome: RollOutcome | null =
-    lastTurn && (phase === "reveal" || phase === "chipfly")
+    lastTurn && (phase === "reveal" || phase === "buckfly")
       ? lastTurn.outcomes[outcomeIdx] ?? null
-      : null;
-  const activeTransfer =
-    lastTurn && (phase === "reveal" || phase === "chipfly")
-      ? lastTurn.transfers[outcomeIdx]
-      : null;
-  const recipient =
-    activeTransfer && activeTransfer.toId !== "pot"
-      ? players.find((p) => p.id === activeTransfer.toId) ?? null
       : null;
 
   return (
@@ -631,7 +535,7 @@ export default function LocalGamePage() {
           "radial-gradient(ellipse at 50% 35%, #0d5c3f 0%, #073d28 55%, #03200f 100%)",
       }}
     >
-      {/* Subtle felt texture overlay */}
+      {/* Subtle felt texture */}
       <div
         className="pointer-events-none absolute inset-0 opacity-30"
         style={{
@@ -647,7 +551,6 @@ export default function LocalGamePage() {
         <div className="text-white/80 text-xs font-black uppercase tracking-widest">
           Round <span className="text-buck-gold">{round}</span>
         </div>
-        {/* Pot counter */}
         <motion.div
           key={displayedPot}
           initial={{ scale: 1 }}
@@ -655,13 +558,15 @@ export default function LocalGamePage() {
           transition={{ duration: 0.35 }}
           className="flex items-center gap-1.5 bg-black/50 border border-buck-gold/50 rounded-full px-3 py-1 backdrop-blur-sm"
         >
-          <div className="w-5 h-5">
-            <BuckChip size={20} />
+          <div style={{ height: 18 }}>
+            <Buck height={18} />
           </div>
           <span className="text-buck-gold font-black text-xs uppercase tracking-widest">
             Pot
           </span>
-          <span className="text-white font-black text-base">{displayedPot}</span>
+          <span className="text-white font-black text-base">
+            {displayedPot}
+          </span>
         </motion.div>
         <button
           onClick={() => {
@@ -676,9 +581,8 @@ export default function LocalGamePage() {
         </button>
       </div>
 
-      {/* MAIN STAGE — active player is the star */}
+      {/* STAGE */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 min-h-0">
-        {/* Player name */}
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
@@ -709,39 +613,32 @@ export default function LocalGamePage() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Player's chip stack */}
-        <div className="relative mt-8 h-56 flex items-end justify-center w-full">
+        {/* Buck pile */}
+        <div className="relative mt-8 min-h-[140px] flex items-end justify-center w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={`${current.id}-stack`}
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 20, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.28 }}
               className="relative flex flex-col items-center"
             >
-              {/* The stack itself */}
               <div className="relative">
-                <ChipStack
-                  count={displayedBucks}
-                  size={56}
-                  offsetY={7}
-                  hideTop={phase === "chipfly" ? 0 : 0}
-                />
-                {/* Flying chip overlays the stack origin */}
+                <BuckPile count={displayedBucks} billHeight={30} />
                 <AnimatePresence>
-                  {phase === "chipfly" && activeOutcome && (
+                  {phase === "buckfly" && activeOutcome && (
                     <motion.div
                       key={`fly-${outcomeIdx}`}
                       className="absolute pointer-events-none"
                       style={{
                         left: "50%",
-                        top: 0,
-                        transform: "translate(-50%, -10px)",
+                        top: "50%",
+                        transform: "translate(-50%, -50%)",
                         zIndex: 50,
                       }}
                     >
-                      <FlyingChip
+                      <FlyingBuck
                         direction={
                           activeOutcome === "left"
                             ? "left"
@@ -756,23 +653,20 @@ export default function LocalGamePage() {
                   )}
                 </AnimatePresence>
               </div>
-
-              {/* Chip count label */}
               <motion.div
                 key={displayedBucks}
                 initial={{ scale: 1.4, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.25 }}
+                transition={{ duration: 0.22 }}
                 className="mt-3 text-white/90 font-black text-sm uppercase tracking-widest"
               >
-                {displayedBucks} chip{displayedBucks === 1 ? "" : "s"}
+                {displayedBucks} buck{displayedBucks === 1 ? "" : "s"}
               </motion.div>
             </motion.div>
           </AnimatePresence>
 
-          {/* Recipient name flash at screen edge */}
           <AnimatePresence>
-            {phase === "chipfly" &&
+            {phase === "buckfly" &&
               activeOutcome === "left" &&
               leftNeighbor && (
                 <RecipientFlash
@@ -781,7 +675,7 @@ export default function LocalGamePage() {
                   color={leftNeighbor.color}
                 />
               )}
-            {phase === "chipfly" &&
+            {phase === "buckfly" &&
               activeOutcome === "right" &&
               rightNeighbor && (
                 <RecipientFlash
@@ -793,7 +687,7 @@ export default function LocalGamePage() {
           </AnimatePresence>
         </div>
 
-        {/* Outcome card centered above the action area */}
+        {/* Outcome card */}
         <div className="relative h-32 flex items-center justify-center w-full">
           <AnimatePresence mode="wait">
             {activeOutcome && (
@@ -840,7 +734,7 @@ export default function LocalGamePage() {
         </div>
       </div>
 
-      {/* Bottom: ROLL BUTTON */}
+      {/* ROLL BUTTON */}
       <div className="relative z-20 px-5 pb-7 pt-2">
         <div className="max-w-md mx-auto">
           <motion.button
@@ -856,11 +750,7 @@ export default function LocalGamePage() {
               phase === "slam"
                 ? { duration: 0.22, times: [0, 0.4, 0.7, 1] }
                 : canRoll
-                ? {
-                    duration: 1.8,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }
+                ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
                 : {}
             }
             onClick={onRoll}
@@ -878,7 +768,6 @@ export default function LocalGamePage() {
               opacity: canRoll ? 1 : 0.55,
             }}
           >
-            {/* invitation glow ring */}
             {canRoll && (
               <motion.span
                 aria-hidden
@@ -900,13 +789,13 @@ export default function LocalGamePage() {
                 {phase === "rolling"
                   ? "ROLLING…"
                   : phase === "reveal" ||
-                    phase === "chipfly" ||
+                    phase === "buckfly" ||
                     phase === "outro"
                   ? "…"
                   : phase === "skip"
                   ? "SKIPPING…"
                   : current.bucks <= 0
-                  ? "NO CHIPS"
+                  ? "NO BUCKS"
                   : "ROLL!"}
               </span>
               <span className="text-3xl">🎲</span>
@@ -943,7 +832,7 @@ export default function LocalGamePage() {
                 {current?.name}
               </div>
               <div className="text-buck-coral font-black text-sm uppercase tracking-widest mt-1">
-                No chips — skipped!
+                No bucks — skipped!
               </div>
             </motion.div>
           </motion.div>

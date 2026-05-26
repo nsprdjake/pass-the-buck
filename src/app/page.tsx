@@ -33,9 +33,22 @@ export default function Home() {
           href="/lobby"
           className={`${
             inProgress ? "mt-3" : "mt-10"
-          } w-full text-center py-4 rounded-2xl font-black text-lg text-white bg-gradient-to-br from-buck-green to-emerald-700 shadow-[0_10px_30px_rgba(16,185,129,0.35)] active:scale-[0.98] transition-transform`}
+          } w-full text-center py-5 rounded-2xl font-black text-lg text-white bg-gradient-to-br from-buck-green to-emerald-700 shadow-[0_10px_30px_rgba(16,185,129,0.35)] active:scale-[0.98] transition-transform`}
         >
-          NEW GAME
+          <span className="block">PLAY ON THIS DEVICE</span>
+          <span className="block text-xs font-bold uppercase tracking-widest text-white/70 mt-1">
+            Pass-and-play, no setup
+          </span>
+        </Link>
+
+        <Link
+          href="/multi"
+          className="mt-3 w-full text-center py-5 rounded-2xl font-black text-lg text-buck-dark bg-buck-gold shadow-[0_10px_30px_rgba(251,191,36,0.35)] active:scale-[0.98] transition-transform"
+        >
+          <span className="block">PLAY ACROSS DEVICES</span>
+          <span className="block text-xs font-bold uppercase tracking-widest text-buck-dark/70 mt-1">
+            Each player on their own phone
+          </span>
         </Link>
 
         <div className="mt-10 grid grid-cols-3 gap-3 w-full">
