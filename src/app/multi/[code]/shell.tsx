@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useRemoteGame } from "@/context/RemoteGameContext";
+import { NoEntry } from "@/components/icons";
 import { getMembership } from "@/lib/identity";
 import LobbyView from "./lobby";
 import ActiveGameView from "./active";
@@ -34,7 +35,9 @@ export default function MultiGameShell({ code }: { code: string }) {
   if (error || !game) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-buck-dark text-center">
-        <div className="text-6xl mb-4">🚫</div>
+        <div className="mb-4 flex justify-center">
+          <NoEntry size={72} />
+        </div>
         <h1 className="text-2xl font-black">Game not found</h1>
         <p className="mt-2 text-white/60">{error ?? "That code doesn't match any game."}</p>
         <button

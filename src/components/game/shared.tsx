@@ -3,6 +3,12 @@
 import { useMemo } from "react";
 import { motion, type TargetAndTransition } from "framer-motion";
 import Buck from "@/components/Buck";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Asterisk,
+} from "@/components/icons";
 import type { RollOutcome } from "@/lib/types";
 
 // === Shared timing — pages should reference these for consistency ===
@@ -14,7 +20,6 @@ export const OUTCOME_GAP_MS = 80;
 export const TURN_OUTRO_MS = 380;
 
 type OutcomeMeta = {
-  emoji: string;
   label: string;
   cardFrom: string;
   cardTo: string;
@@ -23,34 +28,37 @@ type OutcomeMeta = {
 
 export const OUTCOME_META: Record<RollOutcome, OutcomeMeta> = {
   left: {
-    emoji: "⬅️",
     label: "LEFT",
     cardFrom: "#1E40AF",
     cardTo: "#3B82F6",
     accent: "#60A5FA",
   },
   right: {
-    emoji: "➡️",
     label: "RIGHT",
     cardFrom: "#1E40AF",
     cardTo: "#3B82F6",
     accent: "#60A5FA",
   },
   center: {
-    emoji: "⬇️",
     label: "POT!",
     cardFrom: "#9F1239",
     cardTo: "#F97066",
     accent: "#F97066",
   },
   keep: {
-    emoji: "✊",
     label: "KEEP!",
     cardFrom: "#854D0E",
     cardTo: "#FBBF24",
     accent: "#FBBF24",
   },
 };
+
+function OutcomeIcon({ outcome, size }: { outcome: RollOutcome; size: number }) {
+  if (outcome === "left") return <ArrowLeft size={size} color="#fff" />;
+  if (outcome === "right") return <ArrowRight size={size} color="#fff" />;
+  if (outcome === "center") return <ArrowDown size={size} color="#fff" />;
+  return <Asterisk size={size} color="#fff" />;
+}
 
 // ============================================================
 // Confetti
@@ -123,7 +131,9 @@ export function OutcomeCard({
         minWidth: 220,
       }}
     >
-      <div className="text-4xl mb-0.5 leading-none">{meta.emoji}</div>
+      <div className="flex items-center justify-center mb-1">
+        <OutcomeIcon outcome={outcome} size={42} />
+      </div>
       <div className="font-black text-3xl tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
         {meta.label}
       </div>

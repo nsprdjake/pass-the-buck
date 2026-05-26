@@ -6,95 +6,24 @@ type BuckPileProps = {
   count: number;
   /** Height of each bill */
   billHeight?: number;
-  /** Vertical stack offset (px between bills in a stack of <=3) */
+  /** Vertical stack offset (px between bills in the stack of 3) */
   stackOffset?: number;
-  /** Horizontal gap between groups */
-  groupGap?: number;
-  /** How to handle the rightmost N bills as "flying off" (hide them in pile so the overlay reads cleanly) */
-  hideTop?: number;
+  /** Horizontal gap between bills in the side-by-side layout */
+  gap?: number;
 };
 
 /**
- * Returns array of group sizes for a horizontal "row of stacks" layout.
- * Bills are shown side-by-side individually when ≤3; otherwise they are
- * grouped into stacks of 3 (with a smaller leftover stack on the right).
- *
- * Examples:
- *   1 → [1]
- *   3 → [1, 1, 1]
- *   4 → [3, 1]
- *   5 → [3, 2]
- *   6 → [3, 3]
- *   7 → [3, 3, 1]
- */
-function groupSizes(count: number): number[] {
-  if (count <= 0) return [];
-  if (count <= 3) return Array.from({ length: count }, () => 1);
-  const groups: number[] = [];
-  let remaining = count;
-  while (remaining > 3) {
-    groups.push(3);
-    remaining -= 3;
-  }
-  if (remaining > 0) groups.push(remaining);
-  return groups;
-}
-
-/**
- * Render a single stack of N bills (1, 2, or 3), shown from above with the
- * top of each bill peeking from under the next.
- */
-function BuckStack({
-  n,
-  height,
-  offset,
-}: {
-  n: number;
-  height: number;
-  offset: number;
-}) {
-  const w = Math.round(height * 2.3);
-  const stackHeight = height + Math.max(n - 1, 0) * offset;
-  return (
-    <div
-      className="relative"
-      style={{ width: w, height: stackHeight }}
-    >
-      {Array.from({ length: n }).map((_, i) => (
-        <div
-          key={i}
-          className="absolute left-0"
-          style={{
-            top: i * offset,
-            width: w,
-            height,
-            filter: `drop-shadow(0 ${1.5 + i * 0.4}px ${2 + i * 0.3}px rgba(0,0,0,0.45))`,
-            zIndex: i + 1,
-          }}
-        >
-          <Buck height={height} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/**
- * A horizontal row of buck groups. Bills lay flat side-by-side; if there are
- * more than 3, they cluster into stacks of 3 (plus a leftover stack on the
- * right). The whole row is centered.
+ * Renders a player's bucks.
+ *  - 1–3 bucks: shown side-by-side on the table, no stacking.
+ *  - 4+ bucks: a single 3-high stack of bills with the total drawn next to it.
  */
 export default function BuckPile({
   count,
   billHeight = 30,
   stackOffset = 5,
-  groupGap = 6,
-  hideTop = 0,
+  gap = 6,
 }: BuckPileProps) {
-  const visible = Math.max(count - hideTop, 0);
-  const groups = groupSizes(visible);
-
-  if (visible <= 0) {
+  if (count <= 0) {
     const w = Math.round(billHeight * 2.3);
     return (
       <div
@@ -108,19 +37,69 @@ export default function BuckPile({
     );
   }
 
+  const billWidth = Math.round(billHeight * 2.3);
+
+  // 1–3 bucks: lay them flat side-by-side.
+  if (count <= 3) {
+    return (
+      <div className="flex items-end justify-center" style={{ gap }}>
+        {Array.from({ length: count }).map((_, i) => (
+          <div
+            key={i}
+            style={{
+              width: billWidth,
+              height: billHeight,
+              filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.5))",
+            }}
+          >
+            <Buck height={billHeight} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // 4+ bucks: ONE stack of 3 bills with the total beside it.
+  const stackHeight = billHeight + 2 * stackOffset;
   return (
     <div
       className="flex items-end justify-center"
-      style={{ gap: groupGap }}
+      style={{ gap: gap + 6 }}
     >
-      {groups.map((n, i) => (
-        <BuckStack
-          key={i}
-          n={n}
-          height={billHeight}
-          offset={stackOffset}
-        />
-      ))}
+      <div
+        className="relative"
+        style={{ width: billWidth, height: stackHeight }}
+      >
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="absolute left-0"
+            style={{
+              top: i * stackOffset,
+              width: billWidth,
+              height: billHeight,
+              filter: `drop-shadow(0 ${1.5 + i * 0.4}px ${
+                2 + i * 0.3
+              }px rgba(0,0,0,0.5))`,
+              zIndex: i + 1,
+            }}
+          >
+            <Buck height={billHeight} />
+          </div>
+        ))}
+      </div>
+      <div
+        className="flex flex-col items-center justify-center font-black"
+        style={{ height: stackHeight }}
+      >
+        <span className="text-white/40 text-base leading-none mb-0.5">×</span>
+        <span
+          className="text-white leading-none"
+          style={{ fontSize: billHeight * 0.95 }}
+        >
+          {count}
+        </span>
+      </div>
     </div>
   );
 }

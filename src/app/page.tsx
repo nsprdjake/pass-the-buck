@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLocalGame } from "@/context/LocalGameContext";
+import { BillStack, Bolt, Smile, Sparkle } from "@/components/icons";
 
 export default function Home() {
   const { status, players } = useLocalGame();
@@ -10,8 +11,8 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark">
       <div className="flex flex-col items-center text-center max-w-md w-full">
-        <div className="text-8xl mb-4 animate-float select-none" aria-hidden>
-          💵
+        <div className="mb-4 animate-float select-none flex justify-center" aria-hidden>
+          <BillStack size={140} />
         </div>
 
         <h1 className="text-5xl font-black tracking-tight leading-none">
@@ -53,16 +54,16 @@ export default function Home() {
 
         <div className="mt-10 grid grid-cols-3 gap-3 w-full">
           {[
-            { emoji: "⚡", label: "Simple" },
-            { emoji: "🚀", label: "Fast" },
-            { emoji: "🎉", label: "Fun" },
-          ].map((p) => (
+            { Icon: Sparkle, label: "Simple", color: "#A78BFA" },
+            { Icon: Bolt, label: "Fast", color: "#FBBF24" },
+            { Icon: Smile, label: "Fun", color: "#F472B6" },
+          ].map(({ Icon, label, color }) => (
             <div
-              key={p.label}
-              className="bg-buck-card/70 border border-white/10 rounded-full py-2 text-sm font-semibold text-white/90"
+              key={label}
+              className="bg-buck-card/70 border border-white/10 rounded-full py-2 text-sm font-semibold text-white/90 flex items-center justify-center gap-1.5"
             >
-              <span className="mr-1">{p.emoji}</span>
-              {p.label}
+              <Icon size={16} color={color} />
+              {label}
             </div>
           ))}
         </div>

@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import Buck from "@/components/Buck";
 import BuckPile from "@/components/BuckPile";
+import Die from "@/components/Die";
+import DiceTray from "@/components/DiceTray";
 import {
   BUCK_FLY_MS,
   FELT_GRADIENT,
@@ -18,8 +19,10 @@ import {
   SLAM_MS,
   TURN_OUTRO_MS,
 } from "@/components/game/shared";
+import { MoneyBag, Skip } from "@/components/icons";
 import { useRemoteGame } from "@/context/RemoteGameContext";
 import { rollCountForBucks } from "@/lib/game-logic";
+import { playSfx, unlockAudio } from "@/lib/sfx";
 import type { RollOutcome } from "@/lib/types";
 
 type Phase =
@@ -107,17 +110,26 @@ export default function ActiveGameView() {
 
       setPhase("rolling");
       setOutcomeIdx(0);
-      await sleep(ROLLING_MS);
+      playSfx("roll");
+      await sleep(ROLLING_MS - 100);
+      if (cancelled) return;
+      playSfx("dieLand");
+      await sleep(100);
       if (cancelled) return;
 
       for (let i = 0; i < turn.outcomes.length; i++) {
         if (cancelled) return;
         setOutcomeIdx(i);
         setPhase("reveal");
+        playSfx("reveal");
         await sleep(REVEAL_HOLD_MS);
         if (cancelled) return;
         setPhase("buckfly");
         const o = turn.outcomes[i];
+        if (o === "left") playSfx("slideLeft");
+        else if (o === "right") playSfx("slideRight");
+        else if (o === "center") playSfx("pot");
+        else if (o === "keep") playSfx("keep");
         if (o !== "keep") {
           await sleep(140);
           if (cancelled) return;
@@ -205,6 +217,8 @@ export default function ActiveGameView() {
     if (!isMyTurn || phase !== "idle") return;
     if (!current || current.bucks <= 0) return;
     setErr(null);
+    unlockAudio();
+    playSfx("slam");
     setPhase("slam");
     await sleep(SLAM_MS);
     try {
@@ -247,9 +261,7 @@ export default function ActiveGameView() {
           transition={{ duration: 0.35 }}
           className="flex items-center gap-1.5 bg-black/50 border border-buck-gold/50 rounded-full px-3 py-1 backdrop-blur-sm"
         >
-          <div style={{ height: 18 }}>
-            <Buck height={18} />
-          </div>
+          <MoneyBag size={20} />
           <span className="text-buck-gold font-black text-xs uppercase tracking-widest">
             Pot
           </span>
@@ -407,50 +419,43 @@ export default function ActiveGameView() {
           </AnimatePresence>
         </div>
 
-        {/* Outcome card */}
-        <div className="relative h-32 flex items-center justify-center w-full">
-          <AnimatePresence mode="wait">
-            {activeOutcome && (
-              <OutcomeCard
-                key={`oc-${outcomeIdx}-${activeOutcome}`}
-                outcome={activeOutcome}
-                recipientName={
-                  activeOutcome === "left"
-                    ? leftNeighbor?.display_name
-                    : activeOutcome === "right"
-                    ? rightNeighbor?.display_name
-                    : activeOutcome === "center"
-                    ? "the pot"
-                    : undefined
-                }
-                recipientColor={
-                  activeOutcome === "left"
-                    ? leftNeighbor?.color
-                    : activeOutcome === "right"
-                    ? rightNeighbor?.color
-                    : activeOutcome === "center"
-                    ? "#FBBF24"
-                    : undefined
-                }
-              />
-            )}
-            {phase === "rolling" && !activeOutcome && (
-              <motion.div
-                key="rolling"
-                initial={{ scale: 0.7, opacity: 0 }}
-                animate={{
-                  scale: [0.7, 1, 1],
-                  opacity: [0, 1, 1],
-                  rotate: [0, 360, 720],
-                }}
-                exit={{ scale: 0.7, opacity: 0 }}
-                transition={{ duration: ROLLING_MS / 1000, ease: "easeOut" }}
-                className="text-6xl"
-              >
-                🎲
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* Dice tray + outcome card area */}
+        <div className="relative min-h-[150px] flex flex-col items-center justify-center w-full gap-3 mt-2">
+          <div className="h-24 flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              {activeOutcome && (
+                <OutcomeCard
+                  key={`oc-${outcomeIdx}-${activeOutcome}`}
+                  outcome={activeOutcome}
+                  recipientName={
+                    activeOutcome === "left"
+                      ? leftNeighbor?.display_name
+                      : activeOutcome === "right"
+                      ? rightNeighbor?.display_name
+                      : activeOutcome === "center"
+                      ? "the pot"
+                      : undefined
+                  }
+                  recipientColor={
+                    activeOutcome === "left"
+                      ? leftNeighbor?.color
+                      : activeOutcome === "right"
+                      ? rightNeighbor?.color
+                      : activeOutcome === "center"
+                      ? "#FBBF24"
+                      : undefined
+                  }
+                />
+              )}
+            </AnimatePresence>
+          </div>
+          {game.last_turn && (
+            <DiceTray
+              outcomes={game.last_turn.outcomes}
+              phase={phase}
+              activeIdx={outcomeIdx}
+            />
+          )}
         </div>
       </div>
 
@@ -510,7 +515,7 @@ export default function ActiveGameView() {
                 />
               )}
               <span className="relative inline-flex items-center justify-center gap-3">
-                <span className="text-3xl">🎲</span>
+                <Die size={36} blind />
                 <span>
                   {phase === "rolling"
                     ? "ROLLING…"
@@ -524,7 +529,7 @@ export default function ActiveGameView() {
                     ? "NO BUCKS"
                     : "ROLL!"}
                 </span>
-                <span className="text-3xl">🎲</span>
+                <Die size={36} blind />
               </span>
             </motion.button>
           ) : (
@@ -574,7 +579,9 @@ export default function ActiveGameView() {
                 boxShadow: "0 20px 50px rgba(249,112,102,0.4)",
               }}
             >
-              <div className="text-5xl mb-2">⏭️</div>
+              <div className="flex justify-center mb-2">
+                <Skip size={48} color="#F97066" />
+              </div>
               <div
                 className="font-black text-2xl"
                 style={{ color: current.color }}

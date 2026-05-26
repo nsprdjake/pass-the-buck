@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Phone } from "@/components/icons";
 
 export default function MultiLandingPage() {
   return (
@@ -13,8 +14,8 @@ export default function MultiLandingPage() {
           ← Home
         </Link>
 
-        <div className="text-7xl mb-3 select-none" aria-hidden>
-          📱
+        <div className="mb-3 flex justify-center" aria-hidden>
+          <Phone size={88} color="#10B981" />
         </div>
         <h1 className="text-4xl font-black tracking-tight">
           Play <span className="text-buck-green">across devices</span>

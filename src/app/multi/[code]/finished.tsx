@@ -1,14 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Buck from "@/components/Buck";
 import { Confetti } from "@/components/game/shared";
+import { MoneyBag, Trophy } from "@/components/icons";
 import { useRemoteGame } from "@/context/RemoteGameContext";
+import { playSfx } from "@/lib/sfx";
 
 export default function FinishedView({ code }: { code: string }) {
   const router = useRouter();
   const { game, players } = useRemoteGame();
+
+  useEffect(() => {
+    playSfx("winner");
+  }, []);
+
   if (!game) return null;
   const winner =
     players.find((p) => p.id === game.winner_player_id) ??
@@ -62,9 +70,9 @@ export default function FinishedView({ code }: { code: string }) {
           initial={{ scale: 0, rotate: -20 }}
           animate={{ scale: [0, 1.3, 1], rotate: [-20, 8, 0] }}
           transition={{ duration: 0.7, times: [0, 0.7, 1] }}
-          className="text-9xl mb-4"
+          className="mb-4 flex justify-center"
         >
-          🏆
+          <Trophy size={128} />
         </motion.div>
         <div className="text-xs uppercase tracking-[0.4em] text-buck-gold font-black">
           Winner
@@ -79,7 +87,7 @@ export default function FinishedView({ code }: { code: string }) {
           {winner?.display_name}
         </motion.h1>
         <div className="mt-6 inline-flex items-center gap-2 bg-buck-gold/15 border-2 border-buck-gold/40 rounded-full px-5 py-3">
-          <span className="text-buck-gold text-2xl">💰</span>
+          <MoneyBag size={28} />
           <span className="text-buck-gold font-black text-2xl">
             {totalTaken} buck{totalTaken === 1 ? "" : "s"}
           </span>
