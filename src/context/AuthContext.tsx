@@ -28,6 +28,8 @@ export type Profile = {
   balance: number;
   /** Slug of the currently-active theme — drives data-theme on <html>. */
   active_theme_slug: string;
+  /** Slug of the currently-equipped power-up (consumed on next game settle). */
+  active_powerup_slug: string | null;
   created_at: string;
   updated_at: string;
 };

@@ -13,6 +13,14 @@ import {
   type UserAchievement,
 } from "@/lib/achievements";
 import {
+  buyPowerup,
+  equipPowerup,
+  listOwnedPowerups,
+  listPowerups,
+  type OwnedPowerup,
+  type PowerupRow,
+} from "@/lib/powerups";
+import {
   listOwnedThemes,
   listThemes,
   purchaseTheme,
@@ -21,6 +29,13 @@ import {
   type OwnedTheme,
   type ThemeRow,
 } from "@/lib/themes";
+import {
+  bucksPerDollar,
+  formatPrice,
+  listBundles,
+  testPurchaseBundle,
+  type EyebuckBundle,
+} from "@/lib/wallet";
 
 const RYE: React.CSSProperties = {
   fontFamily: "var(--font-rye), Georgia, serif",
@@ -67,9 +82,20 @@ export default function ProfilePage() {
   const [owned, setOwned] = useState<Set<string>>(new Set(["saloon"]));
   const [themeBusy, setThemeBusy] = useState<string | null>(null);
   const [themeError, setThemeError] = useState<string | null>(null);
+  const [powerups, setPowerups] = useState<PowerupRow[] | null>(null);
+  const [ownedPowerups, setOwnedPowerups] = useState<Map<string, number>>(new Map());
+  const [powerupBusy, setPowerupBusy] = useState<string | null>(null);
+  const [powerupError, setPowerupError] = useState<string | null>(null);
   const [stats, setStats] = useState<StatsRow | null>(null);
   const [achievementCatalog, setAchievementCatalog] = useState<Achievement[] | null>(null);
   const [earnedAchievements, setEarnedAchievements] = useState<Map<string, UserAchievement>>(new Map());
+  const [bundles, setBundles] = useState<EyebuckBundle[] | null>(null);
+  const [bundleBusy, setBundleBusy] = useState<string | null>(null);
+  const [bundleError, setBundleError] = useState<string | null>(null);
+  const [purchaseFlash, setPurchaseFlash] = useState<{
+    amount: number;
+    at: number;
+  } | null>(null);
 
   // Bounce signed-out visitors to the auth screen.
   useEffect(() => {
@@ -195,6 +221,95 @@ export default function ProfilePage() {
       cancelled = true;
     };
   }, [user]);
+
+  // Load the bundle catalog once on mount.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = await listBundles();
+        if (!cancelled) setBundles(rows);
+      } catch {
+        if (!cancelled) setBundles([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Auto-dismiss the "+X eyeBucks" flash after a few seconds.
+  useEffect(() => {
+    if (!purchaseFlash) return;
+    const t = setTimeout(() => setPurchaseFlash(null), 4000);
+    return () => clearTimeout(t);
+  }, [purchaseFlash]);
+
+  async function handleBuyBundle(bundleId: string) {
+    if (!user || bundleBusy) return;
+    setBundleBusy(bundleId);
+    setBundleError(null);
+    try {
+      const res = await testPurchaseBundle(bundleId);
+      await refreshProfile();
+      setPurchaseFlash({ amount: res.amountEyebucks, at: Date.now() });
+    } catch (e) {
+      setBundleError(e instanceof Error ? e.message : "Couldn't credit bundle");
+    } finally {
+      setBundleBusy(null);
+    }
+  }
+
+  // Load power-up catalog + this user's inventory.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [catalog, owned]: [PowerupRow[], OwnedPowerup[]] = await Promise.all([
+          listPowerups(),
+          user ? listOwnedPowerups(user.id) : Promise.resolve([] as OwnedPowerup[]),
+        ]);
+        if (cancelled) return;
+        setPowerups(catalog);
+        const m = new Map<string, number>();
+        for (const o of owned) m.set(o.slug, o.quantity);
+        setOwnedPowerups(m);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, profile?.balance, profile?.active_powerup_slug]);
+
+  async function handleBuyPowerup(slug: string) {
+    if (!user || powerupBusy) return;
+    setPowerupBusy(slug);
+    setPowerupError(null);
+    try {
+      await buyPowerup(slug);
+      await refreshProfile();
+    } catch (e) {
+      setPowerupError(e instanceof Error ? e.message : "Couldn't buy");
+    } finally {
+      setPowerupBusy(null);
+    }
+  }
+
+  async function handleEquipPowerup(slug: string | null) {
+    if (!user || powerupBusy) return;
+    setPowerupBusy(slug ?? "__unequip");
+    setPowerupError(null);
+    try {
+      await equipPowerup(slug);
+      await refreshProfile();
+    } catch (e) {
+      setPowerupError(e instanceof Error ? e.message : "Couldn't equip");
+    } finally {
+      setPowerupBusy(null);
+    }
+  }
 
   async function handleBuyTheme(slug: string) {
     if (!user || themeBusy) return;
@@ -641,6 +756,158 @@ export default function ProfilePage() {
             More themes will get fully wired into the rest of the app over the
             next few updates. For now, your active theme is shown here and on
             the leaderboard.
+          </p>
+        </Panel>
+
+        {/* Power-ups — equipable single-game bonuses */}
+        <Panel className="mb-4">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2
+              className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              Power-Ups
+            </h2>
+            <span
+              className="text-[0.62rem] italic text-[var(--parchment-light)]/45"
+              style={FELL}
+            >
+              One equipped at a time
+            </span>
+          </div>
+          {powerups === null ? (
+            <div
+              className="py-5 text-center text-[0.85rem] italic text-[var(--parchment-light)]/50"
+              style={FELL}
+            >
+              Stocking the shelves…
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {powerups.map((p) => {
+                const owned = ownedPowerups.get(p.slug) ?? 0;
+                const isEquipped = profile?.active_powerup_slug === p.slug;
+                const canAfford = (profile?.balance ?? 0) >= p.price_eyebucks;
+                const busy = powerupBusy === p.slug;
+                return (
+                  <li
+                    key={p.slug}
+                    className="relative flex items-center gap-3 rounded-[12px] border-[1.5px] px-3 py-2.5"
+                    style={{
+                      background: isEquipped
+                        ? "linear-gradient(180deg, rgba(201,154,51,0.22) 0%, rgba(122,90,24,0.18) 100%)"
+                        : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+                      borderColor: isEquipped
+                        ? "rgba(255,209,122,0.65)"
+                        : "rgba(201,154,51,0.3)",
+                    }}
+                  >
+                    <div
+                      aria-hidden
+                      className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[10px] border-[1.5px] border-[var(--wood-mid)]"
+                      style={{
+                        background:
+                          "radial-gradient(circle at 30% 30%, var(--accent-light), var(--accent-mid) 55%, var(--accent-dark))",
+                        fontSize: "1.5rem",
+                      }}
+                    >
+                      {p.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="truncate text-[0.95rem] font-bold text-[var(--parchment-light)]"
+                          style={RYE}
+                        >
+                          {p.name}
+                        </span>
+                        {isEquipped && (
+                          <span
+                            className="rounded-full border border-[var(--accent-light)]/65 bg-[var(--accent-light)]/15 px-1.5 py-0.5 text-[0.55rem] font-bold uppercase text-[var(--accent-light)]"
+                            style={{ ...FELL, letterSpacing: "0.24em" }}
+                          >
+                            Equipped
+                          </span>
+                        )}
+                        {owned > 0 && !isEquipped && (
+                          <span
+                            className="rounded-full border border-[var(--parchment-light)]/30 bg-[var(--parchment-light)]/10 px-1.5 py-0.5 text-[0.55rem] font-bold uppercase text-[var(--parchment-light)]/85"
+                            style={{ ...FELL, letterSpacing: "0.24em" }}
+                          >
+                            ×{owned}
+                          </span>
+                        )}
+                      </div>
+                      <div
+                        className="mt-0.5 truncate text-[0.72rem] italic text-[var(--parchment-light)]/65"
+                        style={FELL}
+                      >
+                        {p.description}
+                      </div>
+                    </div>
+                    <div className="flex flex-shrink-0 flex-col items-end gap-1">
+                      {owned > 0 ? (
+                        isEquipped ? (
+                          <button
+                            type="button"
+                            onClick={() => handleEquipPowerup(null)}
+                            disabled={busy}
+                            className="rounded-[8px] border-[1.5px] border-[var(--accent-mid)]/40 px-3 py-1.5 text-[0.65rem] font-bold uppercase text-[var(--parchment-light)]/85 transition-colors hover:border-[var(--accent-light)]/70 disabled:opacity-50"
+                            style={{ ...FELL, letterSpacing: "0.22em" }}
+                          >
+                            {busy ? "…" : "Unequip"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleEquipPowerup(p.slug)}
+                            disabled={busy}
+                            className="rounded-[8px] border-[1.5px] border-[var(--accent-mid)]/55 bg-[rgba(5,28,20,0.65)] px-3 py-1.5 text-[0.65rem] font-bold uppercase text-[var(--parchment-light)]/85 transition-colors hover:border-[var(--accent-light)]/80 hover:text-[var(--accent-light)] disabled:opacity-50"
+                            style={{ ...FELL, letterSpacing: "0.22em" }}
+                          >
+                            {busy ? "…" : "Equip"}
+                          </button>
+                        )
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={() => handleBuyPowerup(p.slug)}
+                        disabled={!canAfford || busy}
+                        className="rounded-[8px] border-[1.5px] px-3 py-1.5 text-[0.65rem] font-bold uppercase disabled:cursor-not-allowed disabled:opacity-50"
+                        style={{
+                          ...FELL,
+                          letterSpacing: "0.18em",
+                          color: canAfford ? "var(--wood-dark)" : "var(--parchment-light)",
+                          background: canAfford
+                            ? "linear-gradient(180deg, var(--accent-light) 0%, var(--accent-mid) 48%, var(--accent-dark) 100%)"
+                            : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+                          borderColor: canAfford
+                            ? "var(--accent-dark)"
+                            : "rgba(201,154,51,0.3)",
+                        }}
+                      >
+                        {busy ? "…" : `${p.price_eyebucks.toLocaleString()} ◈`}
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {powerupError && (
+            <div
+              className="mt-3 rounded-[10px] border-[1.5px] border-[#8b2222]/55 bg-[#8b2222]/25 px-3 py-2 text-[0.82rem] font-bold text-[#ffd2c2]"
+              style={FELL}
+            >
+              {powerupError}
+            </div>
+          )}
+          <p
+            className="mt-3 text-[0.7rem] italic leading-snug text-[var(--parchment-light)]/45"
+            style={FELL}
+          >
+            Equipped power-ups apply to your next cross-device hand and are
+            consumed on settle. Stack inventory by buying multiple.
           </p>
         </Panel>
 

@@ -23,29 +23,47 @@ export type OwnedTheme = {
  * future visual rollouts. Until then, picking one is a status signal
  * (visible on profile) without actually re-skinning the whole app.
  */
+/**
+ * Visual preview palette for each theme — drives the thumbnail swatches
+ * on the theme picker. These values mirror the actual CSS variable
+ * palettes in globals.css ([data-theme="..."]). Update both in tandem
+ * whenever a theme's palette changes.
+ */
 export const THEME_PREVIEW: Record<
   string,
   { swatches: string[]; bg: string }
 > = {
   saloon: {
     bg: "#0a4d33",
-    swatches: ["#ffd17a", "#c99a33", "#f4e4b7", "#5c3b1e"],
+    swatches: ["#ffd17a", "#c99a33", "#f1dfa3", "#5c3b1e"],
   },
   speakeasy: {
     bg: "#0d2820",
-    swatches: ["#e8c468", "#16876a", "#f6efd7", "#1a1410"],
+    swatches: ["#e8c468", "#16876a", "#f6efd7", "#3a1f0e"],
   },
   cantina: {
     bg: "#5e1a0e",
-    swatches: ["#ff9b3c", "#3aa6a0", "#ffe6c2", "#2a0a04"],
+    swatches: ["#ffc26e", "#e07a2a", "#3aa6a0", "#4a2310"],
   },
   "old-money": {
     bg: "#10182a",
-    swatches: ["#c9a059", "#7a1f2e", "#f0e6d2", "#0a0e1a"],
+    swatches: ["#c9a059", "#7a1f2e", "#d8c79e", "#3a1418"],
   },
   riverboat: {
     bg: "#1a242c",
-    swatches: ["#c5a572", "#3a5566", "#dfd5c0", "#0d141a"],
+    swatches: ["#b8a075", "#3a5566", "#d4c8a8", "#3a2010"],
+  },
+  retro: {
+    bg: "#1a0a44",
+    swatches: ["#ff7ad9", "#6ef9ff", "#d61f8c", "#0b0524"],
+  },
+  techno: {
+    bg: "#050a14",
+    swatches: ["#5eff9c", "#b96eff", "#14d672", "#000000"],
+  },
+  arcade: {
+    bg: "#0a0805",
+    swatches: ["#ffb838", "#ff5252", "#ffd968", "#000000"],
   },
 };
 

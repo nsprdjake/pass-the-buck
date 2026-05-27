@@ -1,5 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { IM_Fell_English, Inter, Rye } from "next/font/google";
+import {
+  IM_Fell_English,
+  Inter,
+  Orbitron,
+  Press_Start_2P,
+  Rye,
+  VT323,
+} from "next/font/google";
 import "./globals.css";
 import AchievementToaster from "@/components/AchievementToaster";
 import ThemeSync from "@/components/ThemeSync";
@@ -23,6 +30,29 @@ const fell = IM_Fell_English({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Theme-specific display faces. Loaded once; only render-active when
+// the matching [data-theme] is set on <html>.
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
+  weight: ["500", "700", "900"],
+  display: "swap",
+});
+
+const pressStart = Press_Start_2P({
+  variable: "--font-press-start",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
+const vt323 = VT323({
+  variable: "--font-vt323",
+  subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
 
@@ -58,7 +88,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${rye.variable} ${fell.variable} h-full`}
+      className={`${inter.variable} ${rye.variable} ${fell.variable} ${orbitron.variable} ${pressStart.variable} ${vt323.variable} h-full`}
     >
       <body className="min-h-full bg-buck-dark text-white antialiased">
         <AuthProvider>

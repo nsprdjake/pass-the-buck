@@ -29,6 +29,11 @@
 
   --font-display: var(--font-rye), Georgia, serif;
   --font-vintage: var(--font-fell), Georgia, serif;
+
+  /* Default theme-font overrides (themes can override these) */
+  --theme-font-display: var(--font-rye), Georgia, serif;
+  --theme-font-vintage: var(--font-fell), Georgia, serif;
+  --theme-font-body: var(--font-inter), system-ui, sans-serif;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -174,6 +179,97 @@
   --seal-light: #6a4438;
   --seal-mid:   #3a261e;
   --seal-dark:  #1c120c;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   NON-VINTAGE THEMES — full re-skins.
+   These override --theme-font-display/-vintage so headlines truly
+   feel different, and supply distinct rail + felt overlay treatments
+   below (see [data-theme="X"] .wood-grain / .felt-saloon::after).
+   ─────────────────────────────────────────────────────────────────── */
+
+[data-theme="retro"] {
+  /* 80s synthwave — deep indigo grid horizon, hot magenta, electric cyan,
+     chrome highlights. Vibe: Miami Vice billboard at dusk. */
+  --felt-deep: #0b0524;
+  --felt-mid:  #1a0a44;
+  --felt-rim:  #4c1d8a;
+  --wood-dark: #110830;
+  --wood-mid:  #2a1466;
+  --wood-light: #5024b0;
+  --accent-light: #ff7ad9;     /* hot pink */
+  --accent-mid:   #d61f8c;
+  --accent-dark:  #7a0e4a;
+  --accent-text:  #6ef9ff;     /* electric cyan headlines */
+  --accent-glow:  rgba(255, 122, 217, 0.28);
+  --parchment-light: #fff0fa;
+  --parchment-mid:   #ffc6ee;
+  --parchment-dark:  #d685c2;
+  --ink: #1a0334;
+  --lamp-tint: rgba(255, 122, 217, 0.18);
+  --seal-light: #6ef9ff;
+  --seal-mid:   #1aa4c8;
+  --seal-dark:  #074a5c;
+
+  --theme-font-display: var(--font-orbitron), "Trebuchet MS", sans-serif;
+  --theme-font-vintage: var(--font-vt323), "Courier New", monospace;
+  --theme-font-body: var(--font-inter), system-ui, sans-serif;
+}
+
+[data-theme="techno"] {
+  /* After-hours rave — near-black floor, laser green primary, ultraviolet
+     edges. Less is more; lots of dark space, sharp accents. */
+  --felt-deep: #020306;
+  --felt-mid:  #050a14;
+  --felt-rim:  #0a1428;
+  --wood-dark: #000000;
+  --wood-mid:  #0a0a14;
+  --wood-light: #1a1428;
+  --accent-light: #5eff9c;     /* laser green */
+  --accent-mid:   #14d672;
+  --accent-dark:  #07703a;
+  --accent-text:  #5eff9c;
+  --accent-glow:  rgba(94, 255, 156, 0.35);
+  --parchment-light: #1a1428;
+  --parchment-mid:   #0e0a18;
+  --parchment-dark:  #050308;
+  --ink: #d8ffe8;
+  --lamp-tint: rgba(94, 255, 156, 0.10);
+  --seal-light: #b96eff;
+  --seal-mid:   #7a2dd6;
+  --seal-dark:  #3a0e6e;
+
+  --theme-font-display: var(--font-orbitron), "Trebuchet MS", sans-serif;
+  --theme-font-vintage: var(--font-orbitron), "Trebuchet MS", sans-serif;
+  --theme-font-body: var(--font-orbitron), system-ui, sans-serif;
+}
+
+[data-theme="arcade"] {
+  /* CRT cabinet — pitch black surround, amber phosphor primary, red HUD
+     accent, scanlines instead of paper texture. */
+  --felt-deep: #000000;
+  --felt-mid:  #0a0805;
+  --felt-rim:  #1c1408;
+  --wood-dark: #050505;
+  --wood-mid:  #1a1010;
+  --wood-light: #2c1818;
+  --accent-light: #ffb838;     /* amber */
+  --accent-mid:   #e08a14;
+  --accent-dark:  #7a4608;
+  --accent-text:  #ffd968;
+  --accent-glow:  rgba(255, 184, 56, 0.32);
+  --parchment-light: #ffe2b0;
+  --parchment-mid:   #e8b860;
+  --parchment-dark:  #a8782a;
+  --ink: #1a0a02;
+  --lamp-tint: rgba(255, 184, 56, 0.12);
+  --seal-light: #ff5252;
+  --seal-mid:   #c81e1e;
+  --seal-dark:  #6e0808;
+
+  --theme-font-display: var(--font-press-start), "Courier New", monospace;
+  --theme-font-vintage: var(--font-vt323), "Courier New", monospace;
+  --theme-font-body: var(--font-vt323), "Courier New", monospace;
 }
 
 /* ═══════════════════════════════════════════════════════════════════ */
@@ -374,4 +470,207 @@ body {
 
 .font-vintage {
   font-family: var(--font-fell), Georgia, serif;
+}
+
+/* Theme-aware font utilities — components reading these flip personality
+   when [data-theme] changes on <html>. The fallbacks point back at the
+   Saloon faces so pre-existing markup degrades gracefully. */
+.font-theme-display {
+  font-family: var(--theme-font-display, var(--font-rye), Georgia, serif);
+}
+.font-theme-vintage {
+  font-family: var(--theme-font-vintage, var(--font-fell), Georgia, serif);
+}
+.font-theme-body {
+  font-family: var(--theme-font-body, var(--font-inter), system-ui, sans-serif);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PER-THEME SURFACE OVERRIDES
+   The base .felt-saloon / .wood-grain / .parchment classes are
+   theme-agnostic (they read from --felt-*, --wood-*, --parchment-*).
+   These overrides give each non-vintage theme a distinct character —
+   neon grid, laser scan, CRT scanlines — without touching components.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Retro: pink horizon line + cyan perspective grid over indigo ─── */
+[data-theme="retro"] .felt-saloon::after {
+  /* Replace the saloon's dot mist with a wireframe grid that recedes
+     toward a horizon. The horizon glow lives in ::before via lamp-tint. */
+  opacity: 0.55;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 42%,
+      rgba(255, 122, 217, 0.18) 49%,
+      rgba(255, 122, 217, 0.0) 51%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(110, 249, 255, 0.08) 0 1px,
+      transparent 1px 38px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(110, 249, 255, 0.10) 0 1px,
+      transparent 1px 38px
+    );
+  mix-blend-mode: screen;
+}
+[data-theme="retro"] .felt-saloon::before {
+  /* Pink dusk glow on the horizon */
+  background: radial-gradient(
+    ellipse 80% 28% at 50% 52%,
+    rgba(255, 122, 217, 0.35) 0%,
+    transparent 70%
+  );
+}
+[data-theme="retro"] .wood-grain {
+  /* Replace the wood rail with a chrome strip + magenta neon underline. */
+  background:
+    linear-gradient(
+      180deg,
+      #f9e8ff 0%,
+      #c8b4d8 22%,
+      #6e4a8a 55%,
+      #2a1466 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(255, 122, 217, 0.6),
+    0 0 12px rgba(255, 122, 217, 0.45);
+}
+[data-theme="retro"] .wood-grain::after {
+  content: "";
+  background: none;
+}
+[data-theme="retro"] .parchment {
+  /* Magenta sticker style for outcome cards / posters. */
+  background: linear-gradient(
+    180deg,
+    #ff7ad9 0%,
+    #d61f8c 60%,
+    #6e0a4a 100%
+  );
+}
+[data-theme="retro"] .parchment::after {
+  /* Replace the foxing dots with a faint dot-screen halftone */
+  opacity: 0.18;
+  background: radial-gradient(
+    rgba(255, 255, 255, 0.7) 0.6px,
+    transparent 0.6px
+  );
+  background-size: 5px 5px;
+  mix-blend-mode: screen;
+}
+
+/* ── Techno: pure black + faint green grid + violet edge glow ─────── */
+[data-theme="techno"] .felt-saloon::after {
+  opacity: 0.35;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(94, 255, 156, 0.08) 0 1px,
+      transparent 1px 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(94, 255, 156, 0.05) 0 1px,
+      transparent 1px 40px
+    );
+  mix-blend-mode: screen;
+}
+[data-theme="techno"] .felt-saloon::before {
+  /* Subtle violet edge lighting — like an LED strip under the table */
+  background:
+    radial-gradient(
+      ellipse 90% 30% at 50% 100%,
+      rgba(185, 110, 255, 0.30) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 80% 25% at 50% 0%,
+      rgba(94, 255, 156, 0.12) 0%,
+      transparent 70%
+    );
+}
+[data-theme="techno"] .wood-grain {
+  /* Brushed-matte black bar with a thin laser-green line. */
+  background: linear-gradient(180deg, #0a0a14 0%, #000000 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(94, 255, 156, 0.55),
+    inset 0 -1px 0 rgba(185, 110, 255, 0.4),
+    0 0 8px rgba(94, 255, 156, 0.3);
+}
+[data-theme="techno"] .wood-grain::after {
+  content: "";
+  background: none;
+}
+[data-theme="techno"] .parchment {
+  background: linear-gradient(180deg, #0a1428 0%, #050a14 100%);
+}
+[data-theme="techno"] .parchment::after {
+  opacity: 0.3;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(94, 255, 156, 0.07) 0 1px,
+    transparent 1px 3px
+  );
+  mix-blend-mode: screen;
+}
+
+/* ── Arcade: pitch black + amber scanlines + red HUD edge ─────────── */
+[data-theme="arcade"] .felt-saloon::after {
+  /* CRT scanlines */
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.55) 0 1px,
+    transparent 1px 3px
+  );
+  mix-blend-mode: multiply;
+}
+[data-theme="arcade"] .felt-saloon::before {
+  /* Warm phosphor bloom in the centre */
+  background: radial-gradient(
+    ellipse 50% 30% at 50% 35%,
+    rgba(255, 184, 56, 0.18) 0%,
+    transparent 70%
+  );
+}
+[data-theme="arcade"] .wood-grain {
+  /* Red HUD trim with a black plastic body, like a cabinet bezel. */
+  background: linear-gradient(
+    180deg,
+    #1a0a02 0%,
+    #050505 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 184, 56, 0.55),
+    inset 0 -1px 0 rgba(200, 30, 30, 0.7),
+    0 0 6px rgba(200, 30, 30, 0.4);
+}
+[data-theme="arcade"] .wood-grain::after {
+  content: "";
+  background: none;
+}
+[data-theme="arcade"] .parchment {
+  /* Amber phosphor "screen" for outcome cards */
+  background: linear-gradient(
+    180deg,
+    #ffd968 0%,
+    #e08a14 70%,
+    #7a4608 100%
+  );
+}
+[data-theme="arcade"] .parchment::after {
+  opacity: 0.35;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.5) 0 1px,
+    transparent 1px 3px
+  );
+  mix-blend-mode: multiply;
 }
