@@ -16,7 +16,7 @@ const FELL: React.CSSProperties = {
 
 export default function CreateMultiGamePage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const preferred = usePreferredName();
   const [name, setName] = useState("");
   const [buyIn, setBuyIn] = useState(3);
@@ -52,6 +52,7 @@ export default function CreateMultiGamePage() {
         mode,
         wager,
         userId: user?.id ?? null,
+        color: profile?.color ?? null,
       });
       router.push(`/multi/${game.code}`);
     } catch (e) {

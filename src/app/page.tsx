@@ -134,7 +134,7 @@ export default function Home() {
             letterSpacing: "0.48em",
           }}
         >
-          Est. 1873
+          Est. 2009
         </span>
 
         <h1

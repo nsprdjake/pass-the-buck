@@ -16,7 +16,7 @@ const FELL: React.CSSProperties = {
 function JoinForm() {
   const router = useRouter();
   const search = useSearchParams();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const preferred = usePreferredName();
   const [code, setCode] = useState(search.get("code")?.toUpperCase() ?? "");
   const [name, setName] = useState("");
@@ -39,6 +39,7 @@ function JoinForm() {
         code: code.trim().toUpperCase(),
         displayName: name.trim(),
         userId: user?.id ?? null,
+        color: profile?.color ?? null,
       });
       router.push(`/multi/${game.code}`);
     } catch (e) {

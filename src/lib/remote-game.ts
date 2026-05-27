@@ -95,6 +95,9 @@ export async function createGame(opts: {
   wager?: string | null;
   /** Optional auth.user.id — set when the host is signed in. */
   userId?: string | null;
+  /** Override the seat-derived color. Used to respect a signed-in user's
+   *  profile color. Falls back to PLAYER_COLORS[0] if not provided. */
+  color?: string | null;
 }): Promise<{ game: GameRow; me: PlayerRow }> {
   const sb = getSupabase();
   const deviceId = getDeviceId();
@@ -140,7 +143,7 @@ export async function createGame(opts: {
       device_id: deviceId,
       claim_token: claimToken,
       display_name: opts.displayName.slice(0, 20),
-      color: colorAt(0),
+      color: opts.color || colorAt(0),
       seat: 0,
       bucks: 0,
       is_host: true,
@@ -181,6 +184,8 @@ export async function joinGame(opts: {
   displayName: string;
   /** Optional auth.user.id — set when the joining device is signed in. */
   userId?: string | null;
+  /** Override the seat-derived color (signed-in user's profile color). */
+  color?: string | null;
 }): Promise<{ game: GameRow; me: PlayerRow }> {
   const sb = getSupabase();
   const deviceId = getDeviceId();
@@ -227,7 +232,7 @@ export async function joinGame(opts: {
       device_id: deviceId,
       claim_token: claimToken,
       display_name: opts.displayName.slice(0, 20),
-      color: colorAt(nextSeat),
+      color: opts.color || colorAt(nextSeat),
       seat: nextSeat,
       bucks: 0,
       is_host: false,
