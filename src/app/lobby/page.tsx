@@ -23,9 +23,13 @@ export default function LobbyPage() {
     status,
     players,
     buyIn,
+    mode,
+    wager,
     addPlayer,
     removePlayer,
     setBuyIn,
+    setMode,
+    setWager,
     startGame,
     newGame,
   } = useLocalGame();
@@ -144,6 +148,58 @@ export default function LobbyPage() {
             Each rider starts with this many bucks. They roll one die per buck
             they&apos;re holdin&apos;, up to three dice per turn.
           </p>
+        </Panel>
+
+        {/* ── Stakes card (mode + optional wager) ───────────────── */}
+        <Panel className="mb-4">
+          <div className="mb-3 flex items-center justify-between">
+            <label
+              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              The Stakes
+            </label>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <ModeOption
+              active={mode === "winner"}
+              onClick={() => setMode("winner")}
+              title="Last Buck Wins"
+              caption="Sole champion takes the pot"
+            />
+            <ModeOption
+              active={mode === "loser"}
+              onClick={() => setMode("loser")}
+              title="Stuck with the Tab"
+              caption="Last buck pays the wager"
+            />
+          </div>
+
+          <div className="mt-4">
+            <label
+              className="mb-2 block text-[0.6rem] font-bold uppercase text-[#f4e4b7]/55"
+              htmlFor="wager-input"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              {mode === "loser" ? "The Tab" : "Side Wager"}{" "}
+              <span className="text-[#f4e4b7]/35">(optional)</span>
+            </label>
+            <input
+              id="wager-input"
+              type="text"
+              value={wager ?? ""}
+              onChange={(e) => setWager(e.target.value)}
+              placeholder={
+                mode === "loser"
+                  ? "Loser buys dinner"
+                  : "Winner takes the bottle"
+              }
+              maxLength={80}
+              className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
+              style={FELL}
+            />
+          </div>
         </Panel>
 
         {/* ── Players card ──────────────────────────────────────── */}
@@ -404,6 +460,60 @@ export default function LobbyPage() {
         }
       `}</style>
     </main>
+  );
+}
+
+// ─── Stakes-mode pill (Last Buck Wins / Stuck with the Tab) ──────
+function ModeOption({
+  active,
+  onClick,
+  title,
+  caption,
+}: {
+  active: boolean;
+  onClick: () => void;
+  title: string;
+  caption: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className="relative overflow-hidden rounded-[12px] px-3 py-3 text-left transition-transform active:scale-[0.98]"
+      style={{
+        background: active
+          ? "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)"
+          : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+        border: `1.5px solid ${active ? "#7a5a18" : "rgba(201,154,51,0.4)"}`,
+        boxShadow: active
+          ? "0 1px 0 rgba(255,240,200,0.75) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 4px 14px rgba(0,0,0,0.5)"
+          : "0 1px 0 rgba(244,228,183,0.05) inset, 0 4px 10px rgba(0,0,0,0.35)",
+      }}
+    >
+      <div
+        className={`text-[0.78rem] font-bold uppercase leading-tight ${
+          active ? "text-[#2a1a0a]" : "text-[#f4e4b7]"
+        }`}
+        style={{
+          fontFamily: "var(--font-rye), Georgia, serif",
+          letterSpacing: "0.12em",
+          textShadow: active
+            ? "0 1px 0 rgba(255,240,200,0.55)"
+            : "0 2px 0 rgba(0,0,0,0.55)",
+        }}
+      >
+        {title}
+      </div>
+      <div
+        className={`mt-1 text-[0.62rem] italic leading-snug ${
+          active ? "text-[#2a1a0a]/75" : "text-[#f4e4b7]/55"
+        }`}
+        style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+      >
+        {caption}
+      </div>
+    </button>
   );
 }
 

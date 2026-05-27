@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import StakesRibbon from "@/components/game/StakesRibbon";
 import { useRemoteGame } from "@/context/RemoteGameContext";
 import { leaveOrKick } from "@/lib/remote-game";
 
@@ -92,6 +93,11 @@ export default function LobbyView({ code }: { code: string }) {
             Round-Up
           </h1>
           <div className="w-12" />
+        </div>
+
+        {/* Stakes summary — same ribbon shown on the active game page */}
+        <div className="mb-4">
+          <StakesRibbon mode={game.mode} wager={game.wager} />
         </div>
 
         {/* Invite card */}

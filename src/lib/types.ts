@@ -2,6 +2,16 @@ export type GameStatus = "waiting" | "active" | "finished";
 
 export type RollOutcome = "left" | "center" | "right" | "keep";
 
+/**
+ * Game mode controls how the end of the game is framed.
+ *
+ * - "winner" — last player with bucks wins the pot (default; existing behavior).
+ * - "loser"  — same mechanics, flipped framing: last player with bucks is
+ *             "stuck with the tab" and owes the wager. Strategy inverts:
+ *             players root for L/R/C rolls instead of ✱.
+ */
+export type GameMode = "winner" | "loser";
+
 export interface Player {
   id: string;
   name: string;
@@ -23,6 +33,8 @@ export interface Game {
   turn_timer: number | null;
   players: Player[];
   created_at: string;
+  mode: GameMode;
+  wager: string | null;
 }
 
 export interface Turn {

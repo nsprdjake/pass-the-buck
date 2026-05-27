@@ -16,7 +16,7 @@ import {
   getNextActivePlayer,
   rollTurn,
 } from "@/lib/game-logic";
-import type { Player, RollOutcome } from "@/lib/types";
+import type { GameMode, Player, RollOutcome } from "@/lib/types";
 
 const STORAGE_KEY = "ptb:local-game";
 
@@ -45,12 +45,18 @@ export type LocalGameState = {
   currentIdx: number;
   winnerId: string | null;
   lastTurn: LastTurn | null;
+  /** "winner" = last buck wins; "loser" = last buck stuck with the tab. */
+  mode: GameMode;
+  /** Optional free-text wager shown above the table, e.g. "Loser buys dinner". */
+  wager: string | null;
 };
 
 type Ctx = LocalGameState & {
   addPlayer: (name: string) => void;
   removePlayer: (id: string) => void;
   setBuyIn: (n: number) => void;
+  setMode: (m: GameMode) => void;
+  setWager: (w: string) => void;
   startGame: () => void;
   rollDice: () => void;
   endTurn: () => void;
@@ -71,6 +77,8 @@ function defaultState(): LocalGameState {
     currentIdx: 0,
     winnerId: null,
     lastTurn: null,
+    mode: "winner",
+    wager: null,
   };
 }
 
@@ -93,8 +101,9 @@ export function LocalGameProvider({ children }: { children: React.ReactNode }) {
     try {
       const raw = window.sessionStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as LocalGameState;
-        setState(parsed);
+        const parsed = JSON.parse(raw) as Partial<LocalGameState>;
+        // Backfill new fields for sessions saved before mode/wager existed
+        setState({ ...defaultState(), ...parsed } as LocalGameState);
       }
     } catch {
       // ignore malformed storage
@@ -139,6 +148,21 @@ export function LocalGameProvider({ children }: { children: React.ReactNode }) {
         .filter((p) => p.id !== id)
         .map((p, i) => ({ ...p, order: i, color: colorAt(i) }));
       return { ...s, players: filtered };
+    });
+  }, []);
+
+  const setMode = useCallback((m: GameMode) => {
+    setState((s) => {
+      if (s.status !== "lobby") return s;
+      return { ...s, mode: m };
+    });
+  }, []);
+
+  const setWager = useCallback((w: string) => {
+    setState((s) => {
+      if (s.status !== "lobby") return s;
+      const trimmed = w.slice(0, 80);
+      return { ...s, wager: trimmed.trim() === "" ? null : trimmed };
     });
   }, []);
 
@@ -295,6 +319,8 @@ export function LocalGameProvider({ children }: { children: React.ReactNode }) {
       addPlayer,
       removePlayer,
       setBuyIn,
+      setMode,
+      setWager,
       startGame,
       rollDice,
       endTurn,
@@ -307,6 +333,8 @@ export function LocalGameProvider({ children }: { children: React.ReactNode }) {
       addPlayer,
       removePlayer,
       setBuyIn,
+      setMode,
+      setWager,
       startGame,
       rollDice,
       endTurn,

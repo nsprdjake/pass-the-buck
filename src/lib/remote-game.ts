@@ -4,9 +4,9 @@ import { PLAYER_COLORS } from "./constants";
 import { applyTurn, checkWinner, rollTurn } from "./game-logic";
 import { getDeviceId, getMembership, makeToken, saveMembership } from "./identity";
 import { getSupabase } from "./supabase";
-import type { RollOutcome } from "./types";
+import type { GameMode, RollOutcome } from "./types";
 
-// === Row shapes (matches migration 002) ===
+// === Row shapes (matches migrations 002 + 003) ===
 export type GameRow = {
   id: string;
   code: string;
@@ -20,6 +20,10 @@ export type GameRow = {
   last_turn: ServerTurn | null;
   created_at: string;
   updated_at: string;
+  /** "winner" or "loser" — added in migration 003. Old rows backfilled to "winner". */
+  mode: GameMode;
+  /** Optional free-text wager, e.g. "Loser buys dinner". */
+  wager: string | null;
 };
 
 export type PlayerRow = {
@@ -85,10 +89,15 @@ function colorAt(i: number) {
 export async function createGame(opts: {
   displayName: string;
   buyIn: number;
+  mode?: GameMode;
+  wager?: string | null;
 }): Promise<{ game: GameRow; me: PlayerRow }> {
   const sb = getSupabase();
   const deviceId = getDeviceId();
   const hostToken = makeToken();
+  const mode: GameMode = opts.mode ?? "winner";
+  const wagerTrimmed = (opts.wager ?? "").trim().slice(0, 80);
+  const wager = wagerTrimmed === "" ? null : wagerTrimmed;
 
   // Generate codes until we get a unique one (retry a few times).
   let game: GameRow | null = null;
@@ -101,6 +110,8 @@ export async function createGame(opts: {
         host_token: hostToken,
         buy_in: opts.buyIn,
         status: "lobby",
+        mode,
+        wager,
       })
       .select()
       .single<GameRow>();

@@ -7,6 +7,7 @@ import BuckPile from "@/components/BuckPile";
 import DiceTray from "@/components/DiceTray";
 import PotPile from "@/components/PotPile";
 import RollButton from "@/components/game/RollButton";
+import StakesRibbon from "@/components/game/StakesRibbon";
 import {
   BUCK_FLY_MS,
   FlyingBuck,
@@ -304,6 +305,9 @@ export default function ActiveGameView() {
           Leave
         </button>
       </div>
+
+      {/* Stakes ribbon — mode + optional wager */}
+      <StakesRibbon mode={game.mode} wager={game.wager} />
 
       {/* Pot band — sits on a wood rail */}
       <div
