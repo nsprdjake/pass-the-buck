@@ -337,7 +337,7 @@ export default function ProfilePage() {
                 style={RYE}
               >
                 <span
-                  className="text-[2.4rem] leading-none text-[#ffd17a]"
+                  className="text-[2.4rem] leading-none text-[var(--accent-text)]"
                   style={{
                     textShadow:
                       "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.55)",

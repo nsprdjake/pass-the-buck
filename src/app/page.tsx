@@ -134,7 +134,7 @@ export default function Home() {
             </span>
             {balance !== null && (
               <span
-                className="ml-1 rounded-full border border-[#c99a33]/55 bg-[rgba(201,154,51,0.18)] px-2 py-0.5 text-[0.62rem] font-bold tracking-[0.14em] text-[#ffd17a]"
+                className="ml-1 rounded-full border border-[var(--accent-mid)]/55 bg-[rgba(201,154,51,0.18)] px-2 py-0.5 text-[0.62rem] font-bold tracking-[0.14em] text-[var(--accent-text)]"
                 title={`${balance} eyeBucks`}
               >
                 {balance.toLocaleString()}
@@ -204,7 +204,7 @@ export default function Home() {
         >
           Pass the
           <br />
-          <span style={{ color: "#ffd17a" }}>Buck</span>
+          <span style={{ color: "var(--accent-text, #ffd17a)" }}>Buck</span>
         </h1>
 
         <p
@@ -341,7 +341,7 @@ export default function Home() {
           >
             <div className="mb-2 flex items-center gap-2">
               <span
-                className="text-[0.55rem] font-bold uppercase text-[#ffd17a]/85"
+                className="text-[0.55rem] font-bold uppercase text-[var(--accent-text)]/85"
                 style={{
                   fontFamily: "var(--font-fell), Georgia, serif",
                   letterSpacing: "0.36em",

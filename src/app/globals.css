@@ -30,6 +30,43 @@
   --font-vintage: var(--font-fell), Georgia, serif;
 }
 
+/* ─── Theme accent variables ────────────────────────────────────────
+   Each theme overrides three accent stops + a single highlight color
+   used by headlines. Cascades down through any element that reads
+   var(--accent-…) directly. Components that still use hardcoded brass
+   hex values will be migrated theme-by-theme. */
+:root,
+[data-theme="saloon"] {
+  --accent-light: #ffd17a;
+  --accent-mid:   #c99a33;
+  --accent-dark:  #7a5a18;
+  --accent-text:  #ffd17a;
+}
+[data-theme="speakeasy"] {
+  --accent-light: #5dd0a5;
+  --accent-mid:   #16876a;
+  --accent-dark:  #0d4a3a;
+  --accent-text:  #e8c468;
+}
+[data-theme="cantina"] {
+  --accent-light: #ffc26e;
+  --accent-mid:   #ff8830;
+  --accent-dark:  #9a4015;
+  --accent-text:  #ffd07a;
+}
+[data-theme="old-money"] {
+  --accent-light: #e6cfa1;
+  --accent-mid:   #c9a059;
+  --accent-dark:  #6e4a17;
+  --accent-text:  #e6cfa1;
+}
+[data-theme="riverboat"] {
+  --accent-light: #e0d3b3;
+  --accent-mid:   #c5a572;
+  --accent-dark:  #6e5a2e;
+  --accent-text:  #dfd5c0;
+}
+
 *,
 *::before,
 *::after {
