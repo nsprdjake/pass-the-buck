@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -13,7 +13,7 @@ const FELL: React.CSSProperties = {
   fontFamily: "var(--font-fell), Georgia, serif",
 };
 
-type Step = "email" | "code";
+type Mode = "signin" | "signup";
 
 export default function AuthPage() {
   return (
@@ -38,77 +38,63 @@ function AuthScreen() {
   const search = useSearchParams();
   const next = search.get("next") || "/";
 
-  const { user, loading, sendOtp, verifyOtp } = useAuth();
+  const { user, loading, signIn, signUp } = useAuth();
 
-  const [step, setStep] = useState<Step>("email");
+  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [resentAt, setResentAt] = useState<number | null>(null);
-  const codeRef = useRef<HTMLInputElement>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
-  // If we're already signed in, bounce to the destination immediately.
+  // Already signed in? Skip the screen.
   useEffect(() => {
-    if (!loading && user) {
-      router.replace(next);
-    }
+    if (!loading && user) router.replace(next);
   }, [user, loading, router, next]);
 
-  // When we advance to the code step, focus the OTP input.
+  // Wipe stale errors when switching modes.
   useEffect(() => {
-    if (step === "code") {
-      requestAnimationFrame(() => codeRef.current?.focus());
-    }
-  }, [step]);
-
-  async function handleSendOtp(e: React.FormEvent) {
-    e.preventDefault();
-    if (busy || !email.trim()) return;
-    setBusy(true);
     setError(null);
-    try {
-      await sendOtp(email);
-      setStep("code");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't send the code");
-    } finally {
-      setBusy(false);
-    }
-  }
+    setInfo(null);
+  }, [mode]);
 
-  async function handleVerify(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (busy || code.trim().length < 6) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const session = await verifyOtp(email, code);
-      if (session) {
-        router.replace(next);
-      } else {
-        setError("Couldn't verify that code — try again.");
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Verification failed");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleResend() {
     if (busy) return;
     setBusy(true);
     setError(null);
+    setInfo(null);
     try {
-      await sendOtp(email);
-      setResentAt(Date.now());
+      if (mode === "signin") {
+        const session = await signIn(email, password);
+        if (session) router.replace(next);
+        else setError("Couldn't sign in. Try again.");
+      } else {
+        const session = await signUp({ email, password, displayName });
+        if (session) {
+          // Auto-confirmed (no email gate): we're signed in.
+          router.replace(next);
+        } else {
+          // Email confirmation is still enabled in this Supabase project.
+          // Surface a friendly note so the user knows to check their inbox.
+          setInfo(
+            "Account created. Check your email to confirm, then sign in."
+          );
+          setMode("signin");
+        }
+      }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't resend");
+      setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
       setBusy(false);
     }
   }
+
+  const submitDisabled =
+    busy ||
+    !email.trim() ||
+    password.length < (mode === "signup" ? 6 : 1);
 
   return (
     <main className="felt-saloon relative min-h-[100dvh] overflow-hidden">
@@ -134,21 +120,21 @@ function AuthScreen() {
           className="mt-6 text-[0.62rem] uppercase text-[#f4e4b7]/65"
           style={{ ...FELL, letterSpacing: "0.48em" }}
         >
-          ★  Show Your Face  ★
+          ★  {mode === "signin" ? "Welcome Back" : "Riding In"}  ★
         </span>
 
         <h1
           className="mt-3 leading-[0.95]"
           style={{
             ...RYE,
-            fontSize: "clamp(2.5rem, 12vw, 4rem)",
+            fontSize: "clamp(2.4rem, 11vw, 3.7rem)",
             color: "#f4e4b7",
             textShadow:
               "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 10px 28px rgba(0,0,0,0.6)",
             letterSpacing: "0.01em",
           }}
         >
-          {step === "email" ? (
+          {mode === "signin" ? (
             <>
               Open the
               <br />
@@ -156,9 +142,9 @@ function AuthScreen() {
             </>
           ) : (
             <>
-              Check
+              Stake Your
               <br />
-              <span style={{ color: "#ffd17a" }}>Your Mail</span>
+              <span style={{ color: "#ffd17a" }}>Claim</span>
             </>
           )}
         </h1>
@@ -167,18 +153,39 @@ function AuthScreen() {
           className="mt-4 max-w-[20rem] text-[0.95rem] italic leading-snug text-[#f4e4b7]/80"
           style={FELL}
         >
-          {step === "email"
+          {mode === "signin"
             ? "Sign in to keep your name and game history with you across every device."
-            : `We just sent a six-digit code to ${email}. Punch it in below.`}
+            : "Pick a password and we'll remember you. No email round-trip required."}
         </p>
 
-        {/* === Form panel === */}
+        {/* Mode toggle */}
+        <div
+          className="mt-7 inline-flex rounded-full border-[1.5px] border-[#c99a33]/40 p-1"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(10,40,28,0.6) 0%, rgba(5,28,20,0.75) 100%)",
+          }}
+        >
+          <ToggleTab
+            active={mode === "signin"}
+            onClick={() => setMode("signin")}
+          >
+            Sign In
+          </ToggleTab>
+          <ToggleTab
+            active={mode === "signup"}
+            onClick={() => setMode("signup")}
+          >
+            Create Account
+          </ToggleTab>
+        </div>
+
         <motion.div
-          key={step}
-          initial={{ opacity: 0, y: 12 }}
+          key={mode}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="mt-8 w-full"
+          transition={{ duration: 0.2 }}
+          className="mt-5 w-full"
         >
           <section
             className="rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-5"
@@ -189,21 +196,34 @@ function AuthScreen() {
                 "0 1px 0 rgba(244,228,183,0.06) inset, 0 14px 30px rgba(0,0,0,0.45)",
             }}
           >
-            {step === "email" ? (
-              <form onSubmit={handleSendOtp} className="space-y-3">
-                <label
-                  htmlFor="auth-email"
-                  className="block text-[0.62rem] font-bold uppercase text-[#f4e4b7]/65"
-                  style={{ ...FELL, letterSpacing: "0.36em" }}
+            <form onSubmit={handleSubmit} className="space-y-3 text-left">
+              {mode === "signup" && (
+                <Field
+                  label="Display Name"
+                  htmlFor="auth-name"
+                  hint="What people will see on the table (optional)"
                 >
-                  Your Email
-                </label>
+                  <input
+                    id="auth-name"
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    maxLength={20}
+                    autoComplete="username"
+                    placeholder="Belle, Doc, Whiskey-Jim…"
+                    className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
+                    style={FELL}
+                  />
+                </Field>
+              )}
+
+              <Field label="Email" htmlFor="auth-email">
                 <input
                   id="auth-email"
                   type="email"
                   inputMode="email"
                   autoComplete="email"
-                  autoFocus
+                  autoFocus={mode === "signin"}
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -211,101 +231,69 @@ function AuthScreen() {
                   className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
                   style={FELL}
                 />
-                <button
-                  type="submit"
-                  disabled={busy || !email.trim()}
-                  className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-3.5 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
-                >
-                  <span
-                    className="relative block text-[1rem] font-bold uppercase text-[#2a1a0a]"
-                    style={{
-                      ...RYE,
-                      letterSpacing: "0.22em",
-                      textShadow: "0 1px 0 rgba(255,240,200,0.55)",
-                    }}
-                  >
-                    {busy ? "Sendin' Word…" : "Send the Code"}
-                  </span>
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleVerify} className="space-y-3">
-                <label
-                  htmlFor="auth-code"
-                  className="block text-[0.62rem] font-bold uppercase text-[#f4e4b7]/65"
-                  style={{ ...FELL, letterSpacing: "0.36em" }}
-                >
-                  Six-Digit Code
-                </label>
+              </Field>
+
+              <Field
+                label="Password"
+                htmlFor="auth-password"
+                hint={
+                  mode === "signup" ? "Six characters or more." : undefined
+                }
+              >
                 <input
-                  ref={codeRef}
-                  id="auth-code"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  autoComplete="one-time-code"
-                  maxLength={6}
-                  required
-                  value={code}
-                  onChange={(e) =>
-                    setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                  id="auth-password"
+                  type="password"
+                  autoComplete={
+                    mode === "signin" ? "current-password" : "new-password"
                   }
-                  placeholder="• • • • • •"
-                  className="parchment-input w-full rounded-[10px] px-4 py-4 text-center text-[1.5rem] font-bold tracking-[0.5em] text-[#2a1a0a] placeholder-[#5c3b1e]/40 focus:outline-none"
+                  required
+                  minLength={mode === "signup" ? 6 : undefined}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••"
+                  className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
                   style={FELL}
                 />
-                <button
-                  type="submit"
-                  disabled={busy || code.length < 6}
-                  className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-3.5 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
-                >
-                  <span
-                    className="relative block text-[1rem] font-bold uppercase text-[#2a1a0a]"
-                    style={{
-                      ...RYE,
-                      letterSpacing: "0.22em",
-                      textShadow: "0 1px 0 rgba(255,240,200,0.55)",
-                    }}
-                  >
-                    {busy ? "Checkin'…" : "Step Inside"}
-                  </span>
-                </button>
+              </Field>
 
+              <button
+                type="submit"
+                disabled={submitDisabled}
+                className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-3.5 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
+              >
+                <span
+                  className="relative block text-[1rem] font-bold uppercase text-[#2a1a0a]"
+                  style={{
+                    ...RYE,
+                    letterSpacing: "0.22em",
+                    textShadow: "0 1px 0 rgba(255,240,200,0.55)",
+                  }}
+                >
+                  {busy
+                    ? "Hold On…"
+                    : mode === "signin"
+                    ? "Step Inside"
+                    : "Stake Your Claim"}
+                </span>
+              </button>
+
+              {error && (
                 <div
-                  className="flex items-center justify-between pt-1 text-[0.7rem] text-[#f4e4b7]/60"
+                  className="rounded-[10px] border-[1.5px] border-[#8b2222]/55 bg-[#8b2222]/25 px-3 py-2 text-[0.82rem] font-bold text-[#ffd2c2]"
                   style={FELL}
                 >
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setStep("email");
-                      setCode("");
-                      setError(null);
-                    }}
-                    className="underline transition-colors hover:text-[#ffd17a]"
-                  >
-                    Wrong email?
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleResend}
-                    disabled={busy}
-                    className="underline transition-colors hover:text-[#ffd17a] disabled:opacity-40"
-                  >
-                    {resentAt ? "Resent ✓" : "Resend code"}
-                  </button>
+                  {error}
                 </div>
-              </form>
-            )}
-
-            {error && (
-              <div
-                className="mt-3 rounded-[10px] border-[1.5px] border-[#8b2222]/55 bg-[#8b2222]/25 px-3 py-2 text-[0.82rem] font-bold text-[#ffd2c2]"
-                style={FELL}
-              >
-                {error}
-              </div>
-            )}
+              )}
+              {info && (
+                <div
+                  className="rounded-[10px] border-[1.5px] border-[#c99a33]/45 bg-[#c99a33]/15 px-3 py-2 text-[0.82rem] font-bold text-[#ffd17a]"
+                  style={FELL}
+                >
+                  {info}
+                </div>
+              )}
+            </form>
           </section>
         </motion.div>
 
@@ -313,7 +301,13 @@ function AuthScreen() {
           className="mt-6 text-[0.78rem] italic text-[#f4e4b7]/55"
           style={FELL}
         >
-          Don&apos;t want an account? <Link href="/" className="underline transition-colors hover:text-[#ffd17a]">Keep playing as a stranger.</Link>
+          Don&apos;t want an account?{" "}
+          <Link
+            href="/"
+            className="underline transition-colors hover:text-[#ffd17a]"
+          >
+            Keep playing as a stranger.
+          </Link>
         </p>
       </div>
 
@@ -362,5 +356,71 @@ function AuthScreen() {
         }
       `}</style>
     </main>
+  );
+}
+
+function ToggleTab({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className="rounded-full px-4 py-1.5 text-[0.68rem] font-bold uppercase transition-colors"
+      style={{
+        ...FELL,
+        letterSpacing: "0.22em",
+        color: active ? "#2a1a0a" : "rgba(244,228,183,0.7)",
+        background: active
+          ? "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)"
+          : "transparent",
+        boxShadow: active
+          ? "0 1px 0 rgba(255,240,200,0.85) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 3px 8px rgba(0,0,0,0.4)"
+          : "none",
+        textShadow: active ? "0 1px 0 rgba(255,240,200,0.55)" : undefined,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Field({
+  label,
+  htmlFor,
+  hint,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={htmlFor}
+        className="mb-2 block text-[0.62rem] font-bold uppercase text-[#f4e4b7]/65"
+        style={{ ...FELL, letterSpacing: "0.36em" }}
+      >
+        {label}
+      </label>
+      {children}
+      {hint && (
+        <p
+          className="mt-1.5 text-[0.72rem] italic text-[#f4e4b7]/50"
+          style={FELL}
+        >
+          {hint}
+        </p>
+      )}
+    </div>
   );
 }

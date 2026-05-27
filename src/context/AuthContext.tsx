@@ -31,12 +31,18 @@ type AuthValue = {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
-  /** Send a 6-digit OTP code to the supplied email. */
-  sendOtp: (email: string) => Promise<void>;
-  /** Verify a 6-digit OTP code received by email. Returns the session on success. */
-  verifyOtp: (email: string, token: string) => Promise<Session | null>;
+  /** Sign in with email + password. Returns the session on success. */
+  signIn: (email: string, password: string) => Promise<Session | null>;
+  /** Create a new account with email + password and an optional display name. */
+  signUp: (opts: {
+    email: string;
+    password: string;
+    displayName?: string;
+  }) => Promise<Session | null>;
   /** Update the signed-in user's profile row. */
-  updateProfile: (patch: Partial<Pick<Profile, "display_name" | "color">>) => Promise<void>;
+  updateProfile: (
+    patch: Partial<Pick<Profile, "display_name" | "color">>
+  ) => Promise<void>;
   /** Sign the current user out and clear the local session. */
   signOut: () => Promise<void>;
 };
@@ -99,35 +105,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [session?.user?.id]);
 
-  const sendOtp = useCallback(async (email: string) => {
-    const sb = getSupabase();
-    const cleaned = email.trim().toLowerCase();
-    if (!cleaned) throw new Error("Enter an email");
-    const { error } = await sb.auth.signInWithOtp({
-      email: cleaned,
-      options: {
-        // Allow new user creation via OTP — first-time visitors get an
-        // account auto-provisioned on verification.
-        shouldCreateUser: true,
-      },
-    });
-    if (error) throw new Error(error.message);
-  }, []);
+  const signIn = useCallback(
+    async (email: string, password: string) => {
+      const sb = getSupabase();
+      const cleanedEmail = email.trim().toLowerCase();
+      if (!cleanedEmail) throw new Error("Enter an email");
+      if (!password) throw new Error("Enter a password");
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: cleanedEmail,
+        password,
+      });
+      if (error) throw new Error(prettifyAuthError(error.message));
+      setSession(data.session ?? null);
+      return data.session ?? null;
+    },
+    []
+  );
 
-  const verifyOtp = useCallback(async (email: string, token: string) => {
-    const sb = getSupabase();
-    const cleanedEmail = email.trim().toLowerCase();
-    const cleanedToken = token.trim();
-    if (cleanedToken.length < 6) throw new Error("Code is six digits");
-    const { data, error } = await sb.auth.verifyOtp({
-      email: cleanedEmail,
-      token: cleanedToken,
-      type: "email",
-    });
-    if (error) throw new Error(error.message);
-    setSession(data.session ?? null);
-    return data.session ?? null;
-  }, []);
+  const signUp = useCallback(
+    async (opts: {
+      email: string;
+      password: string;
+      displayName?: string;
+    }) => {
+      const sb = getSupabase();
+      const cleanedEmail = opts.email.trim().toLowerCase();
+      const password = opts.password;
+      if (!cleanedEmail) throw new Error("Enter an email");
+      if (!password || password.length < 6) {
+        throw new Error("Password needs at least 6 characters");
+      }
+      const { data, error } = await sb.auth.signUp({
+        email: cleanedEmail,
+        password,
+      });
+      if (error) throw new Error(prettifyAuthError(error.message));
+
+      const session = data.session ?? null;
+      const userId = data.user?.id ?? null;
+
+      // Best-effort: stamp the new profile with the display name immediately.
+      // This UPDATE only succeeds once the session is established (RLS gates
+      // ptb_profiles writes on auth.uid() = id), so it gracefully no-ops when
+      // email confirmation is required and no session was returned.
+      if (session && userId && opts.displayName?.trim()) {
+        await sb
+          .from("ptb_profiles")
+          .update({
+            display_name: opts.displayName.trim().slice(0, 20),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+      }
+
+      setSession(session);
+      return session;
+    },
+    []
+  );
 
   const updateProfile = useCallback(
     async (patch: Partial<Pick<Profile, "display_name" | "color">>) => {
@@ -164,12 +199,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user: session?.user ?? null,
       session,
       profile,
-      sendOtp,
-      verifyOtp,
+      signIn,
+      signUp,
       updateProfile,
       signOut,
     }),
-    [loading, session, profile, sendOtp, verifyOtp, updateProfile, signOut]
+    [loading, session, profile, signIn, signUp, updateProfile, signOut]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -179,4 +214,17 @@ export function useAuth(): AuthValue {
   const v = useContext(Ctx);
   if (!v) throw new Error("useAuth must be used inside <AuthProvider>");
   return v;
+}
+
+// Map a few common Supabase auth error messages into friendlier copy.
+function prettifyAuthError(msg: string): string {
+  const lc = msg.toLowerCase();
+  if (lc.includes("invalid login")) return "Wrong email or password.";
+  if (lc.includes("user already registered"))
+    return "Already got an account with that email. Try signing in.";
+  if (lc.includes("email rate limit"))
+    return "Too many tries. Hold up a minute, then try again.";
+  if (lc.includes("password should be"))
+    return "Password needs at least 6 characters.";
+  return msg;
 }
