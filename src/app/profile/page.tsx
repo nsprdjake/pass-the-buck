@@ -7,6 +7,15 @@ import Buck from "@/components/Buck";
 import { useAuth } from "@/context/AuthContext";
 import { PLAYER_COLORS } from "@/lib/constants";
 import { getSupabase } from "@/lib/supabase";
+import {
+  listOwnedThemes,
+  listThemes,
+  purchaseTheme,
+  setActiveTheme,
+  THEME_PREVIEW,
+  type OwnedTheme,
+  type ThemeRow,
+} from "@/lib/themes";
 
 const RYE: React.CSSProperties = {
   fontFamily: "var(--font-rye), Georgia, serif",
@@ -31,13 +40,18 @@ type HistoryRow = {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, profile, loading, updateProfile, signOut } = useAuth();
+  const { user, profile, loading, updateProfile, refreshProfile, signOut } =
+    useAuth();
   const [displayName, setDisplayName] = useState("");
   const [color, setColor] = useState<string>(PLAYER_COLORS[0]);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryRow[] | null>(null);
+  const [themes, setThemes] = useState<ThemeRow[] | null>(null);
+  const [owned, setOwned] = useState<Set<string>>(new Set(["saloon"]));
+  const [themeBusy, setThemeBusy] = useState<string | null>(null);
+  const [themeError, setThemeError] = useState<string | null>(null);
 
   // Bounce signed-out visitors to the auth screen.
   useEffect(() => {
@@ -100,6 +114,62 @@ export default function ProfilePage() {
       cancelled = true;
     };
   }, [user]);
+
+  // Load the theme catalog + this user's owned themes whenever auth resolves.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [catalog, ownedList]: [ThemeRow[], OwnedTheme[]] = await Promise.all([
+          listThemes(),
+          user ? listOwnedThemes(user.id) : Promise.resolve([] as OwnedTheme[]),
+        ]);
+        if (cancelled) return;
+        setThemes(catalog);
+        // The Saloon (default, free) is always implicitly owned.
+        const set = new Set<string>(["saloon", ...ownedList.map((o) => o.theme_slug)]);
+        setOwned(set);
+      } catch {
+        // ignore — picker just shows catalog with no ownership
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  async function handleBuyTheme(slug: string) {
+    if (!user || themeBusy) return;
+    setThemeBusy(slug);
+    setThemeError(null);
+    try {
+      await purchaseTheme(slug);
+      setOwned((prev) => new Set(prev).add(slug));
+      await refreshProfile();
+      // Auto-activate the freshly-bought theme — feels good.
+      await setActiveTheme(slug);
+      await refreshProfile();
+    } catch (e) {
+      setThemeError(e instanceof Error ? e.message : "Couldn't unlock that");
+    } finally {
+      setThemeBusy(null);
+    }
+  }
+
+  async function handleSelectTheme(slug: string) {
+    if (!user || themeBusy) return;
+    if (profile?.active_theme_slug === slug) return;
+    setThemeBusy(slug);
+    setThemeError(null);
+    try {
+      await setActiveTheme(slug);
+      await refreshProfile();
+    } catch (e) {
+      setThemeError(e instanceof Error ? e.message : "Couldn't switch");
+    } finally {
+      setThemeBusy(null);
+    }
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -319,6 +389,156 @@ export default function ProfilePage() {
               </div>
             )}
           </form>
+        </Panel>
+
+        {/* Themes — saloon dressing, paid in eyeBucks */}
+        <Panel className="mb-4">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2
+              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              Themes
+            </h2>
+            <span
+              className="text-[0.62rem] italic text-[#f4e4b7]/45"
+              style={FELL}
+            >
+              Buy with eyeBucks
+            </span>
+          </div>
+          {themes === null ? (
+            <div
+              className="py-5 text-center text-[0.85rem] italic text-[#f4e4b7]/50"
+              style={FELL}
+            >
+              Loading the catalog…
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {themes.map((t) => {
+                const isActive = profile?.active_theme_slug === t.slug;
+                const isOwned = owned.has(t.slug);
+                const canAfford = (profile?.balance ?? 0) >= t.price_eyebucks;
+                const preview = THEME_PREVIEW[t.slug];
+                const busy = themeBusy === t.slug;
+                return (
+                  <li
+                    key={t.slug}
+                    className="relative flex items-center gap-3 rounded-[12px] border-[1.5px] px-3 py-2.5"
+                    style={{
+                      background: isActive
+                        ? "linear-gradient(180deg, rgba(201,154,51,0.18) 0%, rgba(122,90,24,0.18) 100%)"
+                        : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+                      borderColor: isActive
+                        ? "rgba(255,209,122,0.65)"
+                        : "rgba(201,154,51,0.3)",
+                    }}
+                  >
+                    {/* Preview swatch */}
+                    <div
+                      aria-hidden
+                      className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-[8px] border-[1.5px] border-[#5c3b1e]"
+                      style={{
+                        background: preview?.bg ?? "#0a4d33",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.45)",
+                      }}
+                    >
+                      <div className="absolute inset-1 grid grid-cols-2 gap-1">
+                        {(preview?.swatches ?? []).slice(0, 4).map((c, i) => (
+                          <div
+                            key={i}
+                            className="rounded-[3px]"
+                            style={{ backgroundColor: c }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="truncate text-[0.95rem] font-bold text-[#f4e4b7]"
+                          style={RYE}
+                        >
+                          {t.name}
+                        </span>
+                        {isActive && (
+                          <span
+                            className="rounded-full border border-[#ffd17a]/65 bg-[#ffd17a]/15 px-1.5 py-0.5 text-[0.55rem] font-bold uppercase text-[#ffd17a]"
+                            style={{ ...FELL, letterSpacing: "0.24em" }}
+                          >
+                            Active
+                          </span>
+                        )}
+                      </div>
+                      <div
+                        className="mt-0.5 truncate text-[0.72rem] italic text-[#f4e4b7]/55"
+                        style={FELL}
+                      >
+                        {t.tagline}
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0">
+                      {isActive ? null : isOwned ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSelectTheme(t.slug)}
+                          disabled={busy}
+                          className="rounded-[8px] border-[1.5px] border-[#c99a33]/55 bg-[rgba(5,28,20,0.65)] px-3 py-1.5 text-[0.65rem] font-bold uppercase text-[#f4e4b7]/85 transition-colors hover:border-[#ffd17a]/80 hover:text-[#ffd17a] disabled:opacity-50"
+                          style={{ ...FELL, letterSpacing: "0.22em" }}
+                        >
+                          {busy ? "…" : "Equip"}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleBuyTheme(t.slug)}
+                          disabled={!canAfford || busy}
+                          className="rounded-[8px] border-[1.5px] px-3 py-1.5 text-[0.65rem] font-bold uppercase disabled:cursor-not-allowed disabled:opacity-50"
+                          style={{
+                            ...FELL,
+                            letterSpacing: "0.18em",
+                            color: canAfford ? "#2a1a0a" : "#f4e4b7",
+                            background: canAfford
+                              ? "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)"
+                              : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+                            borderColor: canAfford
+                              ? "#7a5a18"
+                              : "rgba(201,154,51,0.3)",
+                            boxShadow: canAfford
+                              ? "0 1px 0 rgba(255,240,200,0.75) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 3px 8px rgba(0,0,0,0.4)"
+                              : "0 2px 6px rgba(0,0,0,0.35)",
+                          }}
+                        >
+                          {busy
+                            ? "…"
+                            : `${t.price_eyebucks.toLocaleString()} ◈`}
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {themeError && (
+            <div
+              className="mt-3 rounded-[10px] border-[1.5px] border-[#8b2222]/55 bg-[#8b2222]/25 px-3 py-2 text-[0.82rem] font-bold text-[#ffd2c2]"
+              style={FELL}
+            >
+              {themeError}
+            </div>
+          )}
+          <p
+            className="mt-3 text-[0.7rem] italic leading-snug text-[#f4e4b7]/45"
+            style={FELL}
+          >
+            More themes will get fully wired into the rest of the app over the
+            next few updates. For now, your active theme is shown here and on
+            the leaderboard.
+          </p>
         </Panel>
 
         {/* Game history */}
