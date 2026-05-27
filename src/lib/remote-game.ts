@@ -484,6 +484,10 @@ export async function endTurnRemote(opts: {
   const nextSeat = (currentSeat + 1) % n;
   const nextRound = nextSeat <= currentSeat ? currentRound + 1 : currentRound;
 
+  // Compare-and-swap on `current_seat` so two simultaneous callers (e.g. the
+  // 0-buck player's auto-skip and another player tapping "Skip Them") can't
+  // each advance the seat — only the caller whose snapshot still matches
+  // wins. The loser's UPDATE matches no rows and is a silent no-op.
   await sb
     .from("ptb_games")
     .update({
@@ -492,7 +496,8 @@ export async function endTurnRemote(opts: {
       last_turn: null,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", opts.gameId);
+    .eq("id", opts.gameId)
+    .eq("current_seat", currentSeat);
 }
 
 /**

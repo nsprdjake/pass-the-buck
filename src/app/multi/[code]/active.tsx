@@ -236,11 +236,29 @@ export default function ActiveGameView() {
     0,
     nudgeSentAt + NUDGE_COOLDOWN_MS - Date.now()
   );
+
+  // When the active player has no eyeBucks, nudging is useless — their device
+  // is supposed to auto-skip, but if it's offline or backgrounded the game
+  // stalls. So the button flips purpose: any other player can advance the
+  // turn directly. endTurnRemote uses a compare-and-swap on current_seat so
+  // simultaneous presses can't double-skip.
+  const currentIsBroke = !!current && current.bucks <= 0;
+  const [skipping, setSkipping] = useState(false);
+
   const canNudge =
     !isMyTurn &&
     !!current &&
     !!me &&
+    !currentIsBroke &&
     nudgeCooldownRemaining === 0 &&
+    game?.status === "active";
+
+  const canSkipBroke =
+    !isMyTurn &&
+    !!current &&
+    !!me &&
+    currentIsBroke &&
+    !skipping &&
     game?.status === "active";
 
   const onNudge = useCallback(() => {
@@ -250,6 +268,20 @@ export default function ActiveGameView() {
     sendNudge();
     setNudgeSentAt(Date.now());
   }, [canNudge, sendNudge]);
+
+  const onSkipBroke = useCallback(async () => {
+    if (!canSkipBroke) return;
+    unlockAudio();
+    playSfx("joinClick");
+    setSkipping(true);
+    try {
+      await endTurn();
+    } finally {
+      // Brief debounce so a double-tap can't fire twice while realtime
+      // hasn't propagated the new current_seat yet.
+      setTimeout(() => setSkipping(false), 1200);
+    }
+  }, [canSkipBroke, endTurn]);
 
   // Tick once a second while a cooldown is active so the button label
   // updates without needing a re-render trigger.
@@ -572,39 +604,76 @@ export default function ActiveGameView() {
                 </div>
               </div>
 
-              {/* Nudge button — visible to non-active members */}
-              <motion.button
-                whileTap={canNudge ? { scale: 0.94 } : {}}
-                onClick={onNudge}
-                disabled={!canNudge}
-                className="mt-3 w-full flex items-center justify-center gap-2 py-3 disabled:cursor-not-allowed"
-                style={{
-                  borderRadius: 8,
-                  border: "2px solid #2a1a0a",
-                  background: canNudge
-                    ? "linear-gradient(180deg, #a16207 0%, #6b4209 100%)"
-                    : "linear-gradient(180deg, #3a2410 0%, #2a1a0a 100%)",
-                  boxShadow: canNudge
-                    ? "0 4px 0 #2a1a0a, 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,225,170,0.25)"
-                    : "0 2px 0 #1a0c04, 0 2px 6px rgba(0,0,0,0.45)",
-                  opacity: canNudge ? 1 : 0.55,
-                }}
-              >
-                <Bell size={22} color={canNudge ? "#FFE3A0" : "#7a5c2e"} />
-                <span
+              {/* Nudge button — visible to non-active members. Flips to
+                  "Skip Them" when the active player is broke, so the game
+                  can be unstuck even if that player's device is offline. */}
+              {currentIsBroke ? (
+                <motion.button
+                  whileTap={canSkipBroke ? { scale: 0.94 } : {}}
+                  onClick={onSkipBroke}
+                  disabled={!canSkipBroke}
+                  className="mt-3 w-full flex items-center justify-center gap-2 py-3 disabled:cursor-not-allowed"
                   style={{
-                    fontFamily: "var(--font-rye), Georgia, serif",
-                    color: "#FFE3A0",
-                    fontSize: 16,
-                    letterSpacing: "0.04em",
-                    textShadow: "0 1px 0 #2a1a0a",
+                    borderRadius: 8,
+                    border: "2px solid #2a1a0a",
+                    background: canSkipBroke
+                      ? "linear-gradient(180deg, #6b1f1f 0%, #3a0a0a 100%)"
+                      : "linear-gradient(180deg, #3a2410 0%, #2a1a0a 100%)",
+                    boxShadow: canSkipBroke
+                      ? "0 4px 0 #2a1a0a, 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,225,170,0.18)"
+                      : "0 2px 0 #1a0c04, 0 2px 6px rgba(0,0,0,0.45)",
+                    opacity: canSkipBroke ? 1 : 0.6,
                   }}
                 >
-                  {nudgeCooldownRemaining > 0
-                    ? `Nudged! (${Math.ceil(nudgeCooldownRemaining / 1000)}s)`
-                    : `Nudge ${current.display_name}`}
-                </span>
-              </motion.button>
+                  <Skip size={22} color={canSkipBroke ? "#FFE3A0" : "#7a5c2e"} />
+                  <span
+                    style={{
+                      fontFamily: "var(--font-rye), Georgia, serif",
+                      color: "#FFE3A0",
+                      fontSize: 16,
+                      letterSpacing: "0.04em",
+                      textShadow: "0 1px 0 #2a1a0a",
+                    }}
+                  >
+                    {skipping
+                      ? "Skippin'…"
+                      : `Skip ${current.display_name}`}
+                  </span>
+                </motion.button>
+              ) : (
+                <motion.button
+                  whileTap={canNudge ? { scale: 0.94 } : {}}
+                  onClick={onNudge}
+                  disabled={!canNudge}
+                  className="mt-3 w-full flex items-center justify-center gap-2 py-3 disabled:cursor-not-allowed"
+                  style={{
+                    borderRadius: 8,
+                    border: "2px solid #2a1a0a",
+                    background: canNudge
+                      ? "linear-gradient(180deg, #a16207 0%, #6b4209 100%)"
+                      : "linear-gradient(180deg, #3a2410 0%, #2a1a0a 100%)",
+                    boxShadow: canNudge
+                      ? "0 4px 0 #2a1a0a, 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,225,170,0.25)"
+                      : "0 2px 0 #1a0c04, 0 2px 6px rgba(0,0,0,0.45)",
+                    opacity: canNudge ? 1 : 0.55,
+                  }}
+                >
+                  <Bell size={22} color={canNudge ? "#FFE3A0" : "#7a5c2e"} />
+                  <span
+                    style={{
+                      fontFamily: "var(--font-rye), Georgia, serif",
+                      color: "#FFE3A0",
+                      fontSize: 16,
+                      letterSpacing: "0.04em",
+                      textShadow: "0 1px 0 #2a1a0a",
+                    }}
+                  >
+                    {nudgeCooldownRemaining > 0
+                      ? `Nudged! (${Math.ceil(nudgeCooldownRemaining / 1000)}s)`
+                      : `Nudge ${current.display_name}`}
+                  </span>
+                </motion.button>
+              )}
             </>
           )}
         </div>
