@@ -9,6 +9,14 @@ import { useLocalGame } from "@/context/LocalGameContext";
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 12;
 
+// Shared display-font style for headlines like "Saloon", "Ante the Table"
+const RYE: React.CSSProperties = {
+  fontFamily: "var(--font-rye), Georgia, serif",
+};
+const FELL: React.CSSProperties = {
+  fontFamily: "var(--font-fell), Georgia, serif",
+};
+
 export default function LobbyPage() {
   const router = useRouter();
   const {
@@ -25,7 +33,7 @@ export default function LobbyPage() {
   const [name, setName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // If a previous game is mid-play, offer to resume or start fresh.
+  // If a previous game is mid-play, hop straight back into it.
   useEffect(() => {
     if (status === "active") {
       router.replace("/game/local");
@@ -48,42 +56,70 @@ export default function LobbyPage() {
   }
 
   const canStart = players.length >= MIN_PLAYERS;
+  const needed = MIN_PLAYERS - players.length;
 
   return (
-    <main className="min-h-screen px-5 py-6 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark">
-      <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-between mb-6">
+    <main className="felt-saloon relative min-h-[100dvh] overflow-hidden">
+      {/* wood rails — same framing device as the landing */}
+      <div
+        aria-hidden
+        className="wood-grain pointer-events-none absolute inset-x-0 top-0 h-3 shadow-[0_4px_14px_rgba(0,0,0,0.55)]"
+      />
+      <div
+        aria-hidden
+        className="wood-grain pointer-events-none absolute inset-x-0 bottom-0 h-3 shadow-[0_-4px_14px_rgba(0,0,0,0.55)]"
+      />
+
+      <div className="relative mx-auto max-w-md px-5 pt-7 pb-8">
+        {/* ── Top bar ───────────────────────────────────────────── */}
+        <div className="mb-6 grid grid-cols-[1fr_auto_1fr] items-center">
           <Link
             href="/"
-            className="text-white/70 hover:text-white text-sm font-bold"
+            className="justify-self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 hover:text-[#ffd17a] transition-colors"
+            style={FELL}
           >
             ← Back
           </Link>
           <h1
-            className="text-3xl"
+            className="justify-self-center"
             style={{
-              fontFamily: "var(--font-rye), Georgia, serif",
+              ...RYE,
+              fontSize: "clamp(1.75rem, 7vw, 2.25rem)",
               color: "#f4e4b7",
-              textShadow: "0 2px 0 rgba(0,0,0,0.55)",
+              textShadow:
+                "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
+              letterSpacing: "0.02em",
             }}
           >
             Saloon
           </h1>
           <button
             onClick={newGame}
-            className="text-white/50 hover:text-white text-xs font-bold uppercase tracking-widest"
+            className="justify-self-end text-[0.66rem] font-bold uppercase text-[#f4e4b7]/55 hover:text-[#ffd17a] transition-colors"
+            style={{ ...FELL, letterSpacing: "0.36em" }}
             title="Clear all players"
           >
             Clear
           </button>
         </div>
 
-        <section className="bg-buck-card border border-white/10 rounded-2xl p-4 mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-xs uppercase tracking-widest text-white/60 font-bold">
+        {/* ── Buy-in card ───────────────────────────────────────── */}
+        <Panel className="mb-4">
+          <div className="mb-3 flex items-center justify-between">
+            <label
+              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
               Buy-in
             </label>
-            <span className="text-buck-gold font-black text-lg">
+            <span
+              className="text-[1.15rem]"
+              style={{
+                ...RYE,
+                color: "#ffd17a",
+                textShadow: "0 1px 0 rgba(0,0,0,0.55)",
+              }}
+            >
               {buyIn} buck{buyIn === 1 ? "" : "s"}
             </span>
           </div>
@@ -94,15 +130,24 @@ export default function LobbyPage() {
             step={1}
             value={buyIn}
             onChange={(e) => setBuyIn(parseInt(e.target.value, 10))}
-            className="w-full accent-buck-green"
+            className="brass-slider w-full"
+            style={
+              {
+                ["--fill" as string]: `${((buyIn - 1) / 8) * 100}%`,
+              } as React.CSSProperties
+            }
           />
-          <p className="text-white/40 text-xs mt-2">
-            Each player starts with this many bucks. They roll one die per
-            buck they hold, up to 3 dice per turn.
+          <p
+            className="mt-3 text-[0.82rem] italic leading-snug text-[#f4e4b7]/60"
+            style={FELL}
+          >
+            Each rider starts with this many bucks. They roll one die per buck
+            they&apos;re holdin&apos;, up to three dice per turn.
           </p>
-        </section>
+        </Panel>
 
-        <section className="bg-buck-card border border-white/10 rounded-2xl p-4 mb-4">
+        {/* ── Players card ──────────────────────────────────────── */}
+        <Panel className="mb-5">
           <form onSubmit={handleAdd} className="flex gap-2">
             <input
               ref={inputRef}
@@ -111,34 +156,49 @@ export default function LobbyPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder={
                 players.length === 0
-                  ? "First player's name"
-                  : "Add another player"
+                  ? "Name of the first rider"
+                  : "Add another rider"
               }
               maxLength={20}
               disabled={players.length >= MAX_PLAYERS}
-              className="flex-1 bg-buck-darker border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-buck-green disabled:opacity-40"
+              className="parchment-input flex-1 rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none disabled:opacity-40"
+              style={{
+                fontFamily: "var(--font-fell), Georgia, serif",
+                letterSpacing: "0.01em",
+              }}
             />
             <button
               type="submit"
               disabled={!name.trim() || players.length >= MAX_PLAYERS}
-              className="px-5 rounded-xl font-black bg-buck-green text-white disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-transform"
+              className="brass-mini-button px-5 text-[0.85rem] font-bold uppercase text-[#2a1a0a] disabled:cursor-not-allowed disabled:opacity-40"
+              style={{ ...RYE, letterSpacing: "0.18em" }}
             >
-              ADD
+              Add
             </button>
           </form>
 
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-xs uppercase tracking-widest text-white/60 font-bold">
-                Players
+          <div className="mt-5">
+            <div className="mb-3 flex items-center justify-between">
+              <h2
+                className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+                style={{ ...FELL, letterSpacing: "0.36em" }}
+              >
+                At the Table
               </h2>
-              <span className="text-white/50 text-xs font-bold">
+              <span
+                className="text-[0.7rem] font-bold text-[#f4e4b7]/55"
+                style={{ ...FELL, letterSpacing: "0.18em" }}
+              >
                 {players.length}/{MAX_PLAYERS}
               </span>
             </div>
+
             {players.length === 0 ? (
-              <div className="text-center text-white/40 py-8 text-sm">
-                Add at least {MIN_PLAYERS} players to start
+              <div
+                className="rounded-[10px] border border-dashed border-[#c99a33]/30 py-7 text-center text-[0.88rem] italic text-[#f4e4b7]/55"
+                style={FELL}
+              >
+                Need at least {MIN_PLAYERS} riders to deal.
               </div>
             ) : (
               <ul className="space-y-2">
@@ -151,23 +211,40 @@ export default function LobbyPage() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, x: 40, scale: 0.9 }}
                       transition={{ duration: 0.18 }}
-                      className="flex items-center gap-3 bg-buck-darker rounded-xl px-3 py-2 border border-white/5"
+                      className="parchment relative flex items-center gap-3 overflow-hidden rounded-[10px] border-[1.5px] border-[#5c3b1e] px-3 py-2"
+                      style={{
+                        boxShadow:
+                          "0 1px 0 rgba(255,240,210,0.55) inset, 0 -1px 0 rgba(101,67,33,0.18) inset, 0 4px 12px rgba(0,0,0,0.35)",
+                      }}
                     >
                       <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center text-white font-black flex-shrink-0"
-                        style={{ backgroundColor: p.color }}
+                        className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full font-black text-white"
+                        style={{
+                          backgroundColor: p.color,
+                          boxShadow:
+                            "0 0 0 1.5px #ffd17a, 0 0 0 2.5px #5c3b1e, 0 2px 4px rgba(0,0,0,0.4)",
+                          ...RYE,
+                        }}
                       >
                         {p.name.charAt(0).toUpperCase()}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold truncate">{p.name}</div>
-                        <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                      <div className="min-w-0 flex-1">
+                        <div
+                          className="truncate text-[0.95rem] font-bold text-[#2a1a0a]"
+                          style={RYE}
+                        >
+                          {p.name}
+                        </div>
+                        <div
+                          className="text-[0.6rem] font-bold uppercase text-[#5c3b1e]/70"
+                          style={{ ...FELL, letterSpacing: "0.32em" }}
+                        >
                           Seat {i + 1}
                         </div>
                       </div>
                       <button
                         onClick={() => removePlayer(p.id)}
-                        className="text-white/40 hover:text-buck-coral text-lg font-black px-2"
+                        className="px-2 text-xl font-black text-[#5c3b1e]/55 hover:text-[#8b2222] transition-colors"
                         aria-label={`Remove ${p.name}`}
                       >
                         ×
@@ -178,24 +255,177 @@ export default function LobbyPage() {
               </ul>
             )}
           </div>
-        </section>
+        </Panel>
 
+        {/* ── Start button ──────────────────────────────────────── */}
         <button
           onClick={handleStart}
           disabled={!canStart}
-          className="w-full py-5 rounded-2xl font-black text-lg text-white bg-gradient-to-br from-buck-green to-emerald-700 shadow-[0_10px_30px_rgba(16,185,129,0.35)] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
+          className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-4 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
         >
-          {canStart
-            ? "START GAME"
-            : `NEED ${MIN_PLAYERS - players.length} MORE PLAYER${
-                MIN_PLAYERS - players.length === 1 ? "" : "S"
-              }`}
+          <span
+            className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+            style={{
+              ...RYE,
+              letterSpacing: "0.22em",
+              textShadow: "0 1px 0 rgba(255,240,200,0.55)",
+            }}
+          >
+            {canStart
+              ? "Deal 'em In"
+              : `Need ${needed} More Rider${needed === 1 ? "" : "s"}`}
+          </span>
+          {canStart && (
+            <span
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              {players.length} players · {buyIn}-buck buy-in
+            </span>
+          )}
         </button>
 
-        <p className="text-center text-white/40 text-xs mt-4">
+        <p
+          className="mt-5 text-center text-[0.78rem] italic text-[#f4e4b7]/55"
+          style={FELL}
+        >
           Pass-and-play on one device. No accounts, no setup.
         </p>
       </div>
+
+      {/* Local-only styling for the brass slider + parchment input + brass CTAs.
+          Kept inline so the lobby is self-contained and easy to tune. */}
+      <style jsx>{`
+        :global(.brass-slider) {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 6px;
+          background: linear-gradient(
+            90deg,
+            #c99a33 0%,
+            #c99a33 var(--fill, 50%),
+            rgba(244, 228, 183, 0.18) var(--fill, 50%),
+            rgba(244, 228, 183, 0.18) 100%
+          );
+          border-radius: 999px;
+          outline: none;
+          box-shadow: 0 1px 0 rgba(0, 0, 0, 0.45) inset;
+        }
+        :global(.brass-slider::-webkit-slider-thumb) {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 22px;
+          width: 22px;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle at 30% 30%,
+            #ffe8a8 0%,
+            #d8a93b 55%,
+            #8a6720 100%
+          );
+          border: 1.5px solid #5c3b1e;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55),
+            0 0 0 1px rgba(255, 240, 200, 0.4) inset;
+          cursor: grab;
+        }
+        :global(.brass-slider::-moz-range-thumb) {
+          height: 22px;
+          width: 22px;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle at 30% 30%,
+            #ffe8a8 0%,
+            #d8a93b 55%,
+            #8a6720 100%
+          );
+          border: 1.5px solid #5c3b1e;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+          cursor: grab;
+        }
+        :global(.parchment-input) {
+          background: linear-gradient(
+            180deg,
+            #fdf2ce 0%,
+            #f1dfa3 60%,
+            #d6b87a 100%
+          );
+          border: 1.5px solid #5c3b1e;
+          box-shadow: 0 1px 0 rgba(255, 240, 210, 0.55) inset,
+            0 -1px 0 rgba(101, 67, 33, 0.18) inset,
+            0 3px 10px rgba(0, 0, 0, 0.35);
+          transition: box-shadow 0.15s ease;
+        }
+        :global(.parchment-input:focus) {
+          box-shadow: 0 0 0 2px #ffd17a,
+            0 1px 0 rgba(255, 240, 210, 0.55) inset,
+            0 3px 10px rgba(0, 0, 0, 0.4);
+        }
+        :global(.brass-mini-button) {
+          background: linear-gradient(
+            180deg,
+            #ffd989 0%,
+            #d8a93b 48%,
+            #a07a22 100%
+          );
+          border: 1.5px solid #7a5a18;
+          border-radius: 10px;
+          box-shadow: 0 1px 0 rgba(255, 240, 200, 0.75) inset,
+            0 -2px 0 rgba(60, 40, 8, 0.35) inset,
+            0 4px 12px rgba(0, 0, 0, 0.45);
+          transition: transform 0.08s ease;
+        }
+        :global(.brass-mini-button:active:not(:disabled)) {
+          transform: scale(0.97);
+        }
+        :global(.brass-cta) {
+          background: linear-gradient(
+            180deg,
+            #ffd989 0%,
+            #d8a93b 48%,
+            #a07a22 100%
+          );
+          box-shadow: 0 1px 0 rgba(255, 240, 200, 0.85) inset,
+            0 -2px 0 rgba(60, 40, 8, 0.35) inset,
+            0 10px 26px rgba(0, 0, 0, 0.5);
+        }
+        :global(.brass-cta:disabled) {
+          background: linear-gradient(
+            180deg,
+            rgba(10, 40, 28, 0.55) 0%,
+            rgba(5, 30, 20, 0.7) 100%
+          );
+          border-color: rgba(201, 154, 51, 0.35);
+          box-shadow: 0 1px 0 rgba(244, 228, 183, 0.06) inset,
+            0 8px 22px rgba(0, 0, 0, 0.4);
+        }
+        :global(.brass-cta:disabled > span) {
+          color: rgba(244, 228, 183, 0.6) !important;
+          text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55) !important;
+        }
+      `}</style>
     </main>
+  );
+}
+
+// ─── A felt-on-felt card with a brass hairline border ────────────
+function Panel({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={`relative rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-4 ${className}`}
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(10,40,28,0.65) 0%, rgba(5,28,20,0.78) 100%)",
+        boxShadow:
+          "0 1px 0 rgba(244,228,183,0.06) inset, 0 14px 30px rgba(0,0,0,0.45)",
+      }}
+    >
+      {children}
+    </section>
   );
 }
