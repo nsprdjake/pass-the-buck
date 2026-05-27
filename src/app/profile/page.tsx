@@ -654,7 +654,7 @@ export default function ProfilePage() {
                 Wallet
               </div>
               <div
-                className="mt-1 flex items-baseline gap-1.5"
+                className="mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0"
                 style={RYE}
               >
                 <span
@@ -731,7 +731,7 @@ export default function ProfilePage() {
                     return (
                       <li
                         key={b.id}
-                        className="relative rounded-[12px] border-[1.5px] p-3"
+                        className="relative flex flex-col overflow-hidden rounded-[12px] border-[1.5px] p-3"
                         style={{
                           background: isHighlight
                             ? "linear-gradient(180deg, rgba(201,154,51,0.22) 0%, rgba(122,90,24,0.18) 100%)"
@@ -750,7 +750,7 @@ export default function ProfilePage() {
                           </span>
                         )}
                         <div
-                          className="truncate text-[0.85rem] font-bold text-[var(--parchment-light)]"
+                          className="line-clamp-2 break-words text-[0.85rem] font-bold leading-tight text-[var(--parchment-light)]"
                           style={RYE}
                           title={b.label}
                         >
@@ -758,29 +758,32 @@ export default function ProfilePage() {
                         </div>
                         {b.tagline && (
                           <div
-                            className="mt-0.5 line-clamp-1 text-[0.65rem] italic text-[var(--parchment-light)]/55"
+                            className="mt-0.5 line-clamp-2 break-words text-[0.65rem] italic leading-snug text-[var(--parchment-light)]/55"
                             style={FELL}
                             title={b.tagline}
                           >
                             {b.tagline}
                           </div>
                         )}
-                        <div className="mt-2 flex items-baseline gap-1.5">
+                        {/* Stacked number + label — kept vertical so the
+                            "eyeBucks" word can never overflow into the
+                            neighbouring card when the user bumps Text Size. */}
+                        <div className="mt-2 flex flex-col">
                           <span
-                            className="text-[1.35rem] leading-none text-[var(--accent-text)]"
+                            className="block break-words text-[1.35rem] leading-none text-[var(--accent-text)]"
                             style={RYE}
                           >
                             {b.amount_eyebucks.toLocaleString()}
                           </span>
                           <span
-                            className="text-[0.6rem] uppercase text-[var(--parchment-light)]/65"
+                            className="mt-0.5 block text-[0.6rem] uppercase text-[var(--parchment-light)]/65"
                             style={{ ...FELL, letterSpacing: "0.2em" }}
                           >
                             eyeBucks
                           </span>
                         </div>
                         <div
-                          className="mt-0.5 text-[0.65rem] italic text-[var(--parchment-light)]/45"
+                          className="mt-1 break-words text-[0.65rem] italic text-[var(--parchment-light)]/45"
                           style={FELL}
                         >
                           {rate} eB per $1
