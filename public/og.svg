@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="felt" cx="50%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#1a8f60"/>
+      <stop offset="55%" stop-color="#0a4d33"/>
+      <stop offset="100%" stop-color="#052b1c"/>
+    </radialGradient>
+    <linearGradient id="wood" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5c3b1e"/>
+      <stop offset="100%" stop-color="#2a1a0a"/>
+    </linearGradient>
+    <radialGradient id="star" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffe3a0"/>
+      <stop offset="55%" stop-color="#c99a33"/>
+      <stop offset="100%" stop-color="#5c3c0e"/>
+    </radialGradient>
+    <linearGradient id="paper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf2ce"/>
+      <stop offset="100%" stop-color="#d6b87a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Felt background -->
+  <rect width="1200" height="630" fill="url(#felt)"/>
+
+  <!-- Felt fiber dots -->
+  <g opacity="0.18">
+    <circle cx="120" cy="140" r="1.5" fill="#000"/>
+    <circle cx="980" cy="120" r="1.5" fill="#000"/>
+    <circle cx="320" cy="480" r="1.5" fill="#000"/>
+    <circle cx="860" cy="520" r="1.5" fill="#000"/>
+    <circle cx="540" cy="80" r="1.5" fill="#000"/>
+    <circle cx="60" cy="380" r="1.5" fill="#000"/>
+  </g>
+
+  <!-- Wood rail top + bottom -->
+  <rect x="0" y="0" width="1200" height="38" fill="url(#wood)"/>
+  <rect x="0" y="592" width="1200" height="38" fill="url(#wood)"/>
+  <rect x="0" y="38" width="1200" height="3" fill="#2a1a0a"/>
+  <rect x="0" y="589" width="1200" height="3" fill="#2a1a0a"/>
+
+  <!-- Brass studs -->
+  <g>
+    <circle cx="40" cy="19" r="6" fill="url(#star)" stroke="#2a1a0a" stroke-width="1"/>
+    <circle cx="1160" cy="19" r="6" fill="url(#star)" stroke="#2a1a0a" stroke-width="1"/>
+    <circle cx="40" cy="611" r="6" fill="url(#star)" stroke="#2a1a0a" stroke-width="1"/>
+    <circle cx="1160" cy="611" r="6" fill="url(#star)" stroke="#2a1a0a" stroke-width="1"/>
+  </g>
+
+  <!-- Sheriff star (large) on the left -->
+  <g transform="translate(220 320)">
+    <!-- 5-point star path -->
+    <path d="M 0 -130 L 38 -40 L 134 -40 L 56 18 L 86 110 L 0 56 L -86 110 L -56 18 L -134 -40 L -38 -40 Z"
+          fill="url(#star)" stroke="#2a1a0a" stroke-width="6" stroke-linejoin="round"/>
+    <!-- center bead -->
+    <circle cx="0" cy="0" r="26" fill="#5c3c0e" stroke="#2a1a0a" stroke-width="3"/>
+    <text x="0" y="13" text-anchor="middle" font-size="40" font-weight="900" font-family="Georgia, serif" fill="#ffe3a0">1</text>
+    <!-- ball studs at star points -->
+    <circle cx="0" cy="-126" r="7" fill="#ffe3a0" stroke="#2a1a0a" stroke-width="1.5"/>
+    <circle cx="124" cy="-37" r="7" fill="#ffe3a0" stroke="#2a1a0a" stroke-width="1.5"/>
+    <circle cx="77" cy="103" r="7" fill="#ffe3a0" stroke="#2a1a0a" stroke-width="1.5"/>
+    <circle cx="-77" cy="103" r="7" fill="#ffe3a0" stroke="#2a1a0a" stroke-width="1.5"/>
+    <circle cx="-124" cy="-37" r="7" fill="#ffe3a0" stroke="#2a1a0a" stroke-width="1.5"/>
+  </g>
+
+  <!-- Scrip bills, scattered -->
+  <g transform="translate(940 380)">
+    <g transform="rotate(-14)">
+      <rect x="-130" y="-30" width="260" height="110" rx="6" fill="url(#paper)" stroke="#2a1a0a" stroke-width="4"/>
+      <text x="0" y="20" text-anchor="middle" font-size="22" font-weight="700" font-family="Georgia, serif" fill="#2a1a0a" letter-spacing="6">SALOON SCRIP</text>
+      <circle cx="0" cy="42" r="20" fill="url(#star)" stroke="#2a1a0a" stroke-width="2"/>
+      <text x="0" y="50" text-anchor="middle" font-size="22" font-weight="900" font-family="Georgia, serif" fill="#2a1a0a">$</text>
+    </g>
+    <g transform="translate(-30 -90) rotate(10)">
+      <rect x="-130" y="-30" width="260" height="110" rx="6" fill="url(#paper)" stroke="#2a1a0a" stroke-width="4"/>
+      <text x="0" y="20" text-anchor="middle" font-size="22" font-weight="700" font-family="Georgia, serif" fill="#2a1a0a" letter-spacing="6">SALOON SCRIP</text>
+      <circle cx="0" cy="42" r="20" fill="url(#star)" stroke="#2a1a0a" stroke-width="2"/>
+      <text x="0" y="50" text-anchor="middle" font-size="22" font-weight="900" font-family="Georgia, serif" fill="#2a1a0a">$</text>
+    </g>
+  </g>
+
+  <!-- Title block -->
+  <g transform="translate(600 250)">
+    <text x="0" y="0" text-anchor="middle"
+          font-size="110" font-weight="900"
+          font-family="Georgia, serif"
+          fill="#ffe3a0"
+          stroke="#2a1a0a" stroke-width="3"
+          letter-spacing="2">
+      PASS THE BUCK
+    </text>
+    <text x="0" y="60" text-anchor="middle"
+          font-size="32" font-style="italic"
+          font-family="Georgia, serif"
+          fill="#f4e4b7" opacity="0.85">
+      a saloon dice game
+    </text>
+  </g>
+
+  <!-- URL at bottom -->
+  <text x="600" y="565" text-anchor="middle"
+        font-size="24" font-weight="700"
+        font-family="Georgia, serif"
+        fill="#c99a33"
+        letter-spacing="6">
+    PTB.NSPRD.COM
+  </text>
+</svg>
