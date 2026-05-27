@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useAuth, usePreferredName } from "@/context/AuthContext";
 import { useLocalGame } from "@/context/LocalGameContext";
@@ -52,10 +54,19 @@ function Flourish({ className = "" }: { className?: string }) {
 
 export default function Home() {
   const { status, players } = useLocalGame();
-  const { user, profile } = useAuth();
+  const { user, profile, lastDailyBonus } = useAuth();
   const howdy = usePreferredName();
   const inProgress = status === "active" && players.length > 0;
   const balance = profile?.balance ?? null;
+
+  // Auto-dismiss the daily-bonus parchment after a few seconds.
+  const [showBonus, setShowBonus] = useState<typeof lastDailyBonus | null>(null);
+  useEffect(() => {
+    if (!lastDailyBonus) return;
+    setShowBonus(lastDailyBonus);
+    const t = setTimeout(() => setShowBonus(null), 5500);
+    return () => clearTimeout(t);
+  }, [lastDailyBonus]);
 
   return (
     <main className="felt-saloon relative min-h-[100dvh] overflow-hidden">
@@ -122,6 +133,28 @@ export default function Home() {
           </Link>
         )}
       </div>
+
+      {/* Daily-bonus parchment slip — auto-dismisses after a few seconds */}
+      <AnimatePresence>
+        {showBonus && (
+          <motion.div
+            key={showBonus.awardedAt}
+            initial={{ y: -40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            className="parchment pointer-events-none absolute left-1/2 top-20 z-20 -translate-x-1/2 whitespace-nowrap rounded-full border-[1.5px] border-[#5c3b1e] px-4 py-1.5 text-[0.75rem] font-bold text-[#2a1a0a] shadow-[0_8px_22px_rgba(0,0,0,0.45)]"
+            style={{
+              fontFamily: "var(--font-rye), Georgia, serif",
+              letterSpacing: "0.16em",
+            }}
+          >
+            <span aria-hidden>★</span>{" "}
+            +{showBonus.amount} daily eyeBucks{" "}
+            <span aria-hidden>★</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="relative mx-auto flex max-w-sm flex-col items-center px-6 pt-12 pb-10 text-center">
         {/* ── Hero ────────────────────────────────────────────────── */}

@@ -26,8 +26,16 @@ export type Profile = {
   /** Wallet balance in eyeBucks. Starter balance is 100. Earned by winning
    *  multi-device games; future-spendable on entry costs and power-ups. */
   balance: number;
+  /** Slug of the currently-active theme — drives data-theme on <html>. */
+  active_theme_slug: string;
   created_at: string;
   updated_at: string;
+};
+
+export type DailyBonusClaim = {
+  type: "login";
+  amount: number;
+  awardedAt: number;
 };
 
 type AuthValue = {
@@ -52,6 +60,10 @@ type AuthValue = {
   refreshProfile: () => Promise<void>;
   /** Sign the current user out and clear the local session. */
   signOut: () => Promise<void>;
+  /** Most recent daily-login bonus awarded in THIS browser session (or null
+   *  if today's bonus was already collected before now). Consumers can show
+   *  a toast when this changes. */
+  lastDailyBonus: DailyBonusClaim | null;
 };
 
 const Ctx = createContext<AuthValue | null>(null);
@@ -60,7 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [lastDailyBonus, setLastDailyBonus] = useState<DailyBonusClaim | null>(null);
   const profileFetched = useRef<string | null>(null);
+  const dailyClaimedFor = useRef<string | null>(null);
 
   // Hydrate session on mount + subscribe to auth changes.
   useEffect(() => {
@@ -212,9 +226,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await sb.auth.signOut();
     setSession(null);
     setProfile(null);
+    setLastDailyBonus(null);
     profileFetched.current = null;
+    dailyClaimedFor.current = null;
     resetPushSync();
   }, []);
+
+  // Once per signed-in user per page lifetime, try to claim today's login
+  // bonus. The RPC is idempotent server-side (unique key on user + date),
+  // so if today's bonus was already collected we just get 0 back.
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId) return;
+    if (dailyClaimedFor.current === userId) return;
+    dailyClaimedFor.current = userId;
+    const sb = getSupabase();
+    (async () => {
+      const { data, error } = await sb.rpc("ptb_claim_daily_login");
+      if (error) return;
+      const amount = typeof data === "number" ? data : 0;
+      if (amount > 0) {
+        setLastDailyBonus({ type: "login", amount, awardedAt: Date.now() });
+        // Refresh the profile so the new balance is visible immediately.
+        await refreshProfile();
+      }
+    })();
+  }, [session?.user?.id, refreshProfile]);
 
   // When a user is signed in AND has already granted notification permission,
   // make sure their device's push subscription is registered server-side.
@@ -240,6 +277,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updateProfile,
       refreshProfile,
       signOut,
+      lastDailyBonus,
     }),
     [
       loading,
@@ -250,6 +288,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updateProfile,
       refreshProfile,
       signOut,
+      lastDailyBonus,
     ]
   );
 
