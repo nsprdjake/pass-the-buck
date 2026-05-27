@@ -1,7 +1,12 @@
 "use client";
 
 import { PLAYER_COLORS } from "./constants";
-import { applyTurn, checkWinner, rollTurn } from "./game-logic";
+import {
+  applyTurn,
+  checkWinner,
+  getNextActivePlayer,
+  rollTurn,
+} from "./game-logic";
 import { getDeviceId, getMembership, makeToken, saveMembership } from "./identity";
 import { getSupabase } from "./supabase";
 import type { GameMode, RollOutcome } from "./types";
@@ -502,7 +507,15 @@ export async function endTurnRemote(opts: {
 
   const currentSeat = freshGame?.current_seat ?? opts.currentSeat ?? 0;
   const currentRound = freshGame?.round ?? opts.currentRound ?? 1;
-  const nextSeat = (currentSeat + 1) % n;
+  // Find the current seat's index in the seat-sorted array, then ask the
+  // shared helper for the next seat that still has bucks to roll. This
+  // skips 0-buck players entirely so the active turn jumps straight to the
+  // next eligible roller, instead of landing on a broke seat and forcing a
+  // separate auto-skip round-trip via the UI.
+  const currentIdxInSorted = sorted.findIndex((p) => p.seat === currentSeat);
+  const safeCurrentIdx = currentIdxInSorted >= 0 ? currentIdxInSorted : 0;
+  const nextIdx = getNextActivePlayer(localShape, safeCurrentIdx);
+  const nextSeat = sorted[nextIdx]?.seat ?? (currentSeat + 1) % n;
   const nextRound = nextSeat <= currentSeat ? currentRound + 1 : currentRound;
 
   // Compare-and-swap on `current_seat` so two simultaneous callers (e.g. the

@@ -80,14 +80,24 @@ export function checkWinner(players: Player[]): Player | null {
   return players.find((p) => p.bucks === 1) ?? null;
 }
 
-// Advance to the next seat in order. Players with 0 bucks are NOT removed;
-// they remain seated and can receive bucks from neighbors. The UI is
-// responsible for auto-skipping a 0-buck seat with a brief message.
+// Advance to the next seat *that still has bucks to roll*. Players with 0
+// bucks are NOT removed from the table — they remain seated and can receive
+// bucks from neighbors — but they get skipped on the way around because
+// they'd have nothing to do on their turn anyway.
+//
+// If somehow nobody at the table has bucks (shouldn't happen in a normal
+// game — checkWinner triggers when total === 1), we fall back to the next
+// seat in order so we never loop forever.
 export function getNextActivePlayer(
   players: Player[],
   currentIdx: number
 ): number {
   const n = players.length;
   if (n === 0) return 0;
+  for (let step = 1; step <= n; step++) {
+    const idx = (currentIdx + step) % n;
+    if (players[idx].bucks > 0) return idx;
+  }
+  // No one has bucks — return the next seat as a safety fallback.
   return (currentIdx + 1) % n;
 }
