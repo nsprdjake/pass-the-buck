@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 import { createGame } from "@/lib/remote-game";
 import type { GameMode } from "@/lib/types";
 
@@ -15,12 +16,20 @@ const FELL: React.CSSProperties = {
 
 export default function CreateMultiGamePage() {
   const router = useRouter();
+  const { user, profile } = useAuth();
   const [name, setName] = useState("");
   const [buyIn, setBuyIn] = useState(3);
   const [mode, setMode] = useState<GameMode>("winner");
   const [wager, setWager] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Prefill name from profile once it loads (only if user hasn't typed anything).
+  useEffect(() => {
+    if (profile?.display_name && !name) {
+      setName(profile.display_name);
+    }
+  }, [profile?.display_name, name]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +42,7 @@ export default function CreateMultiGamePage() {
         buyIn,
         mode,
         wager,
+        userId: user?.id ?? null,
       });
       router.push(`/multi/${game.code}`);
     } catch (e) {

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IM_Fell_English, Inter, Rye } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
 import { LocalGameProvider } from "@/context/LocalGameContext";
 
 const inter = Inter({
@@ -58,7 +59,9 @@ export default function RootLayout({
       className={`${inter.variable} ${rye.variable} ${fell.variable} h-full`}
     >
       <body className="min-h-full bg-buck-dark text-white antialiased">
-        <LocalGameProvider>{children}</LocalGameProvider>
+        <AuthProvider>
+          <LocalGameProvider>{children}</LocalGameProvider>
+        </AuthProvider>
       </body>
     </html>
   );

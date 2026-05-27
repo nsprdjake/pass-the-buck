@@ -15,8 +15,12 @@ export function getSupabase(): SupabaseClient {
   }
   _client = createClient(url, key, {
     auth: {
-      persistSession: false,
-      autoRefreshToken: false,
+      // Persist sessions so signed-in users stay signed in across reloads
+      // and devices. Storage uses the supplied storage key under localStorage.
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: "ptb-auth",
     },
     realtime: {
       params: { eventsPerSecond: 10 },

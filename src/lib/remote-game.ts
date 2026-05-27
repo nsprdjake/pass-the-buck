@@ -37,6 +37,8 @@ export type PlayerRow = {
   bucks: number;
   is_host: boolean;
   created_at: string;
+  /** Optional auth.user.id — populated when the joining device was signed in. */
+  user_id: string | null;
 };
 
 export type ServerTransfer = {
@@ -91,6 +93,8 @@ export async function createGame(opts: {
   buyIn: number;
   mode?: GameMode;
   wager?: string | null;
+  /** Optional auth.user.id — set when the host is signed in. */
+  userId?: string | null;
 }): Promise<{ game: GameRow; me: PlayerRow }> {
   const sb = getSupabase();
   const deviceId = getDeviceId();
@@ -98,6 +102,7 @@ export async function createGame(opts: {
   const mode: GameMode = opts.mode ?? "winner";
   const wagerTrimmed = (opts.wager ?? "").trim().slice(0, 80);
   const wager = wagerTrimmed === "" ? null : wagerTrimmed;
+  const hostUserId = opts.userId ?? null;
 
   // Generate codes until we get a unique one (retry a few times).
   let game: GameRow | null = null;
@@ -112,6 +117,7 @@ export async function createGame(opts: {
         status: "lobby",
         mode,
         wager,
+        host_user_id: hostUserId,
       })
       .select()
       .single<GameRow>();
@@ -138,6 +144,7 @@ export async function createGame(opts: {
       seat: 0,
       bucks: 0,
       is_host: true,
+      user_id: hostUserId,
     })
     .select()
     .single<PlayerRow>();
@@ -172,9 +179,12 @@ export async function findGame(code: string): Promise<GameRow> {
 export async function joinGame(opts: {
   code: string;
   displayName: string;
+  /** Optional auth.user.id — set when the joining device is signed in. */
+  userId?: string | null;
 }): Promise<{ game: GameRow; me: PlayerRow }> {
   const sb = getSupabase();
   const deviceId = getDeviceId();
+  const userId = opts.userId ?? null;
   const game = await findGame(opts.code);
   if (game.status !== "lobby") {
     // Allow rejoin if this device already has a row in this game
@@ -221,6 +231,7 @@ export async function joinGame(opts: {
       seat: nextSeat,
       bucks: 0,
       is_host: false,
+      user_id: userId,
     })
     .select()
     .single<PlayerRow>();
