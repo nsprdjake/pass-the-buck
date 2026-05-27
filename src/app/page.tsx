@@ -69,6 +69,22 @@ export default function Home() {
         className="wood-grain pointer-events-none absolute inset-x-0 bottom-0 h-3 shadow-[0_-4px_14px_rgba(0,0,0,0.55)]"
       />
 
+      {/* "How to Play" link — pinned top-left, mirrors the sign-in chip */}
+      <div className="absolute left-4 top-5 z-10">
+        <Link
+          href="/how"
+          aria-label="How to play"
+          className="inline-flex items-center gap-1 rounded-full border border-[#c99a33]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[#f4e4b7]/75 transition-colors hover:border-[#ffd17a]/70 hover:text-[#ffd17a]"
+          style={{
+            fontFamily: "var(--font-fell), Georgia, serif",
+            letterSpacing: "0.22em",
+          }}
+        >
+          <span aria-hidden>?</span>
+          <span>How to Play</span>
+        </Link>
+      </div>
+
       {/* Sign-in / profile chip — pinned top-right above the hero */}
       <div className="absolute right-4 top-5 z-10">
         {user ? (

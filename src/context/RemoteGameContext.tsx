@@ -19,6 +19,7 @@ import {
   type GameRow,
   type PlayerRow,
 } from "@/lib/remote-game";
+import { notifyNudge } from "@/lib/push";
 import { getSupabase } from "@/lib/supabase";
 
 export type Nudge = {
@@ -281,6 +282,14 @@ export function RemoteGameProvider({
         fromColor: me.color,
         toSeat: game.current_seat,
       },
+    });
+    // Fire-and-forget OS-push for backgrounded/closed tabs. The realtime
+    // broadcast above covers connected devices; this picks up the rest.
+    void notifyNudge({
+      gameId: game.id,
+      toSeat: game.current_seat,
+      fromName: me.display_name,
+      fromColor: me.color,
     });
   }, [game, me]);
 

@@ -26,7 +26,9 @@ import {
   ensureNotificationPermission,
   maybeShowOsNotification,
 } from "@/lib/notifications";
+import { syncPushSubscriptionFor } from "@/lib/push";
 import { playSfx, unlockAudio } from "@/lib/sfx";
+import { useAuth } from "@/context/AuthContext";
 import type { RollOutcome } from "@/lib/types";
 
 type Phase =
@@ -46,6 +48,7 @@ const NUDGE_COOLDOWN_MS = 10_000;
 
 export default function ActiveGameView() {
   const router = useRouter();
+  const { user } = useAuth();
   const { game, players, me, current, isMyTurn, roll, endTurn, sendNudge, lastNudge } =
     useRemoteGame();
 
@@ -281,16 +284,20 @@ export default function ActiveGameView() {
     // Ask for OS-notification permission lazily, exactly when the user has
     // demonstrated they care about pings. Browsers gate this behind a user
     // gesture, so this is the right moment. Subsequent calls are no-ops.
-    void ensureNotificationPermission();
+    void ensureNotificationPermission().then(() => {
+      if (user) void syncPushSubscriptionFor(user.id);
+    });
     playSfx("joinClick");
     sendNudge();
     setNudgeSentAt(Date.now());
-  }, [canNudge, sendNudge]);
+  }, [canNudge, sendNudge, user]);
 
   const onSkipBroke = useCallback(async () => {
     if (!canSkipBroke) return;
     unlockAudio();
-    void ensureNotificationPermission();
+    void ensureNotificationPermission().then(() => {
+      if (user) void syncPushSubscriptionFor(user.id);
+    });
     playSfx("joinClick");
     setSkipping(true);
     try {
@@ -300,7 +307,7 @@ export default function ActiveGameView() {
       // hasn't propagated the new current_seat yet.
       setTimeout(() => setSkipping(false), 1200);
     }
-  }, [canSkipBroke, endTurn]);
+  }, [canSkipBroke, endTurn, user]);
 
   // Tick once a second while a cooldown is active so the button label
   // updates without needing a re-render trigger.
@@ -316,7 +323,9 @@ export default function ActiveGameView() {
     if (!current || current.bucks <= 0) return;
     setErr(null);
     unlockAudio();
-    void ensureNotificationPermission();
+    void ensureNotificationPermission().then(() => {
+      if (user) void syncPushSubscriptionFor(user.id);
+    });
     playSfx("slam");
     setPhase("slam");
     await sleep(SLAM_MS);
@@ -326,7 +335,7 @@ export default function ActiveGameView() {
       setErr(e instanceof Error ? e.message : "Couldn't roll");
       setPhase("idle");
     }
-  }, [isMyTurn, phase, current, roll]);
+  }, [isMyTurn, phase, current, roll, user]);
 
   // === Derived display state ===
   const activeOutcome: RollOutcome | null = useMemo(() => {

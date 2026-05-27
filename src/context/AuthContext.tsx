@@ -10,6 +10,8 @@ import {
   useState,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { registerServiceWorker } from "@/lib/notifications";
+import { resetPushSync, syncPushSubscriptionFor } from "@/lib/push";
 import { getSupabase } from "@/lib/supabase";
 
 /**
@@ -63,6 +65,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Hydrate session on mount + subscribe to auth changes.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Register the service worker eagerly so it's ready by the time a
+    // user grants notification permission. Idempotent.
+    void registerServiceWorker();
     const sb = getSupabase();
     let cancelled = false;
 
@@ -208,7 +213,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
     setProfile(null);
     profileFetched.current = null;
+    resetPushSync();
   }, []);
+
+  // When a user is signed in AND has already granted notification permission,
+  // make sure their device's push subscription is registered server-side.
+  // This is the "save my subscription so the server can push to me" step —
+  // separate from the in-tab Notifications API.
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId) return;
+    if (typeof window === "undefined") return;
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
+    void syncPushSubscriptionFor(userId);
+  }, [session?.user?.id]);
 
   const value = useMemo<AuthValue>(
     () => ({
