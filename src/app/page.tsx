@@ -109,12 +109,14 @@ export default function Home() {
         className="wood-grain pointer-events-none absolute inset-x-0 bottom-0 h-3 shadow-[0_-4px_14px_rgba(0,0,0,0.55)]"
       />
 
-      {/* "How to Play" link — pinned top-left, mirrors the sign-in chip */}
-      <div className="absolute left-4 top-5 z-10">
+      {/* Top header bar — How to Play (left) + profile chip (right).
+          Real flex row, not stacked absolutes, so the two pills share
+          the row and never overlap on narrow viewports. */}
+      <div className="relative z-10 flex items-center justify-between gap-2 px-4 pt-5">
         <Link
           href="/how"
           aria-label="How to play"
-          className="inline-flex items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
           style={{
             fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
             letterSpacing: "0.22em",
@@ -123,26 +125,23 @@ export default function Home() {
           <span aria-hidden>?</span>
           <span>How to Play</span>
         </Link>
-      </div>
 
-      {/* Sign-in / profile chip — pinned top-right above the hero */}
-      <div className="absolute right-4 top-5 z-10">
         {user ? (
           <Link
             href="/profile"
-            className="inline-flex items-center gap-1.5 truncate rounded-full border border-[var(--accent-mid)]/55 bg-[rgba(5,28,20,0.75)] py-1.5 pl-3 pr-2 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/85 transition-colors hover:border-[var(--accent-light)]/80 hover:text-[var(--accent-light)]"
+            className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-[var(--accent-mid)]/55 bg-[rgba(5,28,20,0.75)] py-1.5 pl-3 pr-2 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/85 transition-colors hover:border-[var(--accent-light)]/80 hover:text-[var(--accent-light)]"
             style={{
               fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
               letterSpacing: "0.18em",
             }}
           >
             <span aria-hidden>★</span>
-            <span className="max-w-[7rem] truncate">
+            <span className="min-w-0 max-w-[5.5rem] truncate">
               {howdy ? `Howdy, ${howdy}` : "My Saloon"}
             </span>
             {balance !== null && (
               <span
-                className="ml-1 rounded-full border border-[var(--accent-mid)]/55 bg-[rgba(201,154,51,0.18)] px-2 py-0.5 text-[0.62rem] font-bold tracking-[0.14em] text-[var(--accent-text)]"
+                className="ml-0.5 shrink-0 rounded-full border border-[var(--accent-mid)]/55 bg-[rgba(201,154,51,0.18)] px-2 py-0.5 text-[0.62rem] font-bold tracking-[0.14em] text-[var(--accent-text)]"
                 title={`${balance} eyeBucks`}
               >
                 {balance.toLocaleString()}
@@ -152,7 +151,7 @@ export default function Home() {
         ) : (
           <Link
             href="/auth"
-            className="inline-flex items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
             style={{
               fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
               letterSpacing: "0.22em",
@@ -185,7 +184,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <div className="relative mx-auto flex max-w-sm flex-col items-center px-6 pt-12 pb-10 text-center">
+      <div className="relative mx-auto flex max-w-sm flex-col items-center px-6 pt-6 pb-10 text-center">
         {/* ── Hero ────────────────────────────────────────────────── */}
         <Flourish className="text-[var(--accent-mid)]/65" />
 
