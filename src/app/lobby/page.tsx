@@ -119,50 +119,8 @@ export default function LobbyPage() {
           </button>
         </div>
 
-        {/* ── Buy-in card ───────────────────────────────────────── */}
-        <Panel className="mb-4">
-          <div className="mb-3 flex items-center justify-between">
-            <label
-              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
-              style={{ ...FELL, letterSpacing: "0.36em" }}
-            >
-              Buy-in
-            </label>
-            <span
-              className="text-[1.15rem]"
-              style={{
-                ...RYE,
-                color: "#ffd17a",
-                textShadow: "0 1px 0 rgba(0,0,0,0.55)",
-              }}
-            >
-              {buyIn} eyeBuck{buyIn === 1 ? "" : "s"}
-            </span>
-          </div>
-          <input
-            type="range"
-            min={1}
-            max={9}
-            step={1}
-            value={buyIn}
-            onChange={(e) => setBuyIn(parseInt(e.target.value, 10))}
-            className="brass-slider w-full"
-            style={
-              {
-                ["--fill" as string]: `${((buyIn - 1) / 8) * 100}%`,
-              } as React.CSSProperties
-            }
-          />
-          <p
-            className="mt-3 text-[0.82rem] italic leading-snug text-[#f4e4b7]/60"
-            style={FELL}
-          >
-            Each rider starts with this many eyeBucks. They roll one die per
-            eyeBuck they&apos;re holdin&apos;, up to three dice per turn.
-          </p>
-        </Panel>
-
-        {/* ── Stakes card (mode + optional wager) ───────────────── */}
+        {/* ── Stakes card (mode + optional wager) ─ comes first so the
+            player frames the bet before tuning game length. ──────── */}
         <Panel className="mb-4">
           <div className="mb-3 flex items-center justify-between">
             <label
@@ -212,6 +170,51 @@ export default function LobbyPage() {
               style={FELL}
             />
           </div>
+        </Panel>
+
+        {/* ── Buy-in card (a.k.a. starting hand) ─ purely a pacing dial
+            in loser mode; sets the pot prize in winner mode. ───── */}
+        <Panel className="mb-4">
+          <div className="mb-3 flex items-center justify-between">
+            <label
+              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              {mode === "loser" ? "Starting Hand" : "Buy-in"}
+            </label>
+            <span
+              className="text-[1.15rem]"
+              style={{
+                ...RYE,
+                color: "#ffd17a",
+                textShadow: "0 1px 0 rgba(0,0,0,0.55)",
+              }}
+            >
+              {buyIn} eyeBuck{buyIn === 1 ? "" : "s"}
+            </span>
+          </div>
+          <input
+            type="range"
+            min={1}
+            max={9}
+            step={1}
+            value={buyIn}
+            onChange={(e) => setBuyIn(parseInt(e.target.value, 10))}
+            className="brass-slider w-full"
+            style={
+              {
+                ["--fill" as string]: `${((buyIn - 1) / 8) * 100}%`,
+              } as React.CSSProperties
+            }
+          />
+          <p
+            className="mt-3 text-[0.82rem] italic leading-snug text-[#f4e4b7]/60"
+            style={FELL}
+          >
+            {mode === "loser"
+              ? "Just sets game length — the wager stands alone. More eyeBucks means more rolls before someone gets stuck with the tab."
+              : "Sets the pot prize and game length. Each rider starts with this many eyeBucks and rolls one die per eyeBuck held (up to three)."}
+          </p>
         </Panel>
 
         {/* ── Players card ──────────────────────────────────────── */}
