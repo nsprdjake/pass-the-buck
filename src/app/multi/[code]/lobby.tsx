@@ -188,8 +188,11 @@ export default function LobbyView({ code }: { code: string }) {
               className="text-[0.7rem] font-bold text-[#f4e4b7]/55"
               style={{ ...FELL, letterSpacing: "0.18em" }}
             >
-              {players.length}/12 · {game.buy_in} eyeBuck
-              {game.buy_in === 1 ? "" : "s"} each
+              {game.mode === "loser"
+                ? `${players.length}/12`
+                : `${players.length}/12 · ${game.buy_in} eyeBuck${
+                    game.buy_in === 1 ? "" : "s"
+                  } each`}
             </span>
           </div>
 
@@ -300,7 +303,11 @@ export default function LobbyView({ code }: { code: string }) {
                 className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
-                {players.length} riders · {game.buy_in}-eyeBuck buy-in
+                {game.mode === "loser"
+                  ? `${players.length} rider${players.length === 1 ? "" : "s"}${
+                      game.wager ? ` · ${game.wager}` : ""
+                    }`
+                  : `${players.length} riders · ${game.buy_in}-eyeBuck buy-in`}
               </span>
             )}
           </button>

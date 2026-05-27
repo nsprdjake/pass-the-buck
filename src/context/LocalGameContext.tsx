@@ -154,6 +154,17 @@ export function LocalGameProvider({ children }: { children: React.ReactNode }) {
   const setMode = useCallback((m: GameMode) => {
     setState((s) => {
       if (s.status !== "lobby") return s;
+      // Loser mode hides the buy-in dial entirely — the wager is the
+      // stakes, and buy-in is just pacing. Hard-set to 3 (the default,
+      // balanced game length) so loser games are uniformly paced.
+      if (m === "loser") {
+        return {
+          ...s,
+          mode: m,
+          buyIn: 3,
+          players: s.players.map((p) => ({ ...p, bucks: 3 })),
+        };
+      }
       return { ...s, mode: m };
     });
   }, []);

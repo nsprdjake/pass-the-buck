@@ -33,6 +33,13 @@ export default function CreateMultiGamePage() {
     }
   }, [preferred, name]);
 
+  // Loser mode hides the buy-in dial — hard-set the value to 3 so the
+  // pacing is consistent across all loser games (the wager is the stake,
+  // eyeBuck count is just dice fuel).
+  useEffect(() => {
+    if (mode === "loser") setBuyIn(3);
+  }, [mode]);
+
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || busy) return;
@@ -164,15 +171,17 @@ export default function CreateMultiGamePage() {
             </div>
           </Panel>
 
-          {/* Buy-in (a.k.a. starting hand) — pacing dial in loser mode,
-              pot prize in winner mode */}
+          {/* Buy-in — only relevant in winner mode (it's the pot prize).
+              Loser mode hides it entirely and the value is hard-set to 3
+              by the mode-watching effect above. */}
+          {mode === "winner" && (
           <Panel>
             <div className="mb-3 flex items-center justify-between">
               <label
                 className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
-                {mode === "loser" ? "Starting Hand" : "Buy-in"}
+                Buy-in
               </label>
               <span
                 className="text-[1.15rem]"
@@ -203,11 +212,11 @@ export default function CreateMultiGamePage() {
               className="mt-3 text-[0.82rem] italic leading-snug text-[#f4e4b7]/60"
               style={FELL}
             >
-              {mode === "loser"
-                ? "Just sets game length — the wager stands alone. More eyeBucks means more rolls before someone gets stuck with the tab."
-                : "Sets the pot prize and game length. Each rider starts with this many eyeBucks and rolls one die per eyeBuck held (up to three)."}
+              Sets the pot prize and game length. Each rider starts with this
+              many eyeBucks and rolls one die per eyeBuck held (up to three).
             </p>
           </Panel>
+          )}
 
           {error && (
             <div

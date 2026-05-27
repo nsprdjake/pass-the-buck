@@ -172,8 +172,10 @@ export default function LobbyPage() {
           </div>
         </Panel>
 
-        {/* ── Buy-in card (a.k.a. starting hand) ─ purely a pacing dial
-            in loser mode; sets the pot prize in winner mode. ───── */}
+        {/* ── Buy-in card — only relevant in winner mode (it's the pot
+            prize). Loser mode hides it entirely; the wager is the
+            stakes and the eyeBuck count is hard-set to 3 in context. */}
+        {mode === "winner" && (
         <Panel className="mb-4">
           <div className="mb-3 flex items-center justify-between">
             <label
@@ -211,11 +213,11 @@ export default function LobbyPage() {
             className="mt-3 text-[0.82rem] italic leading-snug text-[#f4e4b7]/60"
             style={FELL}
           >
-            {mode === "loser"
-              ? "Just sets game length — the wager stands alone. More eyeBucks means more rolls before someone gets stuck with the tab."
-              : "Sets the pot prize and game length. Each rider starts with this many eyeBucks and rolls one die per eyeBuck held (up to three)."}
+            Sets the pot prize and game length. Each rider starts with this
+            many eyeBucks and rolls one die per eyeBuck held (up to three).
           </p>
         </Panel>
+        )}
 
         {/* ── Players card ──────────────────────────────────────── */}
         <Panel className="mb-5">
@@ -351,7 +353,9 @@ export default function LobbyPage() {
               className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
-              {players.length} players · {buyIn}-eyeBuck buy-in
+              {mode === "loser"
+                ? `${players.length} rider${players.length === 1 ? "" : "s"}${wager ? ` · ${wager}` : ""}`
+                : `${players.length} players · ${buyIn}-eyeBuck buy-in`}
             </span>
           )}
         </button>
