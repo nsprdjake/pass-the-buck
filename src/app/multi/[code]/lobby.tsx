@@ -7,16 +7,24 @@ import StakesRibbon from "@/components/game/StakesRibbon";
 import { useRemoteGame } from "@/context/RemoteGameContext";
 import { leaveOrKick } from "@/lib/remote-game";
 
+const RYE: React.CSSProperties = {
+  fontFamily: "var(--font-rye), Georgia, serif",
+};
+const FELL: React.CSSProperties = {
+  fontFamily: "var(--font-fell), Georgia, serif",
+};
+
 export default function LobbyView({ code }: { code: string }) {
   const router = useRouter();
   const { game, players, me, isHost, start } = useRemoteGame();
   const [starting, setStarting] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"code" | "link" | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   if (!game) return null;
 
   const canStart = players.length >= 2;
+  const needed = Math.max(0, 2 - players.length);
 
   async function handleStart() {
     if (!canStart || starting) return;
@@ -33,8 +41,8 @@ export default function LobbyView({ code }: { code: string }) {
   async function copyCode() {
     try {
       await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1400);
+      setCopied("code");
+      setTimeout(() => setCopied(null), 1400);
     } catch {
       // ignore
     }
@@ -44,8 +52,8 @@ export default function LobbyView({ code }: { code: string }) {
     const url = `${window.location.origin}/multi/join?code=${code}`;
     try {
       await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1400);
+      setCopied("link");
+      setTimeout(() => setCopied(null), 1400);
     } catch {
       // ignore
     }
@@ -73,73 +81,124 @@ export default function LobbyView({ code }: { code: string }) {
   }
 
   return (
-    <main className="min-h-screen px-5 py-6 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark">
-      <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-between mb-6">
+    <main className="felt-saloon relative min-h-[100dvh] overflow-hidden">
+      <div
+        aria-hidden
+        className="wood-grain pointer-events-none absolute inset-x-0 top-0 h-3 shadow-[0_4px_14px_rgba(0,0,0,0.55)]"
+      />
+      <div
+        aria-hidden
+        className="wood-grain pointer-events-none absolute inset-x-0 bottom-0 h-3 shadow-[0_-4px_14px_rgba(0,0,0,0.55)]"
+      />
+
+      <div className="relative mx-auto max-w-md px-5 pt-7 pb-8">
+        {/* Top bar */}
+        <div className="mb-6 grid grid-cols-[1fr_auto_1fr] items-center">
           <button
             onClick={handleLeave}
-            className="text-white/70 hover:text-white text-sm font-bold"
+            className="justify-self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 transition-colors hover:text-[#ffd17a]"
+            style={FELL}
           >
             ← Leave
           </button>
           <h1
-            className="text-3xl"
+            className="justify-self-center"
             style={{
-              fontFamily: "var(--font-rye), Georgia, serif",
+              ...RYE,
+              fontSize: "clamp(1.75rem, 7vw, 2.25rem)",
               color: "#f4e4b7",
-              textShadow: "0 2px 0 rgba(0,0,0,0.55)",
+              textShadow:
+                "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
+              letterSpacing: "0.02em",
             }}
           >
             Round-Up
           </h1>
-          <div className="w-12" />
+          <div />
         </div>
 
-        {/* Stakes summary — same ribbon shown on the active game page */}
+        {/* Stakes summary ribbon */}
         <div className="mb-4">
           <StakesRibbon mode={game.mode} wager={game.wager} />
         </div>
 
-        {/* Invite card */}
-        <section className="bg-buck-card border border-white/10 rounded-2xl p-5 mb-4 text-center">
-          <div className="text-[10px] uppercase tracking-[0.4em] text-white/50 font-black">
-            Game code
+        {/* ── Invite card — parchment poster pinned to the wall ──── */}
+        <section
+          className="parchment relative mb-4 overflow-hidden rounded-[16px] border-[1.5px] border-[#5c3b1e] px-5 pt-4 pb-5 text-center"
+          style={{
+            boxShadow:
+              "0 1px 0 rgba(255,240,210,0.6) inset, 0 -1px 0 rgba(101,67,33,0.18) inset, 0 12px 28px rgba(0,0,0,0.5)",
+          }}
+        >
+          <div
+            className="text-[0.6rem] uppercase text-[#5c3b1e]/75"
+            style={{ ...FELL, letterSpacing: "0.4em" }}
+          >
+            ★  Game Code  ★
           </div>
-          <div className="my-3 font-black text-buck-gold tracking-[0.4em] text-5xl select-all">
+          <button
+            onClick={copyCode}
+            aria-label="Copy code"
+            className="relative my-3 block w-full select-all text-center transition-transform active:scale-[0.98]"
+            style={{
+              ...RYE,
+              color: "#2a1a0a",
+              fontSize: "clamp(2.6rem, 12vw, 3.6rem)",
+              letterSpacing: "0.34em",
+              textShadow: "0 2px 0 rgba(255,240,210,0.55)",
+              lineHeight: 1,
+            }}
+          >
             {code}
-          </div>
+          </button>
           <div className="flex gap-2">
-            <button
-              onClick={copyCode}
-              className="flex-1 py-2 rounded-lg bg-buck-darker border border-white/10 font-black text-sm uppercase tracking-widest text-white/80 active:scale-95 transition-transform"
-            >
-              {copied ? "COPIED!" : "COPY CODE"}
-            </button>
-            <button
-              onClick={copyLink}
-              className="flex-1 py-2 rounded-lg bg-buck-darker border border-white/10 font-black text-sm uppercase tracking-widest text-white/80 active:scale-95 transition-transform"
-            >
-              COPY LINK
-            </button>
+            <PaperButton onClick={copyCode}>
+              {copied === "code" ? "Copied ✓" : "Copy Code"}
+            </PaperButton>
+            <PaperButton onClick={copyLink}>
+              {copied === "link" ? "Copied ✓" : "Copy Link"}
+            </PaperButton>
           </div>
-          <p className="text-white/40 text-xs mt-3">
-            Share the code or link. Anyone with it can join.
+          <p
+            className="mt-3 text-[0.78rem] italic text-[#5c3b1e]/70"
+            style={FELL}
+          >
+            Share the code or link. Anyone holdin&apos; it can ride in.
           </p>
         </section>
 
-        {/* Players */}
-        <section className="bg-buck-card border border-white/10 rounded-2xl p-4 mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xs uppercase tracking-widest text-white/60 font-bold">
-              Players
+        {/* ── Players ────────────────────────────────────────────── */}
+        <section
+          className="relative mb-5 rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-4"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(10,40,28,0.65) 0%, rgba(5,28,20,0.78) 100%)",
+            boxShadow:
+              "0 1px 0 rgba(244,228,183,0.06) inset, 0 14px 30px rgba(0,0,0,0.45)",
+          }}
+        >
+          <div className="mb-3 flex items-center justify-between">
+            <h2
+              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              At the Table
             </h2>
-            <span className="text-white/50 text-xs font-bold">
-              {players.length}/12 · {game.buy_in} eyeBuck{game.buy_in === 1 ? "" : "s"} each
+            <span
+              className="text-[0.7rem] font-bold text-[#f4e4b7]/55"
+              style={{ ...FELL, letterSpacing: "0.18em" }}
+            >
+              {players.length}/12 · {game.buy_in} eyeBuck
+              {game.buy_in === 1 ? "" : "s"} each
             </span>
           </div>
+
           {players.length === 0 ? (
-            <div className="text-center text-white/40 py-8 text-sm">
-              Waiting for players…
+            <div
+              className="rounded-[10px] border border-dashed border-[#c99a33]/30 py-7 text-center text-[0.88rem] italic text-[#f4e4b7]/55"
+              style={FELL}
+            >
+              Waiting for riders to mosey in…
             </div>
           ) : (
             <ul className="space-y-2">
@@ -154,36 +213,45 @@ export default function LobbyView({ code }: { code: string }) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, x: 40, scale: 0.9 }}
                       transition={{ duration: 0.18 }}
-                      className="flex items-center gap-3 bg-buck-darker rounded-xl px-3 py-2 border border-white/5"
+                      className="parchment relative flex items-center gap-3 overflow-hidden rounded-[10px] border-[1.5px] border-[#5c3b1e] px-3 py-2"
+                      style={{
+                        boxShadow:
+                          "0 1px 0 rgba(255,240,210,0.55) inset, 0 -1px 0 rgba(101,67,33,0.18) inset, 0 4px 12px rgba(0,0,0,0.35)",
+                      }}
                     >
                       <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center text-white font-black flex-shrink-0"
-                        style={{ backgroundColor: p.color }}
+                        className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full font-black text-white"
+                        style={{
+                          backgroundColor: p.color,
+                          boxShadow:
+                            "0 0 0 1.5px #ffd17a, 0 0 0 2.5px #5c3b1e, 0 2px 4px rgba(0,0,0,0.4)",
+                          ...RYE,
+                        }}
                       >
                         {p.display_name.charAt(0).toUpperCase()}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold truncate flex items-center gap-2">
-                          {p.display_name}
-                          {p.is_host && (
-                            <span className="text-[9px] uppercase tracking-widest bg-buck-gold/20 text-buck-gold px-1.5 py-0.5 rounded">
-                              Host
-                            </span>
-                          )}
-                          {isMe && (
-                            <span className="text-[9px] uppercase tracking-widest bg-buck-green/20 text-buck-green px-1.5 py-0.5 rounded">
-                              You
-                            </span>
-                          )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <span
+                            className="truncate text-[0.95rem] font-bold text-[#2a1a0a]"
+                            style={RYE}
+                          >
+                            {p.display_name}
+                          </span>
+                          {p.is_host && <Tag color="brass">Host</Tag>}
+                          {isMe && <Tag color="ink">You</Tag>}
                         </div>
-                        <div className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                        <div
+                          className="text-[0.6rem] font-bold uppercase text-[#5c3b1e]/70"
+                          style={{ ...FELL, letterSpacing: "0.32em" }}
+                        >
                           Seat {p.seat + 1}
                         </div>
                       </div>
                       {isHost && !isMe && (
                         <button
                           onClick={() => handleKick(p.id, p.display_name)}
-                          className="text-white/40 hover:text-buck-coral text-lg font-black px-2"
+                          className="px-2 text-xl font-black text-[#5c3b1e]/55 transition-colors hover:text-[#8b2222]"
                           aria-label={`Kick ${p.display_name}`}
                         >
                           ×
@@ -198,29 +266,147 @@ export default function LobbyView({ code }: { code: string }) {
         </section>
 
         {err && (
-          <div className="bg-buck-coral/15 border border-buck-coral/40 rounded-xl px-4 py-3 text-buck-coral text-sm font-bold mb-4">
+          <div
+            className="mb-3 rounded-[12px] border-[1.5px] border-[#8b2222]/55 bg-[#8b2222]/25 px-4 py-3 text-[0.85rem] font-bold text-[#ffd2c2]"
+            style={FELL}
+          >
             {err}
           </div>
         )}
 
+        {/* ── Start CTA / waiting message ────────────────────────── */}
         {isHost ? (
           <button
             onClick={handleStart}
             disabled={!canStart || starting}
-            className="w-full py-5 rounded-2xl font-black text-lg text-white bg-gradient-to-br from-buck-green to-emerald-700 shadow-[0_10px_30px_rgba(16,185,129,0.35)] disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] transition-transform"
+            className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-4 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
           >
-            {starting
-              ? "STARTING…"
-              : canStart
-              ? "START GAME"
-              : "NEED AT LEAST 2 PLAYERS"}
+            <span
+              className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+              style={{
+                ...RYE,
+                letterSpacing: "0.22em",
+                textShadow: "0 1px 0 rgba(255,240,200,0.55)",
+              }}
+            >
+              {starting
+                ? "Dealin'…"
+                : canStart
+                ? "Deal 'em In"
+                : `Need ${needed} More Rider${needed === 1 ? "" : "s"}`}
+            </span>
+            {canStart && !starting && (
+              <span
+                className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
+                style={{ ...FELL, letterSpacing: "0.36em" }}
+              >
+                {players.length} riders · {game.buy_in}-eyeBuck buy-in
+              </span>
+            )}
           </button>
         ) : (
-          <div className="text-center text-white/60 py-5 font-bold">
-            Waiting for the host to start…
+          <div
+            className="rounded-[14px] border-[1.5px] border-dashed border-[#c99a33]/40 py-5 text-center text-[#f4e4b7]/70"
+            style={{
+              ...FELL,
+              fontStyle: "italic",
+              fontSize: "0.95rem",
+            }}
+          >
+            Waitin&apos; on the host to deal…
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        :global(.brass-cta) {
+          background: linear-gradient(
+            180deg,
+            #ffd989 0%,
+            #d8a93b 48%,
+            #a07a22 100%
+          );
+          box-shadow: 0 1px 0 rgba(255, 240, 200, 0.85) inset,
+            0 -2px 0 rgba(60, 40, 8, 0.35) inset,
+            0 10px 26px rgba(0, 0, 0, 0.5);
+        }
+        :global(.brass-cta:disabled) {
+          background: linear-gradient(
+            180deg,
+            rgba(10, 40, 28, 0.55) 0%,
+            rgba(5, 30, 20, 0.7) 100%
+          );
+          border-color: rgba(201, 154, 51, 0.35);
+          box-shadow: 0 1px 0 rgba(244, 228, 183, 0.06) inset,
+            0 8px 22px rgba(0, 0, 0, 0.4);
+        }
+        :global(.brass-cta:disabled > span) {
+          color: rgba(244, 228, 183, 0.6) !important;
+          text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55) !important;
+        }
+      `}</style>
     </main>
+  );
+}
+
+// ─── Small parchment-style button used for Copy Code / Copy Link ─
+function PaperButton({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex-1 rounded-[8px] border-[1.5px] border-[#5c3b1e] py-2 text-[0.72rem] font-bold uppercase text-[#2a1a0a] transition-transform active:scale-[0.97]"
+      style={{
+        fontFamily: "var(--font-rye), Georgia, serif",
+        letterSpacing: "0.22em",
+        background:
+          "linear-gradient(180deg, #fdf2ce 0%, #f1dfa3 60%, #d6b87a 100%)",
+        boxShadow:
+          "0 1px 0 rgba(255,240,210,0.55) inset, 0 -1px 0 rgba(101,67,33,0.18) inset, 0 3px 8px rgba(0,0,0,0.35)",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ─── Tiny inline badge for Host / You labels on player rows ──────
+function Tag({
+  color,
+  children,
+}: {
+  color: "brass" | "ink";
+  children: React.ReactNode;
+}) {
+  const palette =
+    color === "brass"
+      ? {
+          bg: "rgba(201,154,51,0.22)",
+          border: "#c99a33",
+          text: "#5c3b1e",
+        }
+      : {
+          bg: "rgba(42,26,10,0.18)",
+          border: "#5c3b1e",
+          text: "#5c3b1e",
+        };
+  return (
+    <span
+      className="rounded-[4px] border px-1.5 py-0.5 text-[0.55rem] font-bold uppercase"
+      style={{
+        backgroundColor: palette.bg,
+        borderColor: palette.border,
+        color: palette.text,
+        fontFamily: "var(--font-fell), Georgia, serif",
+        letterSpacing: "0.24em",
+      }}
+    >
+      {children}
+    </span>
   );
 }
