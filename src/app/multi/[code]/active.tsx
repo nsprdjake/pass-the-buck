@@ -22,6 +22,10 @@ import {
 import { Bell, Skip } from "@/components/icons";
 import { useRemoteGame, type Nudge } from "@/context/RemoteGameContext";
 import { rollCountForBucks } from "@/lib/game-logic";
+import {
+  ensureNotificationPermission,
+  maybeShowOsNotification,
+} from "@/lib/notifications";
 import { playSfx, unlockAudio } from "@/lib/sfx";
 import type { RollOutcome } from "@/lib/types";
 
@@ -220,6 +224,15 @@ export default function ActiveGameView() {
     lastShownNudgeAtRef.current = lastNudge.at;
     setNudgeFlash(lastNudge);
     playSfx("nudge");
+    // OS-level notification when the page isn't the active surface (other
+    // tab, other app, screen off). The helper short-circuits when the tab
+    // is focused so we don't double-alert.
+    maybeShowOsNotification("Your turn at the saloon", {
+      body: `${lastNudge.fromName} is calling you over to roll.`,
+      tag: `ptb-nudge-${game?.id ?? "x"}`,
+      // Re-using the same tag means a fresh nudge replaces a stale one
+      // instead of stacking up notifications.
+    });
     // Haptic on supporting devices (Android Chrome). iOS Safari ignores this.
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       try {
@@ -230,6 +243,7 @@ export default function ActiveGameView() {
     }
     const t = setTimeout(() => setNudgeFlash(null), 1800);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastNudge, me]);
 
   const nudgeCooldownRemaining = Math.max(
@@ -264,6 +278,10 @@ export default function ActiveGameView() {
   const onNudge = useCallback(() => {
     if (!canNudge) return;
     unlockAudio();
+    // Ask for OS-notification permission lazily, exactly when the user has
+    // demonstrated they care about pings. Browsers gate this behind a user
+    // gesture, so this is the right moment. Subsequent calls are no-ops.
+    void ensureNotificationPermission();
     playSfx("joinClick");
     sendNudge();
     setNudgeSentAt(Date.now());
@@ -272,6 +290,7 @@ export default function ActiveGameView() {
   const onSkipBroke = useCallback(async () => {
     if (!canSkipBroke) return;
     unlockAudio();
+    void ensureNotificationPermission();
     playSfx("joinClick");
     setSkipping(true);
     try {
@@ -297,6 +316,7 @@ export default function ActiveGameView() {
     if (!current || current.bucks <= 0) return;
     setErr(null);
     unlockAudio();
+    void ensureNotificationPermission();
     playSfx("slam");
     setPhase("slam");
     await sleep(SLAM_MS);

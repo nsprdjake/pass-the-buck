@@ -125,6 +125,32 @@ export function RemoteGameProvider({
     }
   }, [normalizedCode]);
 
+  // When the tab returns to the foreground or the network comes back,
+  // re-pull authoritative state from Supabase. Mobile Safari (and most
+  // mobile browsers) tear down realtime sockets when backgrounded, so the
+  // in-memory game/players can drift away from the truth while we were
+  // away. This is a belt-and-suspenders on top of the realtime channel's
+  // built-in reconnect.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    function maybeRefresh() {
+      if (document.visibilityState === "visible") {
+        refresh();
+      }
+    }
+    document.addEventListener("visibilitychange", maybeRefresh);
+    window.addEventListener("focus", maybeRefresh);
+    window.addEventListener("online", maybeRefresh);
+    // pageshow fires on bfcache restores (very common on iOS Safari)
+    window.addEventListener("pageshow", maybeRefresh);
+    return () => {
+      document.removeEventListener("visibilitychange", maybeRefresh);
+      window.removeEventListener("focus", maybeRefresh);
+      window.removeEventListener("online", maybeRefresh);
+      window.removeEventListener("pageshow", maybeRefresh);
+    };
+  }, [refresh]);
+
   // Initial load + realtime subscriptions
   useEffect(() => {
     let cancelled = false;
