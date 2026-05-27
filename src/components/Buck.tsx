@@ -6,16 +6,29 @@ type BuckProps = {
 /**
  * The "eyeBuck" — a hand-stamped piece of saloon scrip.
  *
- * The icon is built around a single recognizable element: a cream-and-gold
- * eye stamped into a red wax seal at the bill's center. The eye reads at
- * every size we use this graphic (22px → 108px), so even when the type goes
- * mushy at small sizes you can still tell the bill is an eyeBuck.
+ * The icon is built around a single recognizable element: a five-point
+ * sheriff star stamped into a small red wax seal at the bill's center.
+ * Reads at every size we use this graphic (22px → 108px).
  *
  * Typography is intentionally restrained: "EYEBUCK" stamped across the top
  * and "ONE" across the bottom, both in Rye, both with measured letter-spacing
  * so they sit on the centerline cleanly. Corner "1" stamps anchor the
  * denomination at any zoom level.
  */
+
+/** 5-pointed star path centered at (cx, cy) with given outer/inner radii. */
+function starPath(cx: number, cy: number, rO: number, rI: number): string {
+  const pts: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 === 0 ? rO : rI;
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    const x = cx + r * Math.cos(a);
+    const y = cy + r * Math.sin(a);
+    pts.push(`${i === 0 ? "M" : "L"} ${x.toFixed(3)} ${y.toFixed(3)}`);
+  }
+  pts.push("Z");
+  return pts.join(" ");
+}
 export default function Buck({ height = 32 }: BuckProps) {
   const w = Math.round(height * 2.35);
   const h = height;
@@ -23,7 +36,6 @@ export default function Buck({ height = 32 }: BuckProps) {
   const paperGrad = `buck-paper-${id}`;
   const sealGrad = `buck-seal-${id}`;
   const sealHL = `buck-seal-hl-${id}`;
-  const irisGrad = `buck-iris-${id}`;
 
   // Long, landed-on-the-table aspect ratio.
   const VB_W = 92;
@@ -34,11 +46,11 @@ export default function Buck({ height = 32 }: BuckProps) {
   // Palette tokens — keep close to the existing parchment + barn-red language
   const ink = "#3a2410";
   const inkLight = "#5a3818";
-  const wax = "#8b2222";
+  const wax = "#8b2222"; // used by the sealGrad in <defs>
   const waxDark = "#5c0f0f";
-  const sclera = "#fbe08a"; // warm cream eye-white against the red seal
-  const irisDark = "#5c1f1f";
-  const irisLight = "#2a0a0a";
+  // Seal sizing — small enough to leave breathing room above and below
+  // for the wordmarks, instead of dominating the bill.
+  const SEAL_R = 6.4;
 
   return (
     <svg
@@ -66,10 +78,11 @@ export default function Buck({ height = 32 }: BuckProps) {
           <stop offset="0%" stopColor="#ffffff" stopOpacity={0.5} />
           <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
         </radialGradient>
-        <radialGradient id={irisGrad} cx="40%" cy="35%" r="65%">
-          <stop offset="0%" stopColor={irisDark} />
-          <stop offset="100%" stopColor={irisLight} />
-        </radialGradient>
+        <linearGradient id={`buck-star-${id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#ffe9a8" />
+          <stop offset="55%" stopColor="#ffd17a" />
+          <stop offset="100%" stopColor="#c99a33" />
+        </linearGradient>
       </defs>
 
       {/* Drop shadow */}
@@ -163,66 +176,49 @@ export default function Buck({ height = 32 }: BuckProps) {
         ✦
       </text>
 
-      {/* === The Eye-in-Wax-Seal — the icon ============================== */}
+      {/* === Sheriff Star in Wax Seal — the icon ========================
+          Smaller, less dominant than before. Slight handpress
+          irregularity in the seal silhouette to keep the aged feel. */}
       <g>
-        {/* Wax seal disk (slightly off-round for hand-pressed feel) */}
+        {/* Wax seal disk */}
         <path
-          d={`M ${cx - 9} ${cy + 0.4}
-              Q ${cx - 9} ${cy - 8.8} ${cx + 0.4} ${cy - 9}
-              Q ${cx + 9} ${cy - 8.6} ${cx + 9.1} ${cy + 0.6}
-              Q ${cx + 8.7} ${cy + 8.8} ${cx - 0.4} ${cy + 9}
-              Q ${cx - 9.1} ${cy + 8.6} ${cx - 9} ${cy + 0.4} Z`}
+          d={`M ${cx - SEAL_R} ${cy + 0.2}
+              Q ${cx - SEAL_R} ${cy - SEAL_R - 0.2} ${cx + 0.3} ${cy - SEAL_R - 0.3}
+              Q ${cx + SEAL_R} ${cy - SEAL_R + 0.1} ${cx + SEAL_R + 0.1} ${cy + 0.4}
+              Q ${cx + SEAL_R - 0.2} ${cy + SEAL_R + 0.1} ${cx - 0.3} ${cy + SEAL_R + 0.2}
+              Q ${cx - SEAL_R - 0.1} ${cy + SEAL_R - 0.1} ${cx - SEAL_R} ${cy + 0.2} Z`}
           fill={`url(#${sealGrad})`}
           stroke={waxDark}
-          strokeWidth={0.55}
+          strokeWidth={0.5}
         />
-        {/* Wax drip */}
+        {/* Tiny wax drip — proportionally smaller for the smaller seal */}
         <path
-          d={`M ${cx - 3} ${cy + 8.6}
-              Q ${cx - 2} ${cy + 10.9}
-              ${cx - 1} ${cy + 9.4}`}
+          d={`M ${cx - 1.8} ${cy + SEAL_R - 0.2}
+              Q ${cx - 1} ${cy + SEAL_R + 1.8}
+              ${cx - 0.2} ${cy + SEAL_R + 0.6}`}
           fill={`url(#${sealGrad})`}
           stroke={waxDark}
-          strokeWidth={0.45}
+          strokeWidth={0.35}
         />
         {/* Wax shine */}
         <ellipse
-          cx={cx - 2.4}
-          cy={cy - 2.6}
-          rx={4}
-          ry={2.2}
+          cx={cx - 1.6}
+          cy={cy - 2}
+          rx={2.8}
+          ry={1.4}
           fill={`url(#${sealHL})`}
         />
 
-        {/* Eye almond — cream-on-red, drawn as two arcs */}
+        {/* Sheriff star — gold, inked outline */}
         <path
-          d={`M ${cx - 6.2} ${cy}
-              Q ${cx} ${cy - 4.6} ${cx + 6.2} ${cy}
-              Q ${cx} ${cy + 4.6} ${cx - 6.2} ${cy} Z`}
-          fill={sclera}
+          d={starPath(cx, cy, 4.2, 1.75)}
+          fill={`url(#buck-star-${id})`}
           stroke={waxDark}
-          strokeWidth={0.35}
+          strokeWidth={0.4}
           strokeLinejoin="round"
         />
-        {/* Iris */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={2.4}
-          fill={`url(#${irisGrad})`}
-          stroke={waxDark}
-          strokeWidth={0.2}
-        />
-        {/* Pupil */}
-        <circle cx={cx} cy={cy} r={1.1} fill="#0a0202" />
-        {/* Tiny catchlight */}
-        <circle
-          cx={cx - 0.7}
-          cy={cy - 0.7}
-          r={0.45}
-          fill="#ffffff"
-          opacity={0.85}
-        />
+        {/* Tiny center pip — gives the star a punched/stamped feel */}
+        <circle cx={cx} cy={cy} r={0.45} fill={waxDark} opacity={0.75} />
       </g>
 
       {/* "ONE" wordmark across the bottom */}
