@@ -216,18 +216,18 @@ export async function joinGame(opts: {
 
   // Find next seat AND collect every color already in use so we can
   // assign one that doesn't collide with another player.
-  const { data: existing } = await sb
+  const { data: seatedPlayers } = await sb
     .from("ptb_players")
     .select("seat, color")
     .eq("game_id", game.id);
-  const maxSeat = (existing ?? []).reduce(
+  const maxSeat = (seatedPlayers ?? []).reduce(
     (m, r) => (r.seat > m ? r.seat : m),
     -1
   );
   const nextSeat = maxSeat + 1;
   if (nextSeat >= 12) throw new Error("Game is full (max 12)");
 
-  const taken = new Set((existing ?? []).map((r) => r.color));
+  const taken = new Set((seatedPlayers ?? []).map((r) => r.color));
   let assignedColor: string;
   if (opts.color && !taken.has(opts.color)) {
     // Preferred color is free — use it.
