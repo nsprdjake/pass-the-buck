@@ -164,7 +164,7 @@ export default function FinishedScreen({
             className="mt-4 text-[0.85rem] italic text-[#f4e4b7]/45"
             style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
           >
-            Last one with {finalBucks} buck
+            Last one with {finalBucks} eyeBuck
             {finalBucks === 1 ? "" : "s"} on the table.
             {pot > 0 ? ` Pot of ${pot} got dragged in.` : ""}
           </p>
@@ -288,11 +288,11 @@ export default function FinishedScreen({
         <div className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-buck-gold/40 bg-buck-gold/15 px-5 py-3">
           <MoneyBag size={28} />
           <span className="text-2xl font-black text-buck-gold">
-            {total} buck{total === 1 ? "" : "s"}
+            {total} eyeBuck{total === 1 ? "" : "s"}
           </span>
         </div>
         <p className="mt-3 text-white/70">
-          Pot of {pot} buck{pot === 1 ? "" : "s"} + their last {finalBucks}
+          Pot of {pot} eyeBuck{pot === 1 ? "" : "s"} + their last {finalBucks}
         </p>
         {wager?.trim() && (
           <p

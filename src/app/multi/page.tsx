@@ -3,59 +3,152 @@
 import Link from "next/link";
 import { Phone } from "@/components/icons";
 
+const RYE: React.CSSProperties = {
+  fontFamily: "var(--font-rye), Georgia, serif",
+};
+const FELL: React.CSSProperties = {
+  fontFamily: "var(--font-fell), Georgia, serif",
+};
+
 export default function MultiLandingPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-b from-buck-dark via-buck-darker to-buck-dark">
-      <div className="flex flex-col items-center text-center max-w-md w-full">
+    <main className="felt-saloon relative min-h-[100dvh] overflow-hidden">
+      <div
+        aria-hidden
+        className="wood-grain pointer-events-none absolute inset-x-0 top-0 h-3 shadow-[0_4px_14px_rgba(0,0,0,0.55)]"
+      />
+      <div
+        aria-hidden
+        className="wood-grain pointer-events-none absolute inset-x-0 bottom-0 h-3 shadow-[0_-4px_14px_rgba(0,0,0,0.55)]"
+      />
+
+      <div className="relative mx-auto flex max-w-sm flex-col items-center px-6 pt-8 pb-10 text-center">
         <Link
           href="/"
-          className="self-start text-white/60 hover:text-white text-sm font-bold mb-6"
+          className="self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 transition-colors hover:text-[#ffd17a]"
+          style={FELL}
         >
           ← Home
         </Link>
 
-        <div className="mb-3 flex justify-center" aria-hidden>
-          <Phone size={88} color="#10B981" />
+        {/* Hero icon */}
+        <div className="relative mt-6 select-none" aria-hidden>
+          <div
+            className="absolute inset-0 -m-6 rounded-full"
+            style={{
+              background:
+                "radial-gradient(closest-side, rgba(255,196,90,0.22), transparent 70%)",
+              filter: "blur(2px)",
+            }}
+          />
+          <div className="relative drop-shadow-[0_14px_18px_rgba(0,0,0,0.55)]">
+            <Phone size={104} color="#ffd17a" />
+          </div>
         </div>
+
+        <span
+          className="mt-7 text-[0.62rem] uppercase text-[#f4e4b7]/65"
+          style={{ ...FELL, letterSpacing: "0.48em" }}
+        >
+          ★  Cross-Device Play  ★
+        </span>
+
         <h1
-          className="leading-tight"
+          className="mt-3 leading-[0.95]"
           style={{
-            fontFamily: "var(--font-rye), Georgia, serif",
-            fontSize: "clamp(2rem, 9vw, 3.5rem)",
+            ...RYE,
+            fontSize: "clamp(2.5rem, 12vw, 4rem)",
             color: "#f4e4b7",
-            textShadow: "0 3px 0 rgba(0,0,0,0.55)",
+            textShadow:
+              "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 10px 28px rgba(0,0,0,0.6)",
+            letterSpacing: "0.01em",
           }}
         >
-          Saloon by Wire
+          Saloon
+          <br />
+          <span style={{ color: "#ffd17a" }}>by Wire</span>
         </h1>
+
         <p
-          className="mt-3 italic"
-          style={{
-            fontFamily: "var(--font-fell), Georgia, serif",
-            color: "rgba(244,228,183,0.8)",
-          }}
+          className="mt-5 max-w-[20rem] text-[1rem] italic leading-snug text-[#f4e4b7]/85"
+          style={FELL}
         >
-          Every cowpoke on their own phone. Ride into the game whenever you
-          please — no need to share a table.
+          Every cowpoke on their own phone. Ride in whenever you please —
+          no need to share a table.
         </p>
 
-        <Link
-          href="/multi/create"
-          className="mt-10 w-full text-center py-5 rounded-2xl font-black text-lg text-white bg-gradient-to-br from-buck-green to-emerald-700 shadow-[0_10px_30px_rgba(16,185,129,0.35)] active:scale-[0.98] transition-transform"
-        >
-          CREATE GAME
-        </Link>
+        {/* CTAs */}
+        <div className="mt-10 flex w-full flex-col gap-3">
+          {/* Primary — brass plaque */}
+          <Link
+            href="/multi/create"
+            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-3.5 text-center transition-transform active:scale-[0.985]"
+            style={{
+              background:
+                "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)",
+              boxShadow:
+                "0 1px 0 rgba(255,240,200,0.85) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 10px 26px rgba(0,0,0,0.5)",
+            }}
+          >
+            <span
+              className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+              style={{
+                ...RYE,
+                letterSpacing: "0.22em",
+                textShadow: "0 1px 0 rgba(255,240,200,0.55)",
+              }}
+            >
+              Set the Table
+            </span>
+            <span
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              Start a new hand
+            </span>
+          </Link>
 
-        <Link
-          href="/multi/join"
-          className="mt-3 w-full text-center py-5 rounded-2xl font-black text-lg text-buck-dark bg-buck-gold shadow-[0_10px_30px_rgba(251,191,36,0.35)] active:scale-[0.98] transition-transform"
-        >
-          JOIN WITH CODE
-        </Link>
+          {/* Secondary — outlined leather */}
+          <Link
+            href="/multi/join"
+            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#c99a33]/55 py-3.5 text-center transition-colors hover:border-[#ffd17a]/80 active:scale-[0.985]"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",
+              boxShadow:
+                "0 1px 0 rgba(244,228,183,0.06) inset, 0 8px 22px rgba(0,0,0,0.4)",
+            }}
+          >
+            <span
+              className="relative block text-[1.05rem] font-bold uppercase text-[#f4e4b7]"
+              style={{
+                ...RYE,
+                letterSpacing: "0.22em",
+                textShadow: "0 2px 0 rgba(0,0,0,0.55)",
+              }}
+            >
+              Pull Up A Chair
+            </span>
+            <span
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#f4e4b7]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              Join with a code
+            </span>
+          </Link>
+        </div>
 
-        <p className="mt-8 text-white/40 text-xs">
-          No accounts. Pick a name, share a 6-letter code, and play.
-        </p>
+        {/* House-rules style divider */}
+        <div className="mt-10 flex w-full items-center gap-3 text-[#c99a33]/55">
+          <span className="h-px flex-1 bg-[#c99a33]/30" />
+          <span
+            className="text-[0.6rem] uppercase text-[#f4e4b7]/70"
+            style={{ ...FELL, letterSpacing: "0.36em" }}
+          >
+            Pick a name · Share the code · Roll
+          </span>
+          <span className="h-px flex-1 bg-[#c99a33]/30" />
+        </div>
       </div>
     </main>
   );

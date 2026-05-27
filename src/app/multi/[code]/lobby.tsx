@@ -134,7 +134,7 @@ export default function LobbyView({ code }: { code: string }) {
               Players
             </h2>
             <span className="text-white/50 text-xs font-bold">
-              {players.length}/12 · {game.buy_in} buck{game.buy_in === 1 ? "" : "s"} each
+              {players.length}/12 · {game.buy_in} eyeBuck{game.buy_in === 1 ? "" : "s"} each
             </span>
           </div>
           {players.length === 0 ? (

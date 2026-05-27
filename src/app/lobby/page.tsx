@@ -124,7 +124,7 @@ export default function LobbyPage() {
                 textShadow: "0 1px 0 rgba(0,0,0,0.55)",
               }}
             >
-              {buyIn} buck{buyIn === 1 ? "" : "s"}
+              {buyIn} eyeBuck{buyIn === 1 ? "" : "s"}
             </span>
           </div>
           <input
@@ -145,8 +145,8 @@ export default function LobbyPage() {
             className="mt-3 text-[0.82rem] italic leading-snug text-[#f4e4b7]/60"
             style={FELL}
           >
-            Each rider starts with this many bucks. They roll one die per buck
-            they&apos;re holdin&apos;, up to three dice per turn.
+            Each rider starts with this many eyeBucks. They roll one die per
+            eyeBuck they&apos;re holdin&apos;, up to three dice per turn.
           </p>
         </Panel>
 
@@ -165,14 +165,14 @@ export default function LobbyPage() {
             <ModeOption
               active={mode === "winner"}
               onClick={() => setMode("winner")}
-              title="Last Buck Wins"
+              title="Last eyeBuck Wins"
               caption="Sole champion takes the pot"
             />
             <ModeOption
               active={mode === "loser"}
               onClick={() => setMode("loser")}
               title="Stuck with the Tab"
-              caption="Last buck pays the wager"
+              caption="Last eyeBuck pays the wager"
             />
           </div>
 
@@ -336,7 +336,7 @@ export default function LobbyPage() {
               className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
-              {players.length} players · {buyIn}-buck buy-in
+              {players.length} players · {buyIn}-eyeBuck buy-in
             </span>
           )}
         </button>

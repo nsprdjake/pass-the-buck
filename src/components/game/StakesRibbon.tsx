@@ -4,7 +4,7 @@ import type { GameMode } from "@/lib/types";
  * Thin parchment ribbon sitting just above the pot band on active game
  * screens. Always reflects what's at stake at a glance:
  *
- *   - "Last Buck Wins · Winner takes the pot"
+ *   - "Last eyeBuck Wins · Winner takes the pot"
  *   - "Stuck with the Tab · Loser buys dinner"
  *
  * The mode label is the always-visible part. If a wager was set on
@@ -17,7 +17,7 @@ export default function StakesRibbon({
   mode: GameMode;
   wager: string | null;
 }) {
-  const label = mode === "loser" ? "Stuck with the Tab" : "Last Buck Wins";
+  const label = mode === "loser" ? "Stuck with the Tab" : "Last eyeBuck Wins";
   const fallback =
     mode === "loser" ? "Loser pays the tab" : "Winner takes the pot";
   const tail = wager?.trim() || fallback;

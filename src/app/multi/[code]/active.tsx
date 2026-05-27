@@ -443,7 +443,7 @@ export default function ActiveGameView() {
                 transition={{ duration: 0.22 }}
                 className="mt-3 text-white/90 font-black text-sm uppercase tracking-widest"
               >
-                {displayedBucks} buck{displayedBucks === 1 ? "" : "s"}
+                {displayedBucks} eyeBuck{displayedBucks === 1 ? "" : "s"}
               </motion.div>
             </motion.div>
           </AnimatePresence>

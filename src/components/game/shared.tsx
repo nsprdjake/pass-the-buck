@@ -31,12 +31,12 @@ export const OUTCOME_META: Record<RollOutcome, OutcomeMeta> = {
   left: {
     label: "LEFT",
     inkColor: "#1e3a8a",
-    caption: "yer neighbor takes a buck",
+    caption: "yer neighbor takes an eyeBuck",
   },
   right: {
     label: "RIGHT",
     inkColor: "#1e3a8a",
-    caption: "yer neighbor takes a buck",
+    caption: "yer neighbor takes an eyeBuck",
   },
   center: {
     label: "POT!",
@@ -46,7 +46,7 @@ export const OUTCOME_META: Record<RollOutcome, OutcomeMeta> = {
   keep: {
     label: "KEEP!",
     inkColor: "#a16207",
-    caption: "yer buck rides another round",
+    caption: "yer eyeBuck rides another round",
   },
 };
 

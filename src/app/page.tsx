@@ -250,7 +250,10 @@ export default function Home() {
         </div>
 
         {/* ── House rules marquee ─────────────────────────────────── */}
-        <div className="mt-10 flex w-full items-center gap-3 text-[#c99a33]/55">
+        <Link
+          href="/how"
+          className="mt-10 flex w-full items-center gap-3 text-[#c99a33]/55 transition-colors hover:text-[#ffd17a]"
+        >
           <span className="h-px flex-1 bg-[#c99a33]/30" />
           <span
             className="text-[0.6rem] uppercase text-[#f4e4b7]/70"
@@ -259,10 +262,10 @@ export default function Home() {
               letterSpacing: "0.36em",
             }}
           >
-            Three Dice · L · C · R · ✸ · Last Buck Wins
+            House Rules · How to Play
           </span>
           <span className="h-px flex-1 bg-[#c99a33]/30" />
-        </div>
+        </Link>
 
         <Flourish className="mt-5 text-[#c99a33]/45" />
       </div>
