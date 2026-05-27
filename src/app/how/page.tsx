@@ -149,9 +149,17 @@ export default function HowToPlayPage() {
               The classic. Last player still holding eyeBucks is crowned
               champion and rakes in the pot. Strategy: <Em>hoard</Em>{" "}
               eyeBucks — root for ✱ (keep) and pray the dice don&apos;t move.
+              <br />
+              <br />
+              <span className="text-[#f4e4b7]/60">
+                Optional: ante real cash before you start — a buck a buy-in,
+                a five, whatever — and settle up at the end. Exchange in
+                person or send it digitally on your word. The eyeBucks
+                just keep score; the trust is on you.
+              </span>
             </>
           }
-          example="“Winner takes the bottle.”"
+          example="“Winner takes the bottle. Or the pot.”"
         />
 
         <ModeCard
