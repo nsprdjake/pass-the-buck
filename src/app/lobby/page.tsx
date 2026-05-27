@@ -182,7 +182,7 @@ export default function LobbyPage() {
               className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
-              {mode === "loser" ? "Starting Hand" : "Buy-in"}
+              Buy-in
             </label>
             <span
               className="text-[1.15rem]"
