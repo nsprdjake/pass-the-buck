@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import Buck from "@/components/Buck";
 import { useAuth } from "@/context/AuthContext";
 import { PLAYER_COLORS } from "@/lib/constants";
@@ -96,6 +97,7 @@ export default function ProfilePage() {
     amount: number;
     at: number;
   } | null>(null);
+  const [openBadgeSlug, setOpenBadgeSlug] = useState<string | null>(null);
 
   // Bounce signed-out visitors to the auth screen.
   useEffect(() => {
@@ -244,6 +246,16 @@ export default function ProfilePage() {
     const t = setTimeout(() => setPurchaseFlash(null), 4000);
     return () => clearTimeout(t);
   }, [purchaseFlash]);
+
+  // Close the badge-detail modal on Escape.
+  useEffect(() => {
+    if (!openBadgeSlug) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenBadgeSlug(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openBadgeSlug]);
 
   async function handleBuyBundle(bundleId: string) {
     if (!user || bundleBusy) return;
@@ -1093,17 +1105,16 @@ export default function ProfilePage() {
             <div className="grid grid-cols-4 gap-2">
               {achievementCatalog.map((a) => {
                 const earned = earnedAchievements.has(a.slug);
+                const mystery = a.hidden && !earned;
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={a.slug}
-                    title={
-                      earned
-                        ? `${a.name} — ${a.description}`
-                        : a.hidden
-                        ? "???"
-                        : `${a.name} — ${a.description}`
+                    onClick={() => setOpenBadgeSlug(a.slug)}
+                    aria-label={
+                      mystery ? "Mystery badge — tap for details" : `${a.name} — tap for details`
                     }
-                    className="relative flex aspect-square flex-col items-center justify-center rounded-[10px] border-[1.5px] p-1 text-center"
+                    className="relative flex aspect-square flex-col items-center justify-center rounded-[10px] border-[1.5px] p-1 text-center transition-transform active:scale-[0.94] focus:outline-none focus:ring-2 focus:ring-[var(--accent-light)]/70"
                     style={{
                       background: earned
                         ? "linear-gradient(180deg, rgba(201,154,51,0.25) 0%, rgba(122,90,24,0.18) 100%)"
@@ -1111,7 +1122,7 @@ export default function ProfilePage() {
                       borderColor: earned
                         ? "rgba(255,209,122,0.6)"
                         : "rgba(201,154,51,0.18)",
-                      opacity: earned ? 1 : 0.4,
+                      opacity: earned ? 1 : 0.5,
                     }}
                   >
                     <div
@@ -1120,20 +1131,158 @@ export default function ProfilePage() {
                         filter: earned ? "none" : "grayscale(1)",
                       }}
                     >
-                      {a.hidden && !earned ? "❓" : a.icon}
+                      {mystery ? "❓" : a.icon}
                     </div>
                     <div
                       className="mt-1 line-clamp-1 text-[0.55rem] font-bold uppercase leading-tight text-[var(--parchment-light)]"
                       style={{ ...FELL, letterSpacing: "0.12em" }}
                     >
-                      {a.hidden && !earned ? "???" : a.name}
+                      {mystery ? "???" : a.name}
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           )}
         </Panel>
+
+        {/* Badge detail modal — tap-friendly replacement for hover tooltips */}
+        <AnimatePresence>
+          {openBadgeSlug && (() => {
+            const badge = achievementCatalog?.find((x) => x.slug === openBadgeSlug);
+            if (!badge) return null;
+            const earnedRow = earnedAchievements.get(badge.slug);
+            const earned = !!earnedRow;
+            const mystery = badge.hidden && !earned;
+            const awardedDate = earnedRow
+              ? new Date(earnedRow.awarded_at).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : null;
+            return (
+              <motion.div
+                key="badge-modal"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                onClick={() => setOpenBadgeSlug(null)}
+                className="fixed inset-0 z-50 flex items-center justify-center p-5"
+                style={{
+                  background: "rgba(0, 0, 0, 0.65)",
+                  backdropFilter: "blur(4px)",
+                  WebkitBackdropFilter: "blur(4px)",
+                }}
+              >
+                <motion.div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label={mystery ? "Mystery badge" : badge.name}
+                  initial={{ y: 24, opacity: 0, scale: 0.95 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  exit={{ y: 12, opacity: 0, scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative w-full max-w-xs overflow-hidden rounded-[18px] border-[1.5px] p-5 text-center"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(45,30,8,0.96) 0%, rgba(20,12,4,0.98) 100%)",
+                    borderColor: earned
+                      ? "rgba(255,209,122,0.7)"
+                      : "rgba(201,154,51,0.4)",
+                    boxShadow:
+                      "0 1px 0 rgba(255,240,200,0.18) inset, 0 22px 48px rgba(0,0,0,0.65)",
+                  }}
+                >
+                  {/* Close button — large hit target for thumbs */}
+                  <button
+                    type="button"
+                    onClick={() => setOpenBadgeSlug(null)}
+                    aria-label="Close"
+                    className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full text-[1.1rem] font-bold text-[var(--parchment-light)]/65 transition-colors hover:bg-white/10 hover:text-[var(--accent-light)] active:bg-white/15"
+                    style={FELL}
+                  >
+                    ✕
+                  </button>
+
+                  <div
+                    className="mb-2 text-[0.55rem] font-bold uppercase text-[var(--parchment-light)]/55"
+                    style={{ ...FELL, letterSpacing: "0.36em" }}
+                  >
+                    {earned ? "Earned" : mystery ? "Locked" : "Unearned"}
+                  </div>
+
+                  <div
+                    className="mx-auto mb-3 grid h-20 w-20 place-items-center rounded-full border-[1.5px]"
+                    style={{
+                      borderColor: earned
+                        ? "rgba(255,209,122,0.7)"
+                        : "rgba(201,154,51,0.3)",
+                      background: earned
+                        ? "linear-gradient(180deg, rgba(201,154,51,0.35) 0%, rgba(122,90,24,0.25) 100%)"
+                        : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+                      boxShadow: earned
+                        ? "0 0 20px rgba(255,209,122,0.4)"
+                        : "none",
+                    }}
+                  >
+                    <span
+                      className="text-[2.6rem] leading-none"
+                      style={{ filter: earned ? "none" : "grayscale(1)" }}
+                    >
+                      {mystery ? "❓" : badge.icon}
+                    </span>
+                  </div>
+
+                  <h3
+                    className="text-[1.3rem] leading-tight text-[var(--accent-text)]"
+                    style={{
+                      ...RYE,
+                      textShadow:
+                        "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    {mystery ? "Mystery Badge" : badge.name}
+                  </h3>
+
+                  <p
+                    className="mt-2 text-[0.85rem] leading-snug text-[var(--parchment-light)]/80"
+                    style={FELL}
+                  >
+                    {mystery
+                      ? "Keep playing to reveal what this one wants. We're not spoiling it."
+                      : badge.description}
+                  </p>
+
+                  {badge.reward_eyebucks > 0 && (
+                    <div
+                      className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-[var(--accent-light)]/55 bg-[var(--accent-light)]/12 px-3 py-1 text-[0.72rem] font-bold uppercase text-[var(--accent-text)]"
+                      style={{ ...FELL, letterSpacing: "0.2em" }}
+                    >
+                      <span aria-hidden>💰</span>
+                      <span>
+                        {earned ? "+" : ""}
+                        {badge.reward_eyebucks} eyeBucks
+                        {earned ? " awarded" : " on earn"}
+                      </span>
+                    </div>
+                  )}
+
+                  {awardedDate && (
+                    <div
+                      className="mt-3 text-[0.7rem] italic text-[var(--parchment-light)]/55"
+                      style={FELL}
+                    >
+                      Earned {awardedDate}
+                    </div>
+                  )}
+                </motion.div>
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
 
         {/* Game history */}
         <Panel>
