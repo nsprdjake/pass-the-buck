@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IM_Fell_English, Inter, Rye } from "next/font/google";
 import "./globals.css";
+import AchievementToaster from "@/components/AchievementToaster";
 import { AuthProvider } from "@/context/AuthContext";
 import { LocalGameProvider } from "@/context/LocalGameContext";
 
@@ -61,6 +62,7 @@ export default function RootLayout({
       <body className="min-h-full bg-buck-dark text-white antialiased">
         <AuthProvider>
           <LocalGameProvider>{children}</LocalGameProvider>
+          <AchievementToaster />
         </AuthProvider>
       </body>
     </html>

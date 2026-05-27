@@ -49,6 +49,10 @@ export type LocalGameState = {
   mode: GameMode;
   /** Optional free-text wager shown above the table, e.g. "Loser buys dinner". */
   wager: string | null;
+  /** Random id assigned at startGame, used as the idempotency key when we
+   *  post the finished game to Supabase for the signed-in host. Null until
+   *  a game starts. */
+  sessionId: string | null;
 };
 
 type Ctx = LocalGameState & {
@@ -79,6 +83,7 @@ function defaultState(): LocalGameState {
     lastTurn: null,
     mode: "winner",
     wager: null,
+    sessionId: null,
   };
 }
 
@@ -200,6 +205,7 @@ export function LocalGameProvider({ children }: { children: React.ReactNode }) {
         round: 1,
         winnerId: null,
         lastTurn: null,
+        sessionId: makeId() + makeId(), // 16-char stable id for this game
         players: s.players.map((p) => ({
           ...p,
           bucks: s.buyIn,

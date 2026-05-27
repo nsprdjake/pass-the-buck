@@ -8,6 +8,11 @@ import { useAuth } from "@/context/AuthContext";
 import { PLAYER_COLORS } from "@/lib/constants";
 import { getSupabase } from "@/lib/supabase";
 import {
+  fetchAchievementsAndEarned,
+  type Achievement,
+  type UserAchievement,
+} from "@/lib/achievements";
+import {
   listOwnedThemes,
   listThemes,
   purchaseTheme,
@@ -22,6 +27,16 @@ const RYE: React.CSSProperties = {
 };
 const FELL: React.CSSProperties = {
   fontFamily: "var(--font-fell), Georgia, serif",
+};
+
+type StatsRow = {
+  games_played: number;
+  games_won: number;
+  games_lost_with_tab: number;
+  biggest_pot: number;
+  current_streak: number;
+  longest_streak: number;
+  total_earned_eyebucks: number;
 };
 
 type HistoryRow = {
@@ -52,6 +67,9 @@ export default function ProfilePage() {
   const [owned, setOwned] = useState<Set<string>>(new Set(["saloon"]));
   const [themeBusy, setThemeBusy] = useState<string | null>(null);
   const [themeError, setThemeError] = useState<string | null>(null);
+  const [stats, setStats] = useState<StatsRow | null>(null);
+  const [achievementCatalog, setAchievementCatalog] = useState<Achievement[] | null>(null);
+  const [earnedAchievements, setEarnedAchievements] = useState<Map<string, UserAchievement>>(new Map());
 
   // Bounce signed-out visitors to the auth screen.
   useEffect(() => {
@@ -114,6 +132,46 @@ export default function ProfilePage() {
       cancelled = true;
     };
   }, [user]);
+
+  // Load this user's stats whenever auth resolves (and after profile refreshes).
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    const sb = getSupabase();
+    (async () => {
+      const { data } = await sb
+        .from("ptb_stats")
+        .select(
+          "games_played, games_won, games_lost_with_tab, biggest_pot, current_streak, longest_streak, total_earned_eyebucks"
+        )
+        .eq("user_id", user.id)
+        .maybeSingle<StatsRow>();
+      if (!cancelled) setStats(data ?? null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, profile?.balance]);
+
+  // Load the achievement catalog + earned set.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { catalog, earned } = await fetchAchievementsAndEarned(
+          user?.id ?? null
+        );
+        if (cancelled) return;
+        setAchievementCatalog(catalog);
+        setEarnedAchievements(earned);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, profile?.balance]);
 
   // Load the theme catalog + this user's owned themes whenever auth resolves.
   useEffect(() => {
@@ -307,6 +365,51 @@ export default function ProfilePage() {
             stakes, power-ups, and shinier saloon doors — coming soon.
           </p>
         </section>
+
+        {/* Stats card — your record at a glance */}
+        {stats && (
+          <Panel className="mb-4">
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2
+                className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+                style={{ ...FELL, letterSpacing: "0.36em" }}
+              >
+                The Record
+              </h2>
+              <span
+                className="text-[0.62rem] italic text-[#f4e4b7]/45"
+                style={FELL}
+              >
+                Across all hands
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <StatTile label="Hands" value={stats.games_played} />
+              <StatTile label="Wins" value={stats.games_won} />
+              <StatTile
+                label="Win Rate"
+                value={
+                  stats.games_played > 0
+                    ? `${Math.round(
+                        (stats.games_won / stats.games_played) * 100
+                      )}%`
+                    : "—"
+                }
+              />
+              <StatTile label="Biggest Pot" value={stats.biggest_pot} />
+              <StatTile label="Best Streak" value={stats.longest_streak} />
+              <StatTile label="Tabs Picked Up" value={stats.games_lost_with_tab} />
+            </div>
+            {stats.current_streak >= 2 && (
+              <div
+                className="mt-3 rounded-[10px] border-[1.5px] border-[#ffd17a]/45 bg-[#ffd17a]/10 px-3 py-2 text-center text-[0.78rem] font-bold uppercase text-[#ffd17a]"
+                style={{ ...FELL, letterSpacing: "0.22em" }}
+              >
+                🔥 On a {stats.current_streak}-win heater
+              </div>
+            )}
+          </Panel>
+        )}
 
         {/* Profile editor */}
         <Panel className="mb-4">
@@ -541,6 +644,75 @@ export default function ProfilePage() {
           </p>
         </Panel>
 
+        {/* Achievements — earned badges + unlock catalog */}
+        <Panel className="mb-4">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2
+              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              Badges
+            </h2>
+            <span
+              className="text-[0.62rem] italic text-[#f4e4b7]/45"
+              style={FELL}
+            >
+              {earnedAchievements.size}/{achievementCatalog?.length ?? 0}
+            </span>
+          </div>
+          {!achievementCatalog ? (
+            <div
+              className="py-5 text-center text-[0.85rem] italic text-[#f4e4b7]/50"
+              style={FELL}
+            >
+              Looking up your bounty list…
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-2">
+              {achievementCatalog.map((a) => {
+                const earned = earnedAchievements.has(a.slug);
+                return (
+                  <div
+                    key={a.slug}
+                    title={
+                      earned
+                        ? `${a.name} — ${a.description}`
+                        : a.hidden
+                        ? "???"
+                        : `${a.name} — ${a.description}`
+                    }
+                    className="relative flex aspect-square flex-col items-center justify-center rounded-[10px] border-[1.5px] p-1 text-center"
+                    style={{
+                      background: earned
+                        ? "linear-gradient(180deg, rgba(201,154,51,0.25) 0%, rgba(122,90,24,0.18) 100%)"
+                        : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+                      borderColor: earned
+                        ? "rgba(255,209,122,0.6)"
+                        : "rgba(201,154,51,0.18)",
+                      opacity: earned ? 1 : 0.4,
+                    }}
+                  >
+                    <div
+                      className="text-[1.3rem] leading-none"
+                      style={{
+                        filter: earned ? "none" : "grayscale(1)",
+                      }}
+                    >
+                      {a.hidden && !earned ? "❓" : a.icon}
+                    </div>
+                    <div
+                      className="mt-1 line-clamp-1 text-[0.55rem] font-bold uppercase leading-tight text-[#f4e4b7]"
+                      style={{ ...FELL, letterSpacing: "0.12em" }}
+                    >
+                      {a.hidden && !earned ? "???" : a.name}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Panel>
+
         {/* Game history */}
         <Panel>
           <div className="mb-3">
@@ -668,6 +840,43 @@ function Panel({
     >
       {children}
     </section>
+  );
+}
+
+function StatTile({
+  label,
+  value,
+}: {
+  label: string;
+  value: number | string;
+}) {
+  return (
+    <div
+      className="rounded-[10px] border-[1.5px] border-[#c99a33]/25 p-2 text-center"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+      }}
+    >
+      <div
+        className="text-[1.05rem] leading-none text-[#ffd17a]"
+        style={{
+          fontFamily: "var(--font-rye), Georgia, serif",
+          textShadow: "0 1px 0 rgba(0,0,0,0.55)",
+        }}
+      >
+        {typeof value === "number" ? value.toLocaleString() : value}
+      </div>
+      <div
+        className="mt-1 text-[0.55rem] font-bold uppercase leading-tight text-[#f4e4b7]/55"
+        style={{
+          fontFamily: "var(--font-fell), Georgia, serif",
+          letterSpacing: "0.18em",
+        }}
+      >
+        {label}
+      </div>
+    </div>
   );
 }
 
