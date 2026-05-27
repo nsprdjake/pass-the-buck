@@ -507,3 +507,19 @@ export async function skipTurnRemote(opts: {
 }) {
   await endTurnRemote(opts);
 }
+
+/**
+ * Credit eyeBucks to signed-in players based on the game's mode and outcome.
+ * Idempotent on the server side — multiple devices calling this in parallel
+ * settle exactly once. Safe to call any time the client thinks a game has
+ * finished; the server short-circuits if status != 'finished' or if it's
+ * already settled.
+ *
+ *   winner mode → champion gets (num_players × buy_in) eyeBucks
+ *   loser mode  → every non-loser gets (buy_in) eyeBucks as a survival bonus
+ */
+export async function settleGameRewards(gameId: string): Promise<void> {
+  const sb = getSupabase();
+  const { error } = await sb.rpc("ptb_settle_game", { p_game_id: gameId });
+  if (error) throw new Error(error.message);
+}

@@ -21,6 +21,9 @@ export type Profile = {
   id: string;
   display_name: string | null;
   color: string | null;
+  /** Wallet balance in eyeBucks. Starter balance is 100. Earned by winning
+   *  multi-device games; future-spendable on entry costs and power-ups. */
+  balance: number;
   created_at: string;
   updated_at: string;
 };
@@ -43,6 +46,8 @@ type AuthValue = {
   updateProfile: (
     patch: Partial<Pick<Profile, "display_name" | "color">>
   ) => Promise<void>;
+  /** Refetch the profile row (e.g. after a wallet credit on game end). */
+  refreshProfile: () => Promise<void>;
   /** Sign the current user out and clear the local session. */
   signOut: () => Promise<void>;
 };
@@ -164,6 +169,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const refreshProfile = useCallback(async () => {
+    const userId = session?.user?.id;
+    if (!userId) return;
+    const sb = getSupabase();
+    const { data } = await sb
+      .from("ptb_profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle<Profile>();
+    setProfile(data ?? null);
+  }, [session?.user?.id]);
+
   const updateProfile = useCallback(
     async (patch: Partial<Pick<Profile, "display_name" | "color">>) => {
       const userId = session?.user?.id;
@@ -202,9 +219,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn,
       signUp,
       updateProfile,
+      refreshProfile,
       signOut,
     }),
-    [loading, session, profile, signIn, signUp, updateProfile, signOut]
+    [
+      loading,
+      session,
+      profile,
+      signIn,
+      signUp,
+      updateProfile,
+      refreshProfile,
+      signOut,
+    ]
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -52,9 +52,10 @@ function Flourish({ className = "" }: { className?: string }) {
 
 export default function Home() {
   const { status, players } = useLocalGame();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const howdy = usePreferredName();
   const inProgress = status === "active" && players.length > 0;
+  const balance = profile?.balance ?? null;
 
   return (
     <main className="felt-saloon relative min-h-[100dvh] overflow-hidden">
@@ -73,16 +74,24 @@ export default function Home() {
         {user ? (
           <Link
             href="/profile"
-            className="inline-flex items-center gap-1.5 truncate rounded-full border border-[#c99a33]/55 bg-[rgba(5,28,20,0.75)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[#f4e4b7]/85 transition-colors hover:border-[#ffd17a]/80 hover:text-[#ffd17a]"
+            className="inline-flex items-center gap-1.5 truncate rounded-full border border-[#c99a33]/55 bg-[rgba(5,28,20,0.75)] py-1.5 pl-3 pr-2 text-[0.7rem] font-bold uppercase text-[#f4e4b7]/85 transition-colors hover:border-[#ffd17a]/80 hover:text-[#ffd17a]"
             style={{
               fontFamily: "var(--font-fell), Georgia, serif",
               letterSpacing: "0.18em",
             }}
           >
             <span aria-hidden>★</span>
-            <span className="max-w-[10rem] truncate">
+            <span className="max-w-[7rem] truncate">
               {howdy ? `Howdy, ${howdy}` : "My Saloon"}
             </span>
+            {balance !== null && (
+              <span
+                className="ml-1 rounded-full border border-[#c99a33]/55 bg-[rgba(201,154,51,0.18)] px-2 py-0.5 text-[0.62rem] font-bold tracking-[0.14em] text-[#ffd17a]"
+                title={`${balance} eyeBucks`}
+              >
+                {balance.toLocaleString()}
+              </span>
+            )}
           </Link>
         ) : (
           <Link

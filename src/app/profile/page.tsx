@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Buck from "@/components/Buck";
 import { useAuth } from "@/context/AuthContext";
 import { PLAYER_COLORS } from "@/lib/constants";
 import { getSupabase } from "@/lib/supabase";
@@ -175,6 +176,67 @@ export default function ProfilePage() {
             Sign Out
           </button>
         </div>
+
+        {/* Wallet — a tiny ledger card showing eyeBuck balance */}
+        <section
+          className="mb-4 relative overflow-hidden rounded-[16px] border-[1.5px] border-[#c99a33]/50 p-4"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(45,30,8,0.85) 0%, rgba(20,12,4,0.92) 100%)",
+            boxShadow:
+              "0 1px 0 rgba(255,240,200,0.12) inset, 0 14px 30px rgba(0,0,0,0.5)",
+          }}
+        >
+          {/* subtle brass top edge */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-0.5"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, #ffd17a, transparent)",
+            }}
+          />
+          <div className="flex items-center justify-between">
+            <div>
+              <div
+                className="text-[0.6rem] uppercase text-[#f4e4b7]/55"
+                style={{ ...FELL, letterSpacing: "0.4em" }}
+              >
+                Wallet
+              </div>
+              <div
+                className="mt-1 flex items-baseline gap-1.5"
+                style={RYE}
+              >
+                <span
+                  className="text-[2.4rem] leading-none text-[#ffd17a]"
+                  style={{
+                    textShadow:
+                      "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.55)",
+                  }}
+                >
+                  {(profile?.balance ?? 0).toLocaleString()}
+                </span>
+                <span
+                  className="text-[0.78rem] uppercase text-[#f4e4b7]/65"
+                  style={{ ...FELL, letterSpacing: "0.24em" }}
+                >
+                  eyeBucks
+                </span>
+              </div>
+            </div>
+            <div className="flex-shrink-0" aria-hidden>
+              <Buck height={56} />
+            </div>
+          </div>
+          <p
+            className="mt-3 text-[0.78rem] italic leading-snug text-[#f4e4b7]/55"
+            style={FELL}
+          >
+            Earn eyeBucks by winning cross-device hands. Save &apos;em for
+            stakes, power-ups, and shinier saloon doors — coming soon.
+          </p>
+        </section>
 
         {/* Profile editor */}
         <Panel className="mb-4">
