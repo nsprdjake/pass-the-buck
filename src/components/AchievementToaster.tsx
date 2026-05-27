@@ -109,7 +109,7 @@ export default function AchievementToaster() {
             <div
               className="text-[0.55rem] font-bold uppercase text-[#5c3b1e]/75"
               style={{
-                fontFamily: "var(--font-fell), Georgia, serif",
+                fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                 letterSpacing: "0.32em",
               }}
             >
@@ -117,13 +117,13 @@ export default function AchievementToaster() {
             </div>
             <div
               className="mt-0.5 truncate text-[1rem] font-bold text-[#2a1a0a]"
-              style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+              style={{ fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)" }}
             >
               {current.name}
             </div>
             <div
               className="mt-0.5 text-[0.72rem] italic text-[#5c3b1e]/85"
-              style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+              style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
             >
               {current.description}
             </div>
@@ -131,7 +131,7 @@ export default function AchievementToaster() {
               <div
                 className="mt-1 text-[0.68rem] font-bold text-[#7a5a18]"
                 style={{
-                  fontFamily: "var(--font-rye), Georgia, serif",
+                  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                   letterSpacing: "0.06em",
                 }}
               >

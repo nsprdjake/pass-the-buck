@@ -106,7 +106,7 @@ export default function BuckPile({
           className="text-white leading-none mt-1"
           style={{
             fontSize: billHeight * 1.1,
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             textShadow: "0 3px 0 rgba(0,0,0,0.55)",
           }}
         >

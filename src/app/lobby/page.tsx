@@ -12,10 +12,10 @@ const MAX_PLAYERS = 12;
 
 // Shared display-font style for headlines like "Saloon", "Ante the Table"
 const RYE: React.CSSProperties = {
-  fontFamily: "var(--font-rye), Georgia, serif",
+  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
 };
 const FELL: React.CSSProperties = {
-  fontFamily: "var(--font-fell), Georgia, serif",
+  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
 };
 
 export default function LobbyPage() {
@@ -236,7 +236,7 @@ export default function LobbyPage() {
               disabled={players.length >= MAX_PLAYERS}
               className="parchment-input flex-1 rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[var(--wood-dark)] placeholder-[var(--wood-mid)]/55 focus:outline-none disabled:opacity-40"
               style={{
-                fontFamily: "var(--font-fell), Georgia, serif",
+                fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                 letterSpacing: "0.01em",
               }}
             />
@@ -515,7 +515,7 @@ function ModeOption({
           active ? "text-[var(--wood-dark)]" : "text-[var(--parchment-light)]"
         }`}
         style={{
-          fontFamily: "var(--font-rye), Georgia, serif",
+          fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
           letterSpacing: "0.12em",
           textShadow: active
             ? "0 1px 0 rgba(255,240,200,0.55)"
@@ -528,7 +528,7 @@ function ModeOption({
         className={`mt-1 text-[0.62rem] italic leading-snug ${
           active ? "text-[var(--wood-dark)]/75" : "text-[var(--parchment-light)]/55"
         }`}
-        style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+        style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
       >
         {caption}
       </div>

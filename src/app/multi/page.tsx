@@ -4,10 +4,10 @@ import Link from "next/link";
 import { Phone } from "@/components/icons";
 
 const RYE: React.CSSProperties = {
-  fontFamily: "var(--font-rye), Georgia, serif",
+  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
 };
 const FELL: React.CSSProperties = {
-  fontFamily: "var(--font-fell), Georgia, serif",
+  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
 };
 
 export default function MultiLandingPage() {

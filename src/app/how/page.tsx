@@ -6,10 +6,10 @@ import Die from "@/components/Die";
 import { ArrowLeft, ArrowRight, ArrowDown, Asterisk } from "@/components/icons";
 
 const RYE: React.CSSProperties = {
-  fontFamily: "var(--font-rye), Georgia, serif",
+  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
 };
 const FELL: React.CSSProperties = {
-  fontFamily: "var(--font-fell), Georgia, serif",
+  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
 };
 
 export default function HowToPlayPage() {
@@ -470,7 +470,7 @@ function Currency() {
   return (
     <span
       className="font-bold text-[var(--accent-light)]"
-      style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+      style={{ fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)" }}
     >
       eyeBucks
     </span>

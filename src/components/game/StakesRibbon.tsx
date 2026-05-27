@@ -37,7 +37,7 @@ export default function StakesRibbon({
         <span
           className="text-[0.6rem] font-bold uppercase text-[var(--wood-dark)]"
           style={{
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             letterSpacing: "0.22em",
           }}
         >
@@ -48,7 +48,7 @@ export default function StakesRibbon({
         </span>
         <span
           className="truncate text-[0.7rem] italic text-[var(--wood-mid)]"
-          style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+          style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
         >
           {tail}
         </span>

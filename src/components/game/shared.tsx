@@ -155,7 +155,7 @@ export function OutcomeCard({
       <div
         className="text-[9px] uppercase tracking-[0.4em]"
         style={{
-          fontFamily: "var(--font-fell), Georgia, serif",
+          fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
           color: "#2a1a0a",
           opacity: 0.7,
         }}
@@ -168,7 +168,7 @@ export function OutcomeCard({
         <span
           className="leading-none"
           style={{
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             color: meta.inkColor,
             fontSize: 38,
             letterSpacing: "0.02em",
@@ -183,7 +183,7 @@ export function OutcomeCard({
         <div
           className="mt-0.5"
           style={{
-            fontFamily: "var(--font-fell), Georgia, serif",
+            fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
             color: "#2a1a0a",
           }}
         >
@@ -202,7 +202,7 @@ export function OutcomeCard({
         <div
           className="mt-0.5 text-[10px] italic"
           style={{
-            fontFamily: "var(--font-fell), Georgia, serif",
+            fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
             color: "#2a1a0a",
             opacity: 0.7,
           }}

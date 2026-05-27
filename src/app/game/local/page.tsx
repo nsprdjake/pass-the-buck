@@ -327,14 +327,14 @@ export default function LocalGamePage() {
           >
             <div
               className="text-[10px] uppercase tracking-[0.4em] text-parchment/70"
-              style={{ fontFamily: "var(--font-fell), Georgia, serif", color: "#f4e4b7", opacity: 0.7 }}
+              style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)", color: "#f4e4b7", opacity: 0.7 }}
             >
               step right up,
             </div>
             <h1
               className="mt-1 leading-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
               style={{
-                fontFamily: "var(--font-rye), Georgia, serif",
+                fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                 color: current.color,
                 fontSize: "clamp(2.5rem, 10vw, 4.5rem)",
                 letterSpacing: "0.01em",
@@ -346,7 +346,7 @@ export default function LocalGamePage() {
             {current.bucks > 0 && phase === "idle" && (
               <div
                 className="mt-2 text-buck-gold/90 uppercase tracking-widest text-xs"
-                style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+                style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
               >
                 {rollCount} di{rollCount === 1 ? "e" : "ce"} on the table
               </div>
@@ -510,7 +510,7 @@ export default function LocalGamePage() {
                 className="text-3xl"
                 style={{
                   color: current?.color,
-                  fontFamily: "var(--font-rye), Georgia, serif",
+                  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                   textShadow: "0 2px 0 rgba(0,0,0,0.55)",
                 }}
               >
@@ -519,7 +519,7 @@ export default function LocalGamePage() {
               <div
                 className="text-buck-coral text-sm uppercase tracking-widest mt-1"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                 }}
               >
                 Plumb broke — skip 'em!
@@ -559,7 +559,7 @@ export default function LocalGamePage() {
               <div
                 className="text-[10px] uppercase tracking-[0.4em] text-parchment"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                   color: "#f4e4b7",
                   opacity: 0.75,
                 }}
@@ -569,7 +569,7 @@ export default function LocalGamePage() {
               <h2
                 className="mt-2 leading-none"
                 style={{
-                  fontFamily: "var(--font-rye), Georgia, serif",
+                  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                   color: nextPlayer.color,
                   fontSize: "clamp(2.75rem, 11vw, 5rem)",
                   letterSpacing: "0.01em",
@@ -583,7 +583,7 @@ export default function LocalGamePage() {
                 transition={{ duration: 1.4, repeat: Infinity }}
                 className="mt-8 uppercase tracking-widest text-sm"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                   color: "#f4e4b7",
                   opacity: 0.75,
                 }}

@@ -116,7 +116,7 @@ export default function Home() {
           aria-label="How to play"
           className="inline-flex items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
           style={{
-            fontFamily: "var(--font-fell), Georgia, serif",
+            fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
             letterSpacing: "0.22em",
           }}
         >
@@ -132,7 +132,7 @@ export default function Home() {
             href="/profile"
             className="inline-flex items-center gap-1.5 truncate rounded-full border border-[var(--accent-mid)]/55 bg-[rgba(5,28,20,0.75)] py-1.5 pl-3 pr-2 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/85 transition-colors hover:border-[var(--accent-light)]/80 hover:text-[var(--accent-light)]"
             style={{
-              fontFamily: "var(--font-fell), Georgia, serif",
+              fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
               letterSpacing: "0.18em",
             }}
           >
@@ -154,7 +154,7 @@ export default function Home() {
             href="/auth"
             className="inline-flex items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
             style={{
-              fontFamily: "var(--font-fell), Georgia, serif",
+              fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
               letterSpacing: "0.22em",
             }}
           >
@@ -174,7 +174,7 @@ export default function Home() {
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             className="parchment pointer-events-none absolute left-1/2 top-20 z-20 -translate-x-1/2 whitespace-nowrap rounded-full border-[1.5px] border-[var(--wood-mid)] px-4 py-1.5 text-[0.75rem] font-bold text-[var(--wood-dark)] shadow-[0_8px_22px_rgba(0,0,0,0.45)]"
             style={{
-              fontFamily: "var(--font-rye), Georgia, serif",
+              fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
               letterSpacing: "0.16em",
             }}
           >
@@ -192,7 +192,7 @@ export default function Home() {
         <span
           className="mt-3 text-[0.62rem] uppercase text-[var(--parchment-light)]/65"
           style={{
-            fontFamily: "var(--font-fell), Georgia, serif",
+            fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
             letterSpacing: "0.48em",
           }}
         >
@@ -202,7 +202,7 @@ export default function Home() {
         <h1
           className="mt-3 leading-[0.92]"
           style={{
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             fontSize: "clamp(3rem, 15vw, 5rem)",
             color: "var(--parchment-light)",
             textShadow:
@@ -217,7 +217,7 @@ export default function Home() {
 
         <p
           className="mt-5 max-w-[19rem] text-[1.02rem] italic leading-snug text-[var(--parchment-light)]/85"
-          style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+          style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
         >
           A frontier dice game of nerve, luck,
           <br />
@@ -253,7 +253,7 @@ export default function Home() {
               <span
                 className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
                 style={{
-                  fontFamily: "var(--font-rye), Georgia, serif",
+                  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                   letterSpacing: "0.22em",
                 }}
               >
@@ -262,7 +262,7 @@ export default function Home() {
               <span
                 className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-mid)]/75"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                   letterSpacing: "0.36em",
                 }}
               >
@@ -285,7 +285,7 @@ export default function Home() {
             <span
               className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
               style={{
-                fontFamily: "var(--font-rye), Georgia, serif",
+                fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                 letterSpacing: "0.22em",
                 textShadow: "0 1px 0 rgba(255,240,200,0.55)",
               }}
@@ -295,7 +295,7 @@ export default function Home() {
             <span
               className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-dark)]/75"
               style={{
-                fontFamily: "var(--font-fell), Georgia, serif",
+                fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                 letterSpacing: "0.36em",
               }}
             >
@@ -317,7 +317,7 @@ export default function Home() {
             <span
               className="relative block text-[1.05rem] font-bold uppercase text-[var(--parchment-light)]"
               style={{
-                fontFamily: "var(--font-rye), Georgia, serif",
+                fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                 letterSpacing: "0.22em",
                 textShadow: "0 2px 0 rgba(0,0,0,0.55)",
               }}
@@ -327,7 +327,7 @@ export default function Home() {
             <span
               className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--parchment-light)]/65"
               style={{
-                fontFamily: "var(--font-fell), Georgia, serif",
+                fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                 letterSpacing: "0.36em",
               }}
             >
@@ -353,7 +353,7 @@ export default function Home() {
             <div
               className="text-[0.55rem] font-bold uppercase text-[var(--accent-text)]/85"
               style={{
-                fontFamily: "var(--font-fell), Georgia, serif",
+                fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                 letterSpacing: "0.36em",
               }}
             >
@@ -361,13 +361,13 @@ export default function Home() {
             </div>
             <div
               className="mt-0.5 truncate text-[0.95rem] font-bold text-[var(--parchment-light)]"
-              style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+              style={{ fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)" }}
             >
               {daily.title}
             </div>
             <div
               className="truncate text-[0.7rem] italic text-[var(--parchment-light)]/65"
-              style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+              style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
             >
               {daily.blurb}
             </div>
@@ -375,7 +375,7 @@ export default function Home() {
           <span
             className="text-[0.7rem] uppercase text-[var(--accent-text)]/70"
             style={{
-              fontFamily: "var(--font-fell), Georgia, serif",
+              fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
               letterSpacing: "0.18em",
             }}
           >
@@ -398,7 +398,7 @@ export default function Home() {
               <span
                 className="text-[0.55rem] font-bold uppercase text-[var(--accent-text)]/85"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                   letterSpacing: "0.36em",
                 }}
               >
@@ -408,7 +408,7 @@ export default function Home() {
               <span
                 className="text-[0.55rem] font-bold uppercase text-[var(--parchment-light)]/45 transition-colors group-hover:text-[var(--accent-light)]"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                   letterSpacing: "0.22em",
                 }}
               >
@@ -424,7 +424,7 @@ export default function Home() {
                   <span
                     className="w-4 text-center text-[0.7rem]"
                     style={{
-                      fontFamily: "var(--font-rye), Georgia, serif",
+                      fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                       color:
                         i === 0
                           ? "var(--accent-light)"
@@ -445,14 +445,14 @@ export default function Home() {
                   />
                   <span
                     className="min-w-0 flex-1 truncate text-[0.78rem] font-bold text-[var(--parchment-light)]"
-                    style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+                    style={{ fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)" }}
                   >
                     {r.display_name || "Stranger"}
                   </span>
                   <span
                     className="text-[0.75rem] text-[var(--accent-light)]"
                     style={{
-                      fontFamily: "var(--font-rye), Georgia, serif",
+                      fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                     }}
                   >
                     {r.value.toLocaleString()}
@@ -472,7 +472,7 @@ export default function Home() {
           <span
             className="text-[0.6rem] uppercase text-[var(--parchment-light)]/70"
             style={{
-              fontFamily: "var(--font-fell), Georgia, serif",
+              fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
               letterSpacing: "0.36em",
             }}
           >

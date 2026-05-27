@@ -137,7 +137,7 @@ export default function RollButton({
         <span
           className="leading-none"
           style={{
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             fontSize: 28,
             color: "#ffe3a0",
             textShadow:

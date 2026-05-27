@@ -147,7 +147,7 @@ export default function Buck({ height = 32 }: BuckProps) {
         fill={ink}
         opacity={0.92}
         style={{
-          fontFamily: "var(--font-rye), Georgia, serif",
+          fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
           letterSpacing: "0.14em",
         }}
       >
@@ -231,7 +231,7 @@ export default function Buck({ height = 32 }: BuckProps) {
         fill={ink}
         opacity={0.88}
         style={{
-          fontFamily: "var(--font-rye), Georgia, serif",
+          fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
           letterSpacing: "0.32em",
         }}
       >
@@ -264,7 +264,7 @@ export default function Buck({ height = 32 }: BuckProps) {
             fontWeight="900"
             fill={ink}
             style={{
-              fontFamily: "var(--font-rye), Georgia, serif",
+              fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             }}
           >
             1

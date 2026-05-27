@@ -98,8 +98,8 @@ export const WESTERN_THEME: Theme = {
     gold: "#c99a33",
   },
   fonts: {
-    display: "var(--font-rye), Georgia, serif",
-    vintage: "var(--font-fell), Georgia, serif",
+    display: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
+    vintage: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
     body: "var(--font-inter), system-ui, sans-serif",
   },
   copy: {

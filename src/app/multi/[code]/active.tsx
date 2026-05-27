@@ -430,14 +430,14 @@ export default function ActiveGameView() {
           >
             <div
               className="text-[10px] uppercase tracking-[0.4em]"
-              style={{ fontFamily: "var(--font-fell), Georgia, serif", color: "var(--parchment-light)", opacity: 0.75 }}
+              style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)", color: "var(--parchment-light)", opacity: 0.75 }}
             >
               {isMyTurn ? "yer turn, partner" : "now rollin'"}
             </div>
             <h1
               className="mt-1 leading-none drop-shadow-[0_4px_12px_rgba(0,0,0,0.7)]"
               style={{
-                fontFamily: "var(--font-rye), Georgia, serif",
+                fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                 color: stageColor,
                 fontSize: "clamp(2.5rem, 10vw, 4.5rem)",
                 letterSpacing: "0.01em",
@@ -449,7 +449,7 @@ export default function ActiveGameView() {
             {current.bucks > 0 && phase === "idle" && (
               <div
                 className="mt-2 text-buck-gold/90 uppercase tracking-widest text-xs"
-                style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+                style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
               >
                 {rollCount} di{rollCount === 1 ? "e" : "ce"} on the table
               </div>
@@ -601,7 +601,7 @@ export default function ActiveGameView() {
                 <div
                   className="text-[10px] uppercase tracking-[0.4em] text-parchment"
                   style={{
-                    fontFamily: "var(--font-fell), Georgia, serif",
+                    fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                     color: "var(--parchment-light)",
                     opacity: 0.8,
                   }}
@@ -611,7 +611,7 @@ export default function ActiveGameView() {
                 <div
                   className="mt-1"
                   style={{
-                    fontFamily: "var(--font-rye), Georgia, serif",
+                    fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                     color: stageColor,
                     fontSize: 28,
                     textShadow: "0 2px 0 rgba(0,0,0,0.7)",
@@ -624,7 +624,7 @@ export default function ActiveGameView() {
                   style={{
                     color: "var(--parchment-light)",
                     opacity: 0.7,
-                    fontFamily: "var(--font-fell), Georgia, serif",
+                    fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                   }}
                 >
                   {phase === "rolling" || phase === "reveal" || phase === "buckfly"
@@ -657,7 +657,7 @@ export default function ActiveGameView() {
                   <Skip size={22} color={canSkipBroke ? "#FFE3A0" : "#7a5c2e"} />
                   <span
                     style={{
-                      fontFamily: "var(--font-rye), Georgia, serif",
+                      fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                       color: "#FFE3A0",
                       fontSize: 16,
                       letterSpacing: "0.04em",
@@ -690,7 +690,7 @@ export default function ActiveGameView() {
                   <Bell size={22} color={canNudge ? "#FFE3A0" : "#7a5c2e"} />
                   <span
                     style={{
-                      fontFamily: "var(--font-rye), Georgia, serif",
+                      fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                       color: "#FFE3A0",
                       fontSize: 16,
                       letterSpacing: "0.04em",
@@ -735,7 +735,7 @@ export default function ActiveGameView() {
                 className="text-3xl"
                 style={{
                   color: current.color,
-                  fontFamily: "var(--font-rye), Georgia, serif",
+                  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                   textShadow: "0 2px 0 rgba(0,0,0,0.55)",
                 }}
               >
@@ -743,7 +743,7 @@ export default function ActiveGameView() {
               </div>
               <div
                 className="text-buck-coral text-sm uppercase tracking-widest mt-1"
-                style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+                style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
               >
                 Plumb broke — skip 'em!
               </div>
@@ -793,7 +793,7 @@ export default function ActiveGameView() {
                 <Bell size={28} color="#a16207" />
                 <span
                   style={{
-                    fontFamily: "var(--font-rye), Georgia, serif",
+                    fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                     color: "var(--wood-dark)",
                     fontSize: 26,
                   }}
@@ -805,7 +805,7 @@ export default function ActiveGameView() {
               <div
                 className="mt-1 text-sm"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                   color: "var(--wood-dark)",
                 }}
               >
@@ -820,7 +820,7 @@ export default function ActiveGameView() {
               <div
                 className="mt-1 text-[10px] uppercase tracking-[0.3em]"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                   color: "var(--wood-dark)",
                   opacity: 0.6,
                 }}

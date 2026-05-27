@@ -7,10 +7,10 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 
 const RYE: React.CSSProperties = {
-  fontFamily: "var(--font-rye), Georgia, serif",
+  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
 };
 const FELL: React.CSSProperties = {
-  fontFamily: "var(--font-fell), Georgia, serif",
+  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
 };
 
 type Mode = "signin" | "signup";

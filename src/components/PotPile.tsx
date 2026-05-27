@@ -114,7 +114,7 @@ export default function PotPile({ count }: PotPileProps) {
         <span
           className="text-buck-gold tracking-[0.18em] text-sm"
           style={{
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             textShadow: "0 2px 0 rgba(0,0,0,0.55)",
           }}
         >
@@ -127,7 +127,7 @@ export default function PotPile({ count }: PotPileProps) {
           transition={{ duration: 0.35, ease: "easeOut" }}
           className="text-white text-3xl leading-none mt-0.5"
           style={{
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             textShadow:
               "0 2px 0 rgba(0,0,0,0.5), 0 0 16px rgba(251,191,36,0.6)",
           }}

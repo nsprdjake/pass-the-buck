@@ -8,10 +8,10 @@ import { createGame } from "@/lib/remote-game";
 import type { GameMode } from "@/lib/types";
 
 const RYE: React.CSSProperties = {
-  fontFamily: "var(--font-rye), Georgia, serif",
+  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
 };
 const FELL: React.CSSProperties = {
-  fontFamily: "var(--font-fell), Georgia, serif",
+  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
 };
 
 export default function CreateMultiGamePage() {
@@ -21,7 +21,7 @@ export default function CreateMultiGamePage() {
         <main className="felt-saloon flex min-h-[100dvh] items-center justify-center">
           <div
             className="text-[var(--parchment-light)]/65"
-            style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+            style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
           >
             Loading…
           </div>
@@ -134,7 +134,7 @@ function CreateMultiGameInner() {
             style={{
               background:
                 "linear-gradient(180deg, rgba(201,154,51,0.18) 0%, rgba(60,40,8,0.12) 100%)",
-              fontFamily: "var(--font-fell), Georgia, serif",
+              fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
             }}
           >
             <div

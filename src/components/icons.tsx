@@ -177,7 +177,7 @@ export function Trophy({ size = 64, className }: IconProps) {
         fontSize="7.5"
         fontWeight="900"
         fill="#FFE3A0"
-        style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+        style={{ fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)" }}
       >
         1
       </text>
@@ -202,7 +202,7 @@ export function Trophy({ size = 64, className }: IconProps) {
           fontWeight="700"
           fill="#FFE3A0"
           style={{
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             letterSpacing: "0.2em",
           }}
         >

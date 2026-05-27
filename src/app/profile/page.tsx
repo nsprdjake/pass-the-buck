@@ -38,10 +38,10 @@ import {
 } from "@/lib/wallet";
 
 const RYE: React.CSSProperties = {
-  fontFamily: "var(--font-rye), Georgia, serif",
+  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
 };
 const FELL: React.CSSProperties = {
-  fontFamily: "var(--font-fell), Georgia, serif",
+  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
 };
 
 type StatsRow = {
@@ -1283,7 +1283,7 @@ function StatTile({
       <div
         className="text-[1.05rem] leading-none text-[var(--accent-light)]"
         style={{
-          fontFamily: "var(--font-rye), Georgia, serif",
+          fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
           textShadow: "0 1px 0 rgba(0,0,0,0.55)",
         }}
       >
@@ -1292,7 +1292,7 @@ function StatTile({
       <div
         className="mt-1 text-[0.55rem] font-bold uppercase leading-tight text-[var(--parchment-light)]/55"
         style={{
-          fontFamily: "var(--font-fell), Georgia, serif",
+          fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
           letterSpacing: "0.18em",
         }}
       >

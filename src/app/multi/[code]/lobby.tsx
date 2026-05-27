@@ -8,10 +8,10 @@ import { useRemoteGame } from "@/context/RemoteGameContext";
 import { leaveOrKick } from "@/lib/remote-game";
 
 const RYE: React.CSSProperties = {
-  fontFamily: "var(--font-rye), Georgia, serif",
+  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
 };
 const FELL: React.CSSProperties = {
-  fontFamily: "var(--font-fell), Georgia, serif",
+  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
 };
 
 export default function LobbyView({ code }: { code: string }) {
@@ -369,7 +369,7 @@ function PaperButton({
       onClick={onClick}
       className="flex-1 rounded-[8px] border-[1.5px] border-[var(--wood-mid)] py-2 text-[0.72rem] font-bold uppercase text-[var(--wood-dark)] transition-transform active:scale-[0.97]"
       style={{
-        fontFamily: "var(--font-rye), Georgia, serif",
+        fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
         letterSpacing: "0.22em",
         background:
           "linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment-mid) 60%, var(--parchment-dark) 100%)",
@@ -409,7 +409,7 @@ function Tag({
         backgroundColor: palette.bg,
         borderColor: palette.border,
         color: palette.text,
-        fontFamily: "var(--font-fell), Georgia, serif",
+        fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
         letterSpacing: "0.24em",
       }}
     >

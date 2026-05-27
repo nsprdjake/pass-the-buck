@@ -100,7 +100,7 @@ export default function FinishedScreen({
           <div
             className="text-[0.72rem] uppercase text-[#ff9b9b]"
             style={{
-              fontFamily: "var(--font-rye), Georgia, serif",
+              fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
               letterSpacing: "0.4em",
             }}
           >
@@ -114,7 +114,7 @@ export default function FinishedScreen({
             className="mt-2 text-6xl leading-tight"
             style={{
               color: playerColor,
-              fontFamily: "var(--font-rye), Georgia, serif",
+              fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
               textShadow:
                 "0 4px 0 rgba(0,0,0,0.65), 0 0 26px rgba(196,56,56,0.35)",
             }}
@@ -136,7 +136,7 @@ export default function FinishedScreen({
               <span
                 className="text-[0.6rem] font-bold uppercase text-[var(--wood-mid)]/85"
                 style={{
-                  fontFamily: "var(--font-rye), Georgia, serif",
+                  fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                   letterSpacing: "0.32em",
                 }}
               >
@@ -145,7 +145,7 @@ export default function FinishedScreen({
               <span
                 className="text-[1.15rem] font-bold text-[var(--wood-dark)]"
                 style={{
-                  fontFamily: "var(--font-fell), Georgia, serif",
+                  fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
                 }}
               >
                 {tab}
@@ -154,7 +154,7 @@ export default function FinishedScreen({
           ) : (
             <p
               className="mt-4 text-[var(--parchment-light)]/65 italic"
-              style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+              style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
             >
               You know the deal. Pay up.
             </p>
@@ -162,7 +162,7 @@ export default function FinishedScreen({
 
           <p
             className="mt-4 text-[0.85rem] italic text-[var(--parchment-light)]/45"
-            style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+            style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
           >
             Last one with {finalBucks} eyeBuck
             {finalBucks === 1 ? "" : "s"} on the table.
@@ -176,7 +176,7 @@ export default function FinishedScreen({
             <span
               className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
               style={{
-                fontFamily: "var(--font-rye), Georgia, serif",
+                fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
                 letterSpacing: "0.22em",
                 textShadow: "0 1px 0 rgba(255,240,200,0.55)",
               }}
@@ -190,7 +190,7 @@ export default function FinishedScreen({
             style={{
               background:
                 "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",
-              fontFamily: "var(--font-rye), Georgia, serif",
+              fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
               letterSpacing: "0.22em",
             }}
           >
@@ -268,7 +268,7 @@ export default function FinishedScreen({
         </motion.div>
         <div
           className="text-xs uppercase tracking-[0.4em] text-buck-gold"
-          style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+          style={{ fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)" }}
         >
           Champion of the Saloon
         </div>
@@ -279,7 +279,7 @@ export default function FinishedScreen({
           className="mt-2 text-6xl leading-tight"
           style={{
             color: playerColor,
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             textShadow: "0 4px 0 rgba(0,0,0,0.55)",
           }}
         >
@@ -297,7 +297,7 @@ export default function FinishedScreen({
         {wager?.trim() && (
           <p
             className="mt-2 text-[0.88rem] italic text-buck-gold/80"
-            style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+            style={{ fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)" }}
           >
             And the wager: {wager.trim()}
           </p>
@@ -309,7 +309,7 @@ export default function FinishedScreen({
           <span
             className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
             style={{
-              fontFamily: "var(--font-rye), Georgia, serif",
+              fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
               letterSpacing: "0.22em",
               textShadow: "0 1px 0 rgba(255,240,200,0.55)",
             }}
@@ -323,7 +323,7 @@ export default function FinishedScreen({
           style={{
             background:
               "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",
-            fontFamily: "var(--font-rye), Georgia, serif",
+            fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
             letterSpacing: "0.22em",
           }}
         >

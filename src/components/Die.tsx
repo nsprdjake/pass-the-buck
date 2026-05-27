@@ -146,7 +146,7 @@ export default function Die({ size = 40, outcome, blind = false }: DieProps) {
         stroke={face.letterStroke}
         strokeWidth={0.9}
         style={{
-          fontFamily: "var(--font-rye), Georgia, serif",
+          fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
           letterSpacing: "-0.04em",
         }}
       >
