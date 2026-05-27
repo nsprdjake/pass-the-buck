@@ -6,6 +6,10 @@ import Link from "next/link";
 import { useAuth, usePreferredName } from "@/context/AuthContext";
 import { useLocalGame } from "@/context/LocalGameContext";
 import Buck from "@/components/Buck";
+import {
+  fetchLeaderboard,
+  type LeaderboardRow,
+} from "@/lib/leaderboards";
 
 // ----- Small ornamental flourish used above + below the hero block -----
 function Flourish({ className = "" }: { className?: string }) {
@@ -67,6 +71,23 @@ export default function Home() {
     const t = setTimeout(() => setShowBonus(null), 5500);
     return () => clearTimeout(t);
   }, [lastDailyBonus]);
+
+  // Top-3 "Richest" strip on the landing. Cheap fetch; refresh on auth state.
+  const [topRich, setTopRich] = useState<LeaderboardRow[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = await fetchLeaderboard("richest", 3);
+        if (!cancelled) setTopRich(rows);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [profile?.balance]);
 
   return (
     <main className="felt-saloon relative min-h-[100dvh] overflow-hidden">
@@ -307,10 +328,90 @@ export default function Home() {
           </Link>
         </div>
 
+        {/* ── Top-3 Richest strip — peek into the leaderboard ─────── */}
+        {topRich && topRich.length > 0 && (
+          <Link
+            href="/leaderboard"
+            className="mt-9 w-full rounded-[12px] border-[1.5px] border-[#c99a33]/35 px-3 py-2.5 transition-colors hover:border-[#ffd17a]/65"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+              boxShadow: "0 1px 0 rgba(244,228,183,0.06) inset",
+            }}
+          >
+            <div className="mb-2 flex items-center gap-2">
+              <span
+                className="text-[0.55rem] font-bold uppercase text-[#ffd17a]/85"
+                style={{
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                  letterSpacing: "0.36em",
+                }}
+              >
+                ★ Top of the Posse
+              </span>
+              <span className="h-px flex-1 bg-[#c99a33]/25" />
+              <span
+                className="text-[0.55rem] font-bold uppercase text-[#f4e4b7]/45 transition-colors group-hover:text-[#ffd17a]"
+                style={{
+                  fontFamily: "var(--font-fell), Georgia, serif",
+                  letterSpacing: "0.22em",
+                }}
+              >
+                See all →
+              </span>
+            </div>
+            <ol className="space-y-1">
+              {topRich.map((r, i) => (
+                <li
+                  key={r.user_id}
+                  className="flex items-center gap-2 text-left"
+                >
+                  <span
+                    className="w-4 text-center text-[0.7rem]"
+                    style={{
+                      fontFamily: "var(--font-rye), Georgia, serif",
+                      color:
+                        i === 0
+                          ? "#ffd17a"
+                          : i === 1
+                          ? "#dfd5c0"
+                          : "#d6a777",
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span
+                    className="h-4 w-4 flex-shrink-0 rounded-full"
+                    style={{
+                      backgroundColor: r.color ?? "#5c3b1e",
+                      boxShadow:
+                        "0 0 0 1px #ffd17a, 0 0 0 1.8px #5c3b1e",
+                    }}
+                  />
+                  <span
+                    className="min-w-0 flex-1 truncate text-[0.78rem] font-bold text-[#f4e4b7]"
+                    style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+                  >
+                    {r.display_name || "Stranger"}
+                  </span>
+                  <span
+                    className="text-[0.75rem] text-[#ffd17a]"
+                    style={{
+                      fontFamily: "var(--font-rye), Georgia, serif",
+                    }}
+                  >
+                    {r.value.toLocaleString()}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </Link>
+        )}
+
         {/* ── House rules marquee ─────────────────────────────────── */}
         <Link
           href="/how"
-          className="mt-10 flex w-full items-center gap-3 text-[#c99a33]/55 transition-colors hover:text-[#ffd17a]"
+          className="mt-5 flex w-full items-center gap-3 text-[#c99a33]/55 transition-colors hover:text-[#ffd17a]"
         >
           <span className="h-px flex-1 bg-[#c99a33]/30" />
           <span
