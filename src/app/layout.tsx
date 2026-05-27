@@ -9,6 +9,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import AchievementToaster from "@/components/AchievementToaster";
+import FontScaleSync from "@/components/FontScaleSync";
 import ThemeSync from "@/components/ThemeSync";
 import { AuthProvider } from "@/context/AuthContext";
 import { LocalGameProvider } from "@/context/LocalGameContext";
@@ -93,6 +94,7 @@ export default function RootLayout({
       <body className="min-h-full bg-buck-dark text-white antialiased">
         <AuthProvider>
           <ThemeSync />
+          <FontScaleSync />
           <LocalGameProvider>{children}</LocalGameProvider>
           <AchievementToaster />
         </AuthProvider>

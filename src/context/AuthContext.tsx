@@ -30,6 +30,10 @@ export type Profile = {
   active_theme_slug: string;
   /** Slug of the currently-equipped power-up (consumed on next game settle). */
   active_powerup_slug: string | null;
+  /** Public URL of the user's chosen avatar image (AI-generated portrait). */
+  avatar_url: string | null;
+  /** Slug of the style used to generate the current avatar. */
+  avatar_style: string | null;
   created_at: string;
   updated_at: string;
 };

@@ -6,8 +6,10 @@ import {
   BOARD_META,
   fetchLeaderboard,
   type BoardKey,
+  type BoardScope,
   type LeaderboardRow,
 } from "@/lib/leaderboards";
+import { useAuth } from "@/context/AuthContext";
 
 const RYE: React.CSSProperties = {
   fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
@@ -24,9 +26,16 @@ const TABS: BoardKey[] = [
 ];
 
 export default function LeaderboardPage() {
+  const { user } = useAuth();
   const [active, setActive] = useState<BoardKey>("richest");
+  const [scope, setScope] = useState<BoardScope>("global");
   const [rows, setRows] = useState<LeaderboardRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Fall back to global if the viewer signs out while looking at friends.
+  useEffect(() => {
+    if (scope === "friends" && !user) setScope("global");
+  }, [scope, user]);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +43,10 @@ export default function LeaderboardPage() {
     setError(null);
     (async () => {
       try {
-        const data = await fetchLeaderboard(active, 25);
+        const data = await fetchLeaderboard(active, 25, {
+          scope,
+          viewerId: user?.id ?? null,
+        });
         if (!cancelled) setRows(data);
       } catch (e) {
         if (!cancelled) {
@@ -45,7 +57,7 @@ export default function LeaderboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [active]);
+  }, [active, scope, user?.id]);
 
   const meta = BOARD_META[active];
 
@@ -83,6 +95,50 @@ export default function LeaderboardPage() {
             The Posse
           </h1>
           <div />
+        </div>
+
+        {/* Scope toggle — global vs my friends */}
+        <div
+          className="mb-3 grid grid-cols-2 gap-1 rounded-full border-[1.5px] border-[var(--accent-mid)]/35 p-1"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+          }}
+        >
+          {(["global", "friends"] as BoardScope[]).map((s) => {
+            const isActive = scope === s;
+            const disabled = s === "friends" && !user;
+            return (
+              <button
+                key={s}
+                type="button"
+                disabled={disabled}
+                onClick={() => setScope(s)}
+                aria-pressed={isActive}
+                title={
+                  disabled
+                    ? "Sign in to see your friends board"
+                    : undefined
+                }
+                className="rounded-full px-3 py-1.5 text-[0.7rem] font-bold uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-45"
+                style={{
+                  ...FELL,
+                  letterSpacing: "0.22em",
+                  background: isActive
+                    ? "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)"
+                    : "transparent",
+                  color: isActive
+                    ? "var(--wood-dark)"
+                    : "rgba(244,228,183,0.75)",
+                  boxShadow: isActive
+                    ? "0 1px 0 rgba(255,240,200,0.65) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 3px 8px rgba(0,0,0,0.4)"
+                    : "none",
+                }}
+              >
+                {s === "global" ? "Global" : "Friends"}
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab strip */}
@@ -195,14 +251,27 @@ export default function LeaderboardPage() {
                   >
                     {i + 1}
                   </span>
-                  <div
-                    className="h-7 w-7 flex-shrink-0 rounded-full"
-                    style={{
-                      backgroundColor: r.color ?? "var(--wood-mid)",
-                      boxShadow:
-                        "0 0 0 1.5px var(--accent-light), 0 0 0 2.5px var(--wood-mid), 0 2px 4px rgba(0,0,0,0.4)",
-                    }}
-                  />
+                  {r.avatar_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={r.avatar_url}
+                      alt=""
+                      className="h-7 w-7 flex-shrink-0 rounded-full object-cover"
+                      style={{
+                        boxShadow:
+                          "0 0 0 1.5px var(--accent-light), 0 0 0 2.5px var(--wood-mid), 0 2px 4px rgba(0,0,0,0.4)",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className="h-7 w-7 flex-shrink-0 rounded-full"
+                      style={{
+                        backgroundColor: r.color ?? "var(--wood-mid)",
+                        boxShadow:
+                          "0 0 0 1.5px var(--accent-light), 0 0 0 2.5px var(--wood-mid), 0 2px 4px rgba(0,0,0,0.4)",
+                      }}
+                    />
+                  )}
                   <div className="min-w-0 flex-1">
                     <div
                       className="truncate text-[0.92rem] font-bold text-[var(--parchment-light)]"

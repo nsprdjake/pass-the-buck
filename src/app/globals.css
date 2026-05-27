@@ -296,6 +296,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   UI TEXT SCALE
+   Default bumped from the browser default 16px to 18px so the table
+   reads cleanly at arm's length on a phone. Per-user override via
+   data-text-scale on <html> (set by FontScaleSync from a localStorage
+   preference written by the Text Size picker on /profile).
+   ═══════════════════════════════════════════════════════════════════ */
+html { font-size: 18px; }
+html[data-text-scale="sm"] { font-size: 16px; }
+html[data-text-scale="md"] { font-size: 18px; }
+html[data-text-scale="lg"] { font-size: 20px; }
+html[data-text-scale="xl"] { font-size: 22px; }
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-16px); }
