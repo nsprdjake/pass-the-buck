@@ -481,6 +481,161 @@ export default function ProfilePage() {
           </p>
         </section>
 
+        {/* Top-up — buy more eyeBucks. TEST MODE until Stripe is wired. */}
+        <Panel className="mb-4">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2
+              className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
+              style={{ ...FELL, letterSpacing: "0.36em" }}
+            >
+              Top Up
+            </h2>
+            <span
+              className="rounded-full border border-[#c43838]/55 bg-[#c43838]/15 px-2 py-0.5 text-[0.55rem] font-bold uppercase text-[#ffd2c2]"
+              style={{ ...FELL, letterSpacing: "0.24em" }}
+              title="No real charges. Stripe integration coming next."
+            >
+              Test Mode
+            </span>
+          </div>
+
+          {bundles === null ? (
+            <div
+              className="py-5 text-center text-[0.85rem] italic text-[var(--parchment-light)]/50"
+              style={FELL}
+            >
+              Counting the cash drawer…
+            </div>
+          ) : bundles.length === 0 ? (
+            <div
+              className="rounded-[10px] border border-dashed border-[var(--accent-mid)]/30 py-7 text-center text-[0.85rem] italic text-[var(--parchment-light)]/55"
+              style={FELL}
+            >
+              No bundles available right now.
+            </div>
+          ) : (
+            (() => {
+              const bestRate = Math.max(...bundles.map(bucksPerDollar));
+              return (
+                <ul className="grid grid-cols-2 gap-2">
+                  {bundles.map((b) => {
+                    const rate = bucksPerDollar(b);
+                    const isHighlight = rate === bestRate;
+                    const busy = bundleBusy === b.id;
+                    return (
+                      <li
+                        key={b.id}
+                        className="relative rounded-[12px] border-[1.5px] p-3"
+                        style={{
+                          background: isHighlight
+                            ? "linear-gradient(180deg, rgba(201,154,51,0.22) 0%, rgba(122,90,24,0.18) 100%)"
+                            : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
+                          borderColor: isHighlight
+                            ? "rgba(255,209,122,0.65)"
+                            : "rgba(201,154,51,0.3)",
+                        }}
+                      >
+                        {isHighlight && (
+                          <span
+                            className="absolute -top-2 left-2 rounded-full border border-[var(--accent-light)]/65 bg-[var(--accent-light)]/20 px-1.5 py-0.5 text-[0.5rem] font-bold uppercase text-[var(--accent-text)]"
+                            style={{ ...FELL, letterSpacing: "0.24em" }}
+                          >
+                            Best Value
+                          </span>
+                        )}
+                        <div
+                          className="truncate text-[0.85rem] font-bold text-[var(--parchment-light)]"
+                          style={RYE}
+                          title={b.label}
+                        >
+                          {b.label}
+                        </div>
+                        {b.tagline && (
+                          <div
+                            className="mt-0.5 line-clamp-1 text-[0.65rem] italic text-[var(--parchment-light)]/55"
+                            style={FELL}
+                            title={b.tagline}
+                          >
+                            {b.tagline}
+                          </div>
+                        )}
+                        <div className="mt-2 flex items-baseline gap-1.5">
+                          <span
+                            className="text-[1.35rem] leading-none text-[var(--accent-text)]"
+                            style={RYE}
+                          >
+                            {b.amount_eyebucks.toLocaleString()}
+                          </span>
+                          <span
+                            className="text-[0.6rem] uppercase text-[var(--parchment-light)]/65"
+                            style={{ ...FELL, letterSpacing: "0.2em" }}
+                          >
+                            eyeBucks
+                          </span>
+                        </div>
+                        <div
+                          className="mt-0.5 text-[0.65rem] italic text-[var(--parchment-light)]/45"
+                          style={FELL}
+                        >
+                          {rate} eB per $1
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleBuyBundle(b.id)}
+                          disabled={busy}
+                          className="mt-3 block w-full rounded-[10px] border-[1.5px] py-2 text-[0.72rem] font-bold uppercase disabled:cursor-not-allowed disabled:opacity-50"
+                          style={{
+                            ...FELL,
+                            letterSpacing: "0.2em",
+                            color: "#2a1a0a",
+                            background:
+                              "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)",
+                            borderColor: "#7a5a18",
+                            boxShadow:
+                              "0 1px 0 rgba(255,240,200,0.75) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 3px 8px rgba(0,0,0,0.4)",
+                          }}
+                        >
+                          {busy
+                            ? "Crediting…"
+                            : `${formatPrice(b.price_cents)} (Test)`}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              );
+            })()
+          )}
+
+          {purchaseFlash && (
+            <div
+              key={purchaseFlash.at}
+              className="mt-3 rounded-[10px] border-[1.5px] border-[var(--accent-light)]/60 bg-[var(--accent-light)]/12 px-3 py-2 text-center text-[0.82rem] font-bold uppercase text-[var(--accent-text)]"
+              style={{ ...FELL, letterSpacing: "0.22em" }}
+            >
+              ✓ Credited +{purchaseFlash.amount.toLocaleString()} eyeBucks
+            </div>
+          )}
+
+          {bundleError && (
+            <div
+              className="mt-3 rounded-[10px] border-[1.5px] border-[#8b2222]/55 bg-[#8b2222]/25 px-3 py-2 text-[0.82rem] font-bold text-[#ffd2c2]"
+              style={FELL}
+            >
+              {bundleError}
+            </div>
+          )}
+
+          <p
+            className="mt-3 text-[0.7rem] italic leading-snug text-[var(--parchment-light)]/50"
+            style={FELL}
+          >
+            <strong className="text-[#ffd2c2]/85">Test mode:</strong>{" "}
+            buttons credit eyeBucks instantly without taking real money so we
+            can shape the economy. Stripe Checkout slots in next.
+          </p>
+        </Panel>
+
         {/* Stats card — your record at a glance */}
         {stats && (
           <Panel className="mb-4">
