@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, usePreferredName } from "@/context/AuthContext";
 import { createGame } from "@/lib/remote-game";
 import type { GameMode } from "@/lib/types";
 
@@ -16,7 +16,8 @@ const FELL: React.CSSProperties = {
 
 export default function CreateMultiGamePage() {
   const router = useRouter();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const preferred = usePreferredName();
   const [name, setName] = useState("");
   const [buyIn, setBuyIn] = useState(3);
   const [mode, setMode] = useState<GameMode>("winner");
@@ -24,12 +25,13 @@ export default function CreateMultiGamePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Prefill name from profile once it loads (only if user hasn't typed anything).
+  // Prefill name from profile or email-local-part once auth resolves
+  // (only if the user hasn't typed anything yet).
   useEffect(() => {
-    if (profile?.display_name && !name) {
-      setName(profile.display_name);
+    if (preferred && !name) {
+      setName(preferred);
     }
-  }, [profile?.display_name, name]);
+  }, [preferred, name]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();

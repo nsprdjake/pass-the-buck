@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, usePreferredName } from "@/context/AuthContext";
 import { joinGame } from "@/lib/remote-game";
 
 const RYE: React.CSSProperties = {
@@ -16,17 +16,18 @@ const FELL: React.CSSProperties = {
 function JoinForm() {
   const router = useRouter();
   const search = useSearchParams();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const preferred = usePreferredName();
   const [code, setCode] = useState(search.get("code")?.toUpperCase() ?? "");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (profile?.display_name && !name) {
-      setName(profile.display_name);
+    if (preferred && !name) {
+      setName(preferred);
     }
-  }, [profile?.display_name, name]);
+  }, [preferred, name]);
 
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();

@@ -43,7 +43,6 @@ function AuthScreen() {
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
@@ -71,7 +70,7 @@ function AuthScreen() {
         if (session) router.replace(next);
         else setError("Couldn't sign in. Try again.");
       } else {
-        const session = await signUp({ email, password, displayName });
+        const session = await signUp({ email, password });
         if (session) {
           // Auto-confirmed (no email gate): we're signed in.
           router.replace(next);
@@ -155,7 +154,7 @@ function AuthScreen() {
         >
           {mode === "signin"
             ? "Sign in to keep your name and game history with you across every device."
-            : "Pick a password and we'll remember you. No email round-trip required."}
+            : "Email and a password — that's it. You'll be in before you can shuffle the dice."}
         </p>
 
         {/* Mode toggle */}
@@ -197,33 +196,13 @@ function AuthScreen() {
             }}
           >
             <form onSubmit={handleSubmit} className="space-y-3 text-left">
-              {mode === "signup" && (
-                <Field
-                  label="Display Name"
-                  htmlFor="auth-name"
-                  hint="What people will see on the table (optional)"
-                >
-                  <input
-                    id="auth-name"
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    maxLength={20}
-                    autoComplete="username"
-                    placeholder="Belle, Doc, Whiskey-Jim…"
-                    className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
-                    style={FELL}
-                  />
-                </Field>
-              )}
-
               <Field label="Email" htmlFor="auth-email">
                 <input
                   id="auth-email"
                   type="email"
                   inputMode="email"
                   autoComplete="email"
-                  autoFocus={mode === "signin"}
+                  autoFocus
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

@@ -216,6 +216,20 @@ export function useAuth(): AuthValue {
   return v;
 }
 
+/**
+ * The user's preferred-to-display name. Order of preference:
+ *   1. The profile.display_name they explicitly chose
+ *   2. The part of their email before "@" (e.g. "jake" from jake@nsprd.com)
+ *   3. null — signed out
+ */
+export function usePreferredName(): string | null {
+  const { user, profile } = useAuth();
+  const explicit = profile?.display_name?.trim();
+  if (explicit) return explicit;
+  const fromEmail = user?.email?.split("@")[0];
+  return fromEmail?.trim() || null;
+}
+
 // Map a few common Supabase auth error messages into friendlier copy.
 function prettifyAuthError(msg: string): string {
   const lc = msg.toLowerCase();

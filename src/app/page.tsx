@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, usePreferredName } from "@/context/AuthContext";
 import { useLocalGame } from "@/context/LocalGameContext";
 import Buck from "@/components/Buck";
 
@@ -52,9 +52,9 @@ function Flourish({ className = "" }: { className?: string }) {
 
 export default function Home() {
   const { status, players } = useLocalGame();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const howdy = usePreferredName();
   const inProgress = status === "active" && players.length > 0;
-  const howdy = profile?.display_name || user?.email?.split("@")[0] || null;
 
   return (
     <main className="felt-saloon relative min-h-[100dvh] overflow-hidden">
