@@ -29,7 +29,7 @@ export default function HowToPlayPage() {
         <div className="mb-6 grid grid-cols-[1fr_auto_1fr] items-center">
           <Link
             href="/"
-            className="justify-self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 transition-colors hover:text-[#ffd17a]"
+            className="justify-self-start text-[0.78rem] font-bold text-[var(--parchment-light)]/75 transition-colors hover:text-[var(--accent-light)]"
             style={FELL}
           >
             ← Back
@@ -39,9 +39,9 @@ export default function HowToPlayPage() {
             style={{
               ...RYE,
               fontSize: "clamp(1.6rem, 6.5vw, 2.1rem)",
-              color: "#f4e4b7",
+              color: "var(--parchment-light)",
               textShadow:
-                "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
+                "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
               letterSpacing: "0.02em",
             }}
           >
@@ -52,7 +52,7 @@ export default function HowToPlayPage() {
 
         {/* Eyebrow */}
         <p
-          className="mb-7 text-center text-[0.95rem] italic leading-snug text-[#f4e4b7]/80"
+          className="mb-7 text-center text-[0.95rem] italic leading-snug text-[var(--parchment-light)]/80"
           style={FELL}
         >
           Three dice, a fistful of eyeBucks, and a saloon&apos;s worth of
@@ -141,7 +141,7 @@ export default function HowToPlayPage() {
         </div>
 
         <ModeCard
-          accent="#ffd17a"
+          accent="var(--accent-light)"
           title="Last eyeBuck Wins"
           subtitle="Sole champion takes the pot"
           body={
@@ -151,7 +151,7 @@ export default function HowToPlayPage() {
               eyeBucks — root for ✱ (keep) and pray the dice don&apos;t move.
               <br />
               <br />
-              <span className="text-[#f4e4b7]/60">
+              <span className="text-[var(--parchment-light)]/60">
                 Optional: ante real cash before you start — a buck a buy-in,
                 a five, whatever — and settle up at the end. Exchange in
                 person or send it digitally on your word. The eyeBucks
@@ -178,7 +178,7 @@ export default function HowToPlayPage() {
         />
 
         <p
-          className="mt-6 text-center text-[0.82rem] italic leading-snug text-[#f4e4b7]/55"
+          className="mt-6 text-center text-[0.82rem] italic leading-snug text-[var(--parchment-light)]/55"
           style={FELL}
         >
           The mechanics never change. Only who&apos;s the hero and who&apos;s
@@ -189,10 +189,10 @@ export default function HowToPlayPage() {
         <div className="mt-8 flex flex-col gap-3">
           <Link
             href="/lobby"
-            className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-4 text-center transition-transform active:scale-[0.985]"
+            className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-4 text-center transition-transform active:scale-[0.985]"
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
               style={{
                 ...RYE,
                 letterSpacing: "0.22em",
@@ -202,7 +202,7 @@ export default function HowToPlayPage() {
               Saddle Up
             </span>
             <span
-              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-dark)]/75"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               Pass-and-play right here
@@ -210,7 +210,7 @@ export default function HowToPlayPage() {
           </Link>
           <Link
             href="/multi"
-            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#c99a33]/55 py-3.5 text-center transition-colors hover:border-[#ffd17a]/80 active:scale-[0.985]"
+            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-mid)]/55 py-3.5 text-center transition-colors hover:border-[var(--accent-light)]/80 active:scale-[0.985]"
             style={{
               background:
                 "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",
@@ -219,7 +219,7 @@ export default function HowToPlayPage() {
             }}
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[#f4e4b7]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--parchment-light)]"
               style={{
                 ...RYE,
                 letterSpacing: "0.22em",
@@ -260,7 +260,7 @@ function SectionTitle({
   return (
     <div className="mb-4 text-center">
       <div
-        className="text-[0.6rem] uppercase text-[#f4e4b7]/55"
+        className="text-[0.6rem] uppercase text-[var(--parchment-light)]/55"
         style={{ ...FELL, letterSpacing: "0.4em" }}
       >
         {eyebrow}
@@ -269,15 +269,15 @@ function SectionTitle({
         className="mt-1 text-[1.45rem]"
         style={{
           ...RYE,
-          color: "#f4e4b7",
-          textShadow: "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45)",
+          color: "var(--parchment-light)",
+          textShadow: "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45)",
           letterSpacing: "0.02em",
         }}
       >
         {title}
       </h2>
       <div className="mt-2 flex justify-center">
-        <div className="h-px w-20 bg-[#c99a33]/40" />
+        <div className="h-px w-20 bg-[var(--accent-mid)]/40" />
       </div>
     </div>
   );
@@ -297,7 +297,7 @@ function Step({
 }) {
   return (
     <section
-      className="relative mb-3 rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-4"
+      className="relative mb-3 rounded-[16px] border-[1.5px] border-[var(--accent-mid)]/35 p-4"
       style={{
         background:
           "linear-gradient(180deg, rgba(10,40,28,0.65) 0%, rgba(5,28,20,0.78) 100%)",
@@ -307,11 +307,11 @@ function Step({
     >
       <div className="flex items-start gap-3">
         <div
-          className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-[1rem] font-bold text-[#2a1a0a]"
+          className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-[1rem] font-bold text-[var(--wood-dark)]"
           style={{
             background:
               "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)",
-            border: "1.5px solid #7a5a18",
+            border: "1.5px solid var(--accent-dark)",
             boxShadow:
               "0 1px 0 rgba(255,240,200,0.75) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 3px 8px rgba(0,0,0,0.45)",
             ...RYE,
@@ -325,7 +325,7 @@ function Step({
             className="text-[1.05rem]"
             style={{
               ...RYE,
-              color: "#ffd17a",
+              color: "var(--accent-light)",
               letterSpacing: "0.04em",
               textShadow: "0 2px 0 rgba(0,0,0,0.5)",
             }}
@@ -333,7 +333,7 @@ function Step({
             {heading}
           </h3>
           <p
-            className="mt-1 text-[0.92rem] leading-snug text-[#f4e4b7]/85"
+            className="mt-1 text-[0.92rem] leading-snug text-[var(--parchment-light)]/85"
             style={FELL}
           >
             {body}
@@ -387,13 +387,13 @@ function ModeCard({
         {title}
       </h3>
       <p
-        className="text-[0.62rem] uppercase text-[#f4e4b7]/55"
+        className="text-[0.62rem] uppercase text-[var(--parchment-light)]/55"
         style={{ ...FELL, letterSpacing: "0.32em" }}
       >
         {subtitle}
       </p>
       <p
-        className="mt-2 text-[0.92rem] leading-snug text-[#f4e4b7]/85"
+        className="mt-2 text-[0.92rem] leading-snug text-[var(--parchment-light)]/85"
         style={FELL}
       >
         {body}
@@ -402,9 +402,9 @@ function ModeCard({
         className="mx-auto mt-3 inline-block rounded-[8px] border-[1.5px] px-3 py-1 text-[0.78rem] italic"
         style={{
           background:
-            "linear-gradient(180deg, #fdf2ce 0%, #f1dfa3 60%, #d6b87a 100%)",
-          borderColor: "#5c3b1e",
-          color: "#2a1a0a",
+            "linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment-mid) 60%, var(--parchment-dark) 100%)",
+          borderColor: "var(--wood-mid)",
+          color: "var(--wood-dark)",
           boxShadow: "0 1px 0 rgba(255,240,210,0.55) inset",
         }}
       >
@@ -452,9 +452,9 @@ function DieFacesGrid() {
       {rows.map(({ outcome, label, body, Icon }) => (
         <li key={label} className="flex items-center gap-3">
           <Die size={42} outcome={outcome} />
-          <Icon size={18} color="#f4e4b7" />
+          <Icon size={18} color="var(--parchment-light)" />
           <span
-            className="flex-1 text-[0.85rem] leading-snug text-[#f4e4b7]/85"
+            className="flex-1 text-[0.85rem] leading-snug text-[var(--parchment-light)]/85"
             style={FELL}
           >
             {body}
@@ -469,7 +469,7 @@ function DieFacesGrid() {
 function Currency() {
   return (
     <span
-      className="font-bold text-[#ffd17a]"
+      className="font-bold text-[var(--accent-light)]"
       style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
     >
       eyeBucks
@@ -479,6 +479,6 @@ function Currency() {
 
 function Em({ children }: { children: React.ReactNode }) {
   return (
-    <span className="font-bold italic text-[#ffd17a]">{children}</span>
+    <span className="font-bold italic text-[var(--accent-light)]">{children}</span>
   );
 }

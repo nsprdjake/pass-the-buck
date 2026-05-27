@@ -91,7 +91,7 @@ export default function LobbyPage() {
         <div className="mb-6 grid grid-cols-[1fr_auto_1fr] items-center">
           <Link
             href="/"
-            className="justify-self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 hover:text-[#ffd17a] transition-colors"
+            className="justify-self-start text-[0.78rem] font-bold text-[var(--parchment-light)]/75 hover:text-[var(--accent-light)] transition-colors"
             style={FELL}
           >
             ← Back
@@ -101,9 +101,9 @@ export default function LobbyPage() {
             style={{
               ...RYE,
               fontSize: "clamp(1.75rem, 7vw, 2.25rem)",
-              color: "#f4e4b7",
+              color: "var(--parchment-light)",
               textShadow:
-                "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
+                "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
               letterSpacing: "0.02em",
             }}
           >
@@ -111,7 +111,7 @@ export default function LobbyPage() {
           </h1>
           <button
             onClick={newGame}
-            className="justify-self-end text-[0.66rem] font-bold uppercase text-[#f4e4b7]/55 hover:text-[#ffd17a] transition-colors"
+            className="justify-self-end text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/55 hover:text-[var(--accent-light)] transition-colors"
             style={{ ...FELL, letterSpacing: "0.36em" }}
             title="Clear all players"
           >
@@ -124,7 +124,7 @@ export default function LobbyPage() {
         <Panel className="mb-4">
           <div className="mb-3 flex items-center justify-between">
             <label
-              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               The Stakes
@@ -148,12 +148,12 @@ export default function LobbyPage() {
 
           <div className="mt-4">
             <label
-              className="mb-2 block text-[0.6rem] font-bold uppercase text-[#f4e4b7]/55"
+              className="mb-2 block text-[0.6rem] font-bold uppercase text-[var(--parchment-light)]/55"
               htmlFor="wager-input"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               {mode === "loser" ? "The Tab" : "Side Wager"}{" "}
-              <span className="text-[#f4e4b7]/35">(optional)</span>
+              <span className="text-[var(--parchment-light)]/35">(optional)</span>
             </label>
             <input
               id="wager-input"
@@ -166,7 +166,7 @@ export default function LobbyPage() {
                   : "Winner takes the bottle"
               }
               maxLength={80}
-              className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
+              className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[var(--wood-dark)] placeholder-[var(--wood-mid)]/55 focus:outline-none"
               style={FELL}
             />
           </div>
@@ -179,7 +179,7 @@ export default function LobbyPage() {
         <Panel className="mb-4">
           <div className="mb-3 flex items-center justify-between">
             <label
-              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               Buy-in
@@ -188,7 +188,7 @@ export default function LobbyPage() {
               className="text-[1.15rem]"
               style={{
                 ...RYE,
-                color: "#ffd17a",
+                color: "var(--accent-light)",
                 textShadow: "0 1px 0 rgba(0,0,0,0.55)",
               }}
             >
@@ -210,7 +210,7 @@ export default function LobbyPage() {
             }
           />
           <p
-            className="mt-3 text-[0.82rem] italic leading-snug text-[#f4e4b7]/60"
+            className="mt-3 text-[0.82rem] italic leading-snug text-[var(--parchment-light)]/60"
             style={FELL}
           >
             Sets the pot prize and game length. Each rider starts with this
@@ -234,7 +234,7 @@ export default function LobbyPage() {
               }
               maxLength={20}
               disabled={players.length >= MAX_PLAYERS}
-              className="parchment-input flex-1 rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none disabled:opacity-40"
+              className="parchment-input flex-1 rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[var(--wood-dark)] placeholder-[var(--wood-mid)]/55 focus:outline-none disabled:opacity-40"
               style={{
                 fontFamily: "var(--font-fell), Georgia, serif",
                 letterSpacing: "0.01em",
@@ -243,7 +243,7 @@ export default function LobbyPage() {
             <button
               type="submit"
               disabled={!name.trim() || players.length >= MAX_PLAYERS}
-              className="brass-mini-button px-5 text-[0.85rem] font-bold uppercase text-[#2a1a0a] disabled:cursor-not-allowed disabled:opacity-40"
+              className="brass-mini-button px-5 text-[0.85rem] font-bold uppercase text-[var(--wood-dark)] disabled:cursor-not-allowed disabled:opacity-40"
               style={{ ...RYE, letterSpacing: "0.18em" }}
             >
               Add
@@ -253,13 +253,13 @@ export default function LobbyPage() {
           <div className="mt-5">
             <div className="mb-3 flex items-center justify-between">
               <h2
-                className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+                className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 At the Table
               </h2>
               <span
-                className="text-[0.7rem] font-bold text-[#f4e4b7]/55"
+                className="text-[0.7rem] font-bold text-[var(--parchment-light)]/55"
                 style={{ ...FELL, letterSpacing: "0.18em" }}
               >
                 {players.length}/{MAX_PLAYERS}
@@ -268,7 +268,7 @@ export default function LobbyPage() {
 
             {players.length === 0 ? (
               <div
-                className="rounded-[10px] border border-dashed border-[#c99a33]/30 py-7 text-center text-[0.88rem] italic text-[#f4e4b7]/55"
+                className="rounded-[10px] border border-dashed border-[var(--accent-mid)]/30 py-7 text-center text-[0.88rem] italic text-[var(--parchment-light)]/55"
                 style={FELL}
               >
                 Need at least {MIN_PLAYERS} riders to deal.
@@ -284,7 +284,7 @@ export default function LobbyPage() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, x: 40, scale: 0.9 }}
                       transition={{ duration: 0.18 }}
-                      className="parchment relative flex items-center gap-3 overflow-hidden rounded-[10px] border-[1.5px] border-[#5c3b1e] px-3 py-2"
+                      className="parchment relative flex items-center gap-3 overflow-hidden rounded-[10px] border-[1.5px] border-[var(--wood-mid)] px-3 py-2"
                       style={{
                         boxShadow:
                           "0 1px 0 rgba(255,240,210,0.55) inset, 0 -1px 0 rgba(101,67,33,0.18) inset, 0 4px 12px rgba(0,0,0,0.35)",
@@ -295,7 +295,7 @@ export default function LobbyPage() {
                         style={{
                           backgroundColor: p.color,
                           boxShadow:
-                            "0 0 0 1.5px #ffd17a, 0 0 0 2.5px #5c3b1e, 0 2px 4px rgba(0,0,0,0.4)",
+                            "0 0 0 1.5px var(--accent-light), 0 0 0 2.5px var(--wood-mid), 0 2px 4px rgba(0,0,0,0.4)",
                           ...RYE,
                         }}
                       >
@@ -303,13 +303,13 @@ export default function LobbyPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div
-                          className="truncate text-[0.95rem] font-bold text-[#2a1a0a]"
+                          className="truncate text-[0.95rem] font-bold text-[var(--wood-dark)]"
                           style={RYE}
                         >
                           {p.name}
                         </div>
                         <div
-                          className="text-[0.6rem] font-bold uppercase text-[#5c3b1e]/70"
+                          className="text-[0.6rem] font-bold uppercase text-[var(--wood-mid)]/70"
                           style={{ ...FELL, letterSpacing: "0.32em" }}
                         >
                           Seat {i + 1}
@@ -317,7 +317,7 @@ export default function LobbyPage() {
                       </div>
                       <button
                         onClick={() => removePlayer(p.id)}
-                        className="px-2 text-xl font-black text-[#5c3b1e]/55 hover:text-[#8b2222] transition-colors"
+                        className="px-2 text-xl font-black text-[var(--wood-mid)]/55 hover:text-[#8b2222] transition-colors"
                         aria-label={`Remove ${p.name}`}
                       >
                         ×
@@ -334,10 +334,10 @@ export default function LobbyPage() {
         <button
           onClick={handleStart}
           disabled={!canStart}
-          className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-4 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
+          className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-4 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
         >
           <span
-            className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+            className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
             style={{
               ...RYE,
               letterSpacing: "0.22em",
@@ -350,7 +350,7 @@ export default function LobbyPage() {
           </span>
           {canStart && (
             <span
-              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-dark)]/75"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               {mode === "loser"
@@ -361,7 +361,7 @@ export default function LobbyPage() {
         </button>
 
         <p
-          className="mt-5 text-center text-[0.78rem] italic text-[#f4e4b7]/55"
+          className="mt-5 text-center text-[0.78rem] italic text-[var(--parchment-light)]/55"
           style={FELL}
         >
           Pass-and-play on one device. No accounts, no setup.
@@ -377,8 +377,8 @@ export default function LobbyPage() {
           height: 6px;
           background: linear-gradient(
             90deg,
-            #c99a33 0%,
-            #c99a33 var(--fill, 50%),
+            var(--accent-mid) 0%,
+            var(--accent-mid) var(--fill, 50%),
             rgba(244, 228, 183, 0.18) var(--fill, 50%),
             rgba(244, 228, 183, 0.18) 100%
           );
@@ -398,7 +398,7 @@ export default function LobbyPage() {
             #d8a93b 55%,
             #8a6720 100%
           );
-          border: 1.5px solid #5c3b1e;
+          border: 1.5px solid var(--wood-mid);
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55),
             0 0 0 1px rgba(255, 240, 200, 0.4) inset;
           cursor: grab;
@@ -413,25 +413,25 @@ export default function LobbyPage() {
             #d8a93b 55%,
             #8a6720 100%
           );
-          border: 1.5px solid #5c3b1e;
+          border: 1.5px solid var(--wood-mid);
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
           cursor: grab;
         }
         :global(.parchment-input) {
           background: linear-gradient(
             180deg,
-            #fdf2ce 0%,
-            #f1dfa3 60%,
-            #d6b87a 100%
+            var(--parchment-light) 0%,
+            var(--parchment-mid) 60%,
+            var(--parchment-dark) 100%
           );
-          border: 1.5px solid #5c3b1e;
+          border: 1.5px solid var(--wood-mid);
           box-shadow: 0 1px 0 rgba(255, 240, 210, 0.55) inset,
             0 -1px 0 rgba(101, 67, 33, 0.18) inset,
             0 3px 10px rgba(0, 0, 0, 0.35);
           transition: box-shadow 0.15s ease;
         }
         :global(.parchment-input:focus) {
-          box-shadow: 0 0 0 2px #ffd17a,
+          box-shadow: 0 0 0 2px var(--accent-light),
             0 1px 0 rgba(255, 240, 210, 0.55) inset,
             0 3px 10px rgba(0, 0, 0, 0.4);
         }
@@ -442,7 +442,7 @@ export default function LobbyPage() {
             #d8a93b 48%,
             #a07a22 100%
           );
-          border: 1.5px solid #7a5a18;
+          border: 1.5px solid var(--accent-dark);
           border-radius: 10px;
           box-shadow: 0 1px 0 rgba(255, 240, 200, 0.75) inset,
             0 -2px 0 rgba(60, 40, 8, 0.35) inset,
@@ -504,7 +504,7 @@ function ModeOption({
         background: active
           ? "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)"
           : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
-        border: `1.5px solid ${active ? "#7a5a18" : "rgba(201,154,51,0.4)"}`,
+        border: `1.5px solid ${active ? "var(--accent-dark)" : "rgba(201,154,51,0.4)"}`,
         boxShadow: active
           ? "0 1px 0 rgba(255,240,200,0.75) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 4px 14px rgba(0,0,0,0.5)"
           : "0 1px 0 rgba(244,228,183,0.05) inset, 0 4px 10px rgba(0,0,0,0.35)",
@@ -512,7 +512,7 @@ function ModeOption({
     >
       <div
         className={`text-[0.78rem] font-bold uppercase leading-tight ${
-          active ? "text-[#2a1a0a]" : "text-[#f4e4b7]"
+          active ? "text-[var(--wood-dark)]" : "text-[var(--parchment-light)]"
         }`}
         style={{
           fontFamily: "var(--font-rye), Georgia, serif",
@@ -526,7 +526,7 @@ function ModeOption({
       </div>
       <div
         className={`mt-1 text-[0.62rem] italic leading-snug ${
-          active ? "text-[#2a1a0a]/75" : "text-[#f4e4b7]/55"
+          active ? "text-[var(--wood-dark)]/75" : "text-[var(--parchment-light)]/55"
         }`}
         style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
       >
@@ -546,7 +546,7 @@ function Panel({
 }) {
   return (
     <section
-      className={`relative rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-4 ${className}`}
+      className={`relative rounded-[16px] border-[1.5px] border-[var(--accent-mid)]/35 p-4 ${className}`}
       style={{
         background:
           "linear-gradient(180deg, rgba(10,40,28,0.65) 0%, rgba(5,28,20,0.78) 100%)",

@@ -374,8 +374,8 @@ export default function ActiveGameView() {
       <div
         className="wood-grain relative z-20 flex items-center justify-center px-4 py-2"
         style={{
-          borderTop: "3px solid #2a1a0a",
-          borderBottom: "3px solid #2a1a0a",
+          borderTop: "3px solid var(--wood-dark)",
+          borderBottom: "3px solid var(--wood-dark)",
           boxShadow:
             "inset 0 2px 0 rgba(255,225,170,0.12), inset 0 -2px 0 rgba(0,0,0,0.5), 0 6px 12px rgba(0,0,0,0.45)",
         }}
@@ -430,7 +430,7 @@ export default function ActiveGameView() {
           >
             <div
               className="text-[10px] uppercase tracking-[0.4em]"
-              style={{ fontFamily: "var(--font-fell), Georgia, serif", color: "#f4e4b7", opacity: 0.75 }}
+              style={{ fontFamily: "var(--font-fell), Georgia, serif", color: "var(--parchment-light)", opacity: 0.75 }}
             >
               {isMyTurn ? "yer turn, partner" : "now rollin'"}
             </div>
@@ -593,7 +593,7 @@ export default function ActiveGameView() {
                 className="wood-grain w-full px-6 py-5 text-center relative"
                 style={{
                   borderRadius: 10,
-                  border: "3px solid #2a1a0a",
+                  border: "3px solid var(--wood-dark)",
                   boxShadow:
                     "inset 0 2px 0 rgba(255,255,255,0.12), inset 0 -3px 0 rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.5)",
                 }}
@@ -602,7 +602,7 @@ export default function ActiveGameView() {
                   className="text-[10px] uppercase tracking-[0.4em] text-parchment"
                   style={{
                     fontFamily: "var(--font-fell), Georgia, serif",
-                    color: "#f4e4b7",
+                    color: "var(--parchment-light)",
                     opacity: 0.8,
                   }}
                 >
@@ -622,7 +622,7 @@ export default function ActiveGameView() {
                 <div
                   className="text-[11px] uppercase tracking-widest mt-1"
                   style={{
-                    color: "#f4e4b7",
+                    color: "var(--parchment-light)",
                     opacity: 0.7,
                     fontFamily: "var(--font-fell), Georgia, serif",
                   }}
@@ -644,12 +644,12 @@ export default function ActiveGameView() {
                   className="mt-3 w-full flex items-center justify-center gap-2 py-3 disabled:cursor-not-allowed"
                   style={{
                     borderRadius: 8,
-                    border: "2px solid #2a1a0a",
+                    border: "2px solid var(--wood-dark)",
                     background: canSkipBroke
                       ? "linear-gradient(180deg, #6b1f1f 0%, #3a0a0a 100%)"
-                      : "linear-gradient(180deg, #3a2410 0%, #2a1a0a 100%)",
+                      : "linear-gradient(180deg, var(--ink) 0%, var(--wood-dark) 100%)",
                     boxShadow: canSkipBroke
-                      ? "0 4px 0 #2a1a0a, 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,225,170,0.18)"
+                      ? "0 4px 0 var(--wood-dark), 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,225,170,0.18)"
                       : "0 2px 0 #1a0c04, 0 2px 6px rgba(0,0,0,0.45)",
                     opacity: canSkipBroke ? 1 : 0.6,
                   }}
@@ -661,7 +661,7 @@ export default function ActiveGameView() {
                       color: "#FFE3A0",
                       fontSize: 16,
                       letterSpacing: "0.04em",
-                      textShadow: "0 1px 0 #2a1a0a",
+                      textShadow: "0 1px 0 var(--wood-dark)",
                     }}
                   >
                     {skipping
@@ -677,12 +677,12 @@ export default function ActiveGameView() {
                   className="mt-3 w-full flex items-center justify-center gap-2 py-3 disabled:cursor-not-allowed"
                   style={{
                     borderRadius: 8,
-                    border: "2px solid #2a1a0a",
+                    border: "2px solid var(--wood-dark)",
                     background: canNudge
                       ? "linear-gradient(180deg, #a16207 0%, #6b4209 100%)"
-                      : "linear-gradient(180deg, #3a2410 0%, #2a1a0a 100%)",
+                      : "linear-gradient(180deg, var(--ink) 0%, var(--wood-dark) 100%)",
                     boxShadow: canNudge
-                      ? "0 4px 0 #2a1a0a, 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,225,170,0.25)"
+                      ? "0 4px 0 var(--wood-dark), 0 6px 14px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,225,170,0.25)"
                       : "0 2px 0 #1a0c04, 0 2px 6px rgba(0,0,0,0.45)",
                     opacity: canNudge ? 1 : 0.55,
                   }}
@@ -694,7 +694,7 @@ export default function ActiveGameView() {
                       color: "#FFE3A0",
                       fontSize: 16,
                       letterSpacing: "0.04em",
-                      textShadow: "0 1px 0 #2a1a0a",
+                      textShadow: "0 1px 0 var(--wood-dark)",
                     }}
                   >
                     {nudgeCooldownRemaining > 0
@@ -782,7 +782,7 @@ export default function ActiveGameView() {
               transition={{ duration: 0.5, times: [0, 0.4, 0.6, 0.8, 1] }}
               className="parchment relative px-6 pt-3 pb-4 text-center"
               style={{
-                border: "3px solid #2a1a0a",
+                border: "3px solid var(--wood-dark)",
                 borderRadius: 4,
                 boxShadow:
                   "0 14px 32px rgba(0,0,0,0.6), 0 0 60px rgba(255,227,160,0.55)",
@@ -794,7 +794,7 @@ export default function ActiveGameView() {
                 <span
                   style={{
                     fontFamily: "var(--font-rye), Georgia, serif",
-                    color: "#2a1a0a",
+                    color: "var(--wood-dark)",
                     fontSize: 26,
                   }}
                 >
@@ -806,7 +806,7 @@ export default function ActiveGameView() {
                 className="mt-1 text-sm"
                 style={{
                   fontFamily: "var(--font-fell), Georgia, serif",
-                  color: "#2a1a0a",
+                  color: "var(--wood-dark)",
                 }}
               >
                 <span className="italic opacity-70">from </span>
@@ -821,7 +821,7 @@ export default function ActiveGameView() {
                 className="mt-1 text-[10px] uppercase tracking-[0.3em]"
                 style={{
                   fontFamily: "var(--font-fell), Georgia, serif",
-                  color: "#2a1a0a",
+                  color: "var(--wood-dark)",
                   opacity: 0.6,
                 }}
               >

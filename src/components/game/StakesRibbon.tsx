@@ -29,13 +29,13 @@ export default function StakesRibbon({
         style={{
           background:
             "linear-gradient(180deg, rgba(244,228,183,0.92) 0%, rgba(217,194,149,0.92) 100%)",
-          borderColor: "#5c3b1e",
+          borderColor: "var(--wood-mid)",
           boxShadow:
             "0 1px 0 rgba(255,240,210,0.6) inset, 0 2px 6px rgba(0,0,0,0.45)",
         }}
       >
         <span
-          className="text-[0.6rem] font-bold uppercase text-[#2a1a0a]"
+          className="text-[0.6rem] font-bold uppercase text-[var(--wood-dark)]"
           style={{
             fontFamily: "var(--font-rye), Georgia, serif",
             letterSpacing: "0.22em",
@@ -43,11 +43,11 @@ export default function StakesRibbon({
         >
           {label}
         </span>
-        <span aria-hidden className="text-[0.55rem] text-[#5c3b1e]/70">
+        <span aria-hidden className="text-[0.55rem] text-[var(--wood-mid)]/70">
           ✸
         </span>
         <span
-          className="truncate text-[0.7rem] italic text-[#5c3b1e]"
+          className="truncate text-[0.7rem] italic text-[var(--wood-mid)]"
           style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
         >
           {tail}

@@ -255,7 +255,7 @@ export default function ProfilePage() {
   if (loading || !user) {
     return (
       <main className="felt-saloon flex min-h-[100dvh] items-center justify-center">
-        <div className="text-[#f4e4b7]/65" style={FELL}>Loading…</div>
+        <div className="text-[var(--parchment-light)]/65" style={FELL}>Loading…</div>
       </main>
     );
   }
@@ -275,7 +275,7 @@ export default function ProfilePage() {
         <div className="mb-6 grid grid-cols-[1fr_auto_1fr] items-center">
           <Link
             href="/"
-            className="justify-self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 transition-colors hover:text-[#ffd17a]"
+            className="justify-self-start text-[0.78rem] font-bold text-[var(--parchment-light)]/75 transition-colors hover:text-[var(--accent-light)]"
             style={FELL}
           >
             ← Back
@@ -285,9 +285,9 @@ export default function ProfilePage() {
             style={{
               ...RYE,
               fontSize: "clamp(1.6rem, 6.5vw, 2.1rem)",
-              color: "#f4e4b7",
+              color: "var(--parchment-light)",
               textShadow:
-                "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
+                "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
               letterSpacing: "0.02em",
             }}
           >
@@ -298,7 +298,7 @@ export default function ProfilePage() {
               await signOut();
               router.replace("/");
             }}
-            className="justify-self-end text-[0.66rem] font-bold uppercase text-[#f4e4b7]/55 transition-colors hover:text-[#ffd17a]"
+            className="justify-self-end text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/55 transition-colors hover:text-[var(--accent-light)]"
             style={{ ...FELL, letterSpacing: "0.36em" }}
           >
             Sign Out
@@ -307,7 +307,7 @@ export default function ProfilePage() {
 
         {/* Wallet — a tiny ledger card showing eyeBuck balance */}
         <section
-          className="mb-4 relative overflow-hidden rounded-[16px] border-[1.5px] border-[#c99a33]/50 p-4"
+          className="mb-4 relative overflow-hidden rounded-[16px] border-[1.5px] border-[var(--accent-mid)]/50 p-4"
           style={{
             background:
               "linear-gradient(180deg, rgba(45,30,8,0.85) 0%, rgba(20,12,4,0.92) 100%)",
@@ -321,13 +321,13 @@ export default function ProfilePage() {
             className="absolute inset-x-0 top-0 h-0.5"
             style={{
               background:
-                "linear-gradient(90deg, transparent, #ffd17a, transparent)",
+                "linear-gradient(90deg, transparent, var(--accent-light), transparent)",
             }}
           />
           <div className="flex items-center justify-between">
             <div>
               <div
-                className="text-[0.6rem] uppercase text-[#f4e4b7]/55"
+                className="text-[0.6rem] uppercase text-[var(--parchment-light)]/55"
                 style={{ ...FELL, letterSpacing: "0.4em" }}
               >
                 Wallet
@@ -340,13 +340,13 @@ export default function ProfilePage() {
                   className="text-[2.4rem] leading-none text-[var(--accent-text)]"
                   style={{
                     textShadow:
-                      "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.55)",
+                      "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.55)",
                   }}
                 >
                   {(profile?.balance ?? 0).toLocaleString()}
                 </span>
                 <span
-                  className="text-[0.78rem] uppercase text-[#f4e4b7]/65"
+                  className="text-[0.78rem] uppercase text-[var(--parchment-light)]/65"
                   style={{ ...FELL, letterSpacing: "0.24em" }}
                 >
                   eyeBucks
@@ -358,7 +358,7 @@ export default function ProfilePage() {
             </div>
           </div>
           <p
-            className="mt-3 text-[0.78rem] italic leading-snug text-[#f4e4b7]/55"
+            className="mt-3 text-[0.78rem] italic leading-snug text-[var(--parchment-light)]/55"
             style={FELL}
           >
             Earn eyeBucks by winning cross-device hands. Save &apos;em for
@@ -371,13 +371,13 @@ export default function ProfilePage() {
           <Panel className="mb-4">
             <div className="mb-3 flex items-baseline justify-between">
               <h2
-                className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+                className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 The Record
               </h2>
               <span
-                className="text-[0.62rem] italic text-[#f4e4b7]/45"
+                className="text-[0.62rem] italic text-[var(--parchment-light)]/45"
                 style={FELL}
               >
                 Across all hands
@@ -402,7 +402,7 @@ export default function ProfilePage() {
             </div>
             {stats.current_streak >= 2 && (
               <div
-                className="mt-3 rounded-[10px] border-[1.5px] border-[#ffd17a]/45 bg-[#ffd17a]/10 px-3 py-2 text-center text-[0.78rem] font-bold uppercase text-[#ffd17a]"
+                className="mt-3 rounded-[10px] border-[1.5px] border-[var(--accent-light)]/45 bg-[var(--accent-light)]/10 px-3 py-2 text-center text-[0.78rem] font-bold uppercase text-[var(--accent-light)]"
                 style={{ ...FELL, letterSpacing: "0.22em" }}
               >
                 🔥 On a {stats.current_streak}-win heater
@@ -417,7 +417,7 @@ export default function ProfilePage() {
             <div>
               <label
                 htmlFor="profile-name"
-                className="mb-2 block text-[0.62rem] font-bold uppercase text-[#f4e4b7]/65"
+                className="mb-2 block text-[0.62rem] font-bold uppercase text-[var(--parchment-light)]/65"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 Display Name
@@ -429,11 +429,11 @@ export default function ProfilePage() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="What should we call you?"
                 maxLength={20}
-                className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
+                className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[var(--wood-dark)] placeholder-[var(--wood-mid)]/55 focus:outline-none"
                 style={FELL}
               />
               <p
-                className="mt-2 text-[0.72rem] italic text-[#f4e4b7]/55"
+                className="mt-2 text-[0.72rem] italic text-[var(--parchment-light)]/55"
                 style={FELL}
               >
                 {user.email ?? user.phone ?? "signed in"}
@@ -442,7 +442,7 @@ export default function ProfilePage() {
 
             <div>
               <label
-                className="mb-2 block text-[0.62rem] font-bold uppercase text-[#f4e4b7]/65"
+                className="mb-2 block text-[0.62rem] font-bold uppercase text-[var(--parchment-light)]/65"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 Color
@@ -459,7 +459,7 @@ export default function ProfilePage() {
                       backgroundColor: c,
                       boxShadow:
                         c === color
-                          ? "0 0 0 2px #ffd17a, 0 0 0 4px #5c3b1e, 0 4px 10px rgba(0,0,0,0.45)"
+                          ? "0 0 0 2px var(--accent-light), 0 0 0 4px var(--wood-mid), 0 4px 10px rgba(0,0,0,0.45)"
                           : "0 0 0 1.5px rgba(92,59,30,0.6), 0 2px 6px rgba(0,0,0,0.35)",
                     }}
                   />
@@ -470,10 +470,10 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-3.5 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
+              className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-3.5 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
             >
               <span
-                className="relative block text-[0.95rem] font-bold uppercase text-[#2a1a0a]"
+                className="relative block text-[0.95rem] font-bold uppercase text-[var(--wood-dark)]"
                 style={{
                   ...RYE,
                   letterSpacing: "0.22em",
@@ -498,13 +498,13 @@ export default function ProfilePage() {
         <Panel className="mb-4">
           <div className="mb-3 flex items-baseline justify-between">
             <h2
-              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               Themes
             </h2>
             <span
-              className="text-[0.62rem] italic text-[#f4e4b7]/45"
+              className="text-[0.62rem] italic text-[var(--parchment-light)]/45"
               style={FELL}
             >
               Buy with eyeBucks
@@ -512,7 +512,7 @@ export default function ProfilePage() {
           </div>
           {themes === null ? (
             <div
-              className="py-5 text-center text-[0.85rem] italic text-[#f4e4b7]/50"
+              className="py-5 text-center text-[0.85rem] italic text-[var(--parchment-light)]/50"
               style={FELL}
             >
               Loading the catalog…
@@ -541,9 +541,9 @@ export default function ProfilePage() {
                     {/* Preview swatch */}
                     <div
                       aria-hidden
-                      className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-[8px] border-[1.5px] border-[#5c3b1e]"
+                      className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-[8px] border-[1.5px] border-[var(--wood-mid)]"
                       style={{
-                        background: preview?.bg ?? "#0a4d33",
+                        background: preview?.bg ?? "var(--felt-mid)",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.45)",
                       }}
                     >
@@ -561,14 +561,14 @@ export default function ProfilePage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span
-                          className="truncate text-[0.95rem] font-bold text-[#f4e4b7]"
+                          className="truncate text-[0.95rem] font-bold text-[var(--parchment-light)]"
                           style={RYE}
                         >
                           {t.name}
                         </span>
                         {isActive && (
                           <span
-                            className="rounded-full border border-[#ffd17a]/65 bg-[#ffd17a]/15 px-1.5 py-0.5 text-[0.55rem] font-bold uppercase text-[#ffd17a]"
+                            className="rounded-full border border-[var(--accent-light)]/65 bg-[var(--accent-light)]/15 px-1.5 py-0.5 text-[0.55rem] font-bold uppercase text-[var(--accent-light)]"
                             style={{ ...FELL, letterSpacing: "0.24em" }}
                           >
                             Active
@@ -576,7 +576,7 @@ export default function ProfilePage() {
                         )}
                       </div>
                       <div
-                        className="mt-0.5 truncate text-[0.72rem] italic text-[#f4e4b7]/55"
+                        className="mt-0.5 truncate text-[0.72rem] italic text-[var(--parchment-light)]/55"
                         style={FELL}
                       >
                         {t.tagline}
@@ -589,7 +589,7 @@ export default function ProfilePage() {
                           type="button"
                           onClick={() => handleSelectTheme(t.slug)}
                           disabled={busy}
-                          className="rounded-[8px] border-[1.5px] border-[#c99a33]/55 bg-[rgba(5,28,20,0.65)] px-3 py-1.5 text-[0.65rem] font-bold uppercase text-[#f4e4b7]/85 transition-colors hover:border-[#ffd17a]/80 hover:text-[#ffd17a] disabled:opacity-50"
+                          className="rounded-[8px] border-[1.5px] border-[var(--accent-mid)]/55 bg-[rgba(5,28,20,0.65)] px-3 py-1.5 text-[0.65rem] font-bold uppercase text-[var(--parchment-light)]/85 transition-colors hover:border-[var(--accent-light)]/80 hover:text-[var(--accent-light)] disabled:opacity-50"
                           style={{ ...FELL, letterSpacing: "0.22em" }}
                         >
                           {busy ? "…" : "Equip"}
@@ -603,12 +603,12 @@ export default function ProfilePage() {
                           style={{
                             ...FELL,
                             letterSpacing: "0.18em",
-                            color: canAfford ? "#2a1a0a" : "#f4e4b7",
+                            color: canAfford ? "var(--wood-dark)" : "var(--parchment-light)",
                             background: canAfford
                               ? "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)"
                               : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
                             borderColor: canAfford
-                              ? "#7a5a18"
+                              ? "var(--accent-dark)"
                               : "rgba(201,154,51,0.3)",
                             boxShadow: canAfford
                               ? "0 1px 0 rgba(255,240,200,0.75) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 3px 8px rgba(0,0,0,0.4)"
@@ -635,7 +635,7 @@ export default function ProfilePage() {
             </div>
           )}
           <p
-            className="mt-3 text-[0.7rem] italic leading-snug text-[#f4e4b7]/45"
+            className="mt-3 text-[0.7rem] italic leading-snug text-[var(--parchment-light)]/45"
             style={FELL}
           >
             More themes will get fully wired into the rest of the app over the
@@ -648,13 +648,13 @@ export default function ProfilePage() {
         <Panel className="mb-4">
           <div className="mb-3 flex items-baseline justify-between">
             <h2
-              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               Badges
             </h2>
             <span
-              className="text-[0.62rem] italic text-[#f4e4b7]/45"
+              className="text-[0.62rem] italic text-[var(--parchment-light)]/45"
               style={FELL}
             >
               {earnedAchievements.size}/{achievementCatalog?.length ?? 0}
@@ -662,7 +662,7 @@ export default function ProfilePage() {
           </div>
           {!achievementCatalog ? (
             <div
-              className="py-5 text-center text-[0.85rem] italic text-[#f4e4b7]/50"
+              className="py-5 text-center text-[0.85rem] italic text-[var(--parchment-light)]/50"
               style={FELL}
             >
               Looking up your bounty list…
@@ -701,7 +701,7 @@ export default function ProfilePage() {
                       {a.hidden && !earned ? "❓" : a.icon}
                     </div>
                     <div
-                      className="mt-1 line-clamp-1 text-[0.55rem] font-bold uppercase leading-tight text-[#f4e4b7]"
+                      className="mt-1 line-clamp-1 text-[0.55rem] font-bold uppercase leading-tight text-[var(--parchment-light)]"
                       style={{ ...FELL, letterSpacing: "0.12em" }}
                     >
                       {a.hidden && !earned ? "???" : a.name}
@@ -717,7 +717,7 @@ export default function ProfilePage() {
         <Panel>
           <div className="mb-3">
             <h2
-              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               Recent Hands
@@ -725,14 +725,14 @@ export default function ProfilePage() {
           </div>
           {history === null ? (
             <div
-              className="py-5 text-center text-[0.85rem] italic text-[#f4e4b7]/50"
+              className="py-5 text-center text-[0.85rem] italic text-[var(--parchment-light)]/50"
               style={FELL}
             >
               Riding into the records…
             </div>
           ) : finishedHistory.length === 0 ? (
             <div
-              className="rounded-[10px] border border-dashed border-[#c99a33]/30 py-7 text-center text-[0.85rem] italic text-[#f4e4b7]/55"
+              className="rounded-[10px] border border-dashed border-[var(--accent-mid)]/30 py-7 text-center text-[0.85rem] italic text-[var(--parchment-light)]/55"
               style={FELL}
             >
               No finished hands yet. Cross-device games you join while signed in
@@ -747,12 +747,12 @@ export default function ProfilePage() {
                   ? (stuck ? "Stuck with the Tab" : "Walked Free")
                   : (iWon ? "Champion" : "Knocked Out");
                 const resultColor = h.mode === "loser"
-                  ? (stuck ? "#c43838" : "#ffd17a")
-                  : (iWon ? "#ffd17a" : "#f4e4b7");
+                  ? (stuck ? "#c43838" : "var(--accent-light)")
+                  : (iWon ? "var(--accent-light)" : "var(--parchment-light)");
                 return (
                   <li
                     key={h.player_id}
-                    className="flex items-center justify-between rounded-[10px] border-[1.5px] border-[#c99a33]/30 px-3 py-2"
+                    className="flex items-center justify-between rounded-[10px] border-[1.5px] border-[var(--accent-mid)]/30 px-3 py-2"
                     style={{
                       background:
                         "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
@@ -766,7 +766,7 @@ export default function ProfilePage() {
                         {result}
                       </div>
                       <div
-                        className="text-[0.7rem] italic text-[#f4e4b7]/55"
+                        className="text-[0.7rem] italic text-[var(--parchment-light)]/55"
                         style={FELL}
                       >
                         {fmtDate(h.created_at)} · code {h.code}
@@ -774,7 +774,7 @@ export default function ProfilePage() {
                       </div>
                     </div>
                     <div
-                      className="ml-2 text-[0.7rem] uppercase text-[#f4e4b7]/45"
+                      className="ml-2 text-[0.7rem] uppercase text-[var(--parchment-light)]/45"
                       style={{ ...FELL, letterSpacing: "0.24em" }}
                     >
                       {h.mode === "loser" ? "Tab" : "Pot"}
@@ -791,17 +791,17 @@ export default function ProfilePage() {
         :global(.parchment-input) {
           background: linear-gradient(
             180deg,
-            #fdf2ce 0%,
-            #f1dfa3 60%,
-            #d6b87a 100%
+            var(--parchment-light) 0%,
+            var(--parchment-mid) 60%,
+            var(--parchment-dark) 100%
           );
-          border: 1.5px solid #5c3b1e;
+          border: 1.5px solid var(--wood-mid);
           box-shadow: 0 1px 0 rgba(255, 240, 210, 0.55) inset,
             0 -1px 0 rgba(101, 67, 33, 0.18) inset,
             0 3px 10px rgba(0, 0, 0, 0.35);
         }
         :global(.parchment-input:focus) {
-          box-shadow: 0 0 0 2px #ffd17a,
+          box-shadow: 0 0 0 2px var(--accent-light),
             0 1px 0 rgba(255, 240, 210, 0.55) inset,
             0 3px 10px rgba(0, 0, 0, 0.4);
         }
@@ -830,7 +830,7 @@ function Panel({
 }) {
   return (
     <section
-      className={`relative rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-4 ${className}`}
+      className={`relative rounded-[16px] border-[1.5px] border-[var(--accent-mid)]/35 p-4 ${className}`}
       style={{
         background:
           "linear-gradient(180deg, rgba(10,40,28,0.65) 0%, rgba(5,28,20,0.78) 100%)",
@@ -852,14 +852,14 @@ function StatTile({
 }) {
   return (
     <div
-      className="rounded-[10px] border-[1.5px] border-[#c99a33]/25 p-2 text-center"
+      className="rounded-[10px] border-[1.5px] border-[var(--accent-mid)]/25 p-2 text-center"
       style={{
         background:
           "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
       }}
     >
       <div
-        className="text-[1.05rem] leading-none text-[#ffd17a]"
+        className="text-[1.05rem] leading-none text-[var(--accent-light)]"
         style={{
           fontFamily: "var(--font-rye), Georgia, serif",
           textShadow: "0 1px 0 rgba(0,0,0,0.55)",
@@ -868,7 +868,7 @@ function StatTile({
         {typeof value === "number" ? value.toLocaleString() : value}
       </div>
       <div
-        className="mt-1 text-[0.55rem] font-bold uppercase leading-tight text-[#f4e4b7]/55"
+        className="mt-1 text-[0.55rem] font-bold uppercase leading-tight text-[var(--parchment-light)]/55"
         style={{
           fontFamily: "var(--font-fell), Georgia, serif",
           letterSpacing: "0.18em",

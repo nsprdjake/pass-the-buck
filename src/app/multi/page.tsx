@@ -25,7 +25,7 @@ export default function MultiLandingPage() {
       <div className="relative mx-auto flex max-w-sm flex-col items-center px-6 pt-8 pb-10 text-center">
         <Link
           href="/"
-          className="self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 transition-colors hover:text-[#ffd17a]"
+          className="self-start text-[0.78rem] font-bold text-[var(--parchment-light)]/75 transition-colors hover:text-[var(--accent-light)]"
           style={FELL}
         >
           ← Home
@@ -42,12 +42,12 @@ export default function MultiLandingPage() {
             }}
           />
           <div className="relative drop-shadow-[0_14px_18px_rgba(0,0,0,0.55)]">
-            <Phone size={104} color="#ffd17a" />
+            <Phone size={104} color="var(--accent-light)" />
           </div>
         </div>
 
         <span
-          className="mt-7 text-[0.62rem] uppercase text-[#f4e4b7]/65"
+          className="mt-7 text-[0.62rem] uppercase text-[var(--parchment-light)]/65"
           style={{ ...FELL, letterSpacing: "0.48em" }}
         >
           ★  Cross-Device Play  ★
@@ -58,19 +58,19 @@ export default function MultiLandingPage() {
           style={{
             ...RYE,
             fontSize: "clamp(2.5rem, 12vw, 4rem)",
-            color: "#f4e4b7",
+            color: "var(--parchment-light)",
             textShadow:
-              "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 10px 28px rgba(0,0,0,0.6)",
+              "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45), 0 10px 28px rgba(0,0,0,0.6)",
             letterSpacing: "0.01em",
           }}
         >
           Saloon
           <br />
-          <span style={{ color: "#ffd17a" }}>by Wire</span>
+          <span style={{ color: "var(--accent-light)" }}>by Wire</span>
         </h1>
 
         <p
-          className="mt-5 max-w-[20rem] text-[1rem] italic leading-snug text-[#f4e4b7]/85"
+          className="mt-5 max-w-[20rem] text-[1rem] italic leading-snug text-[var(--parchment-light)]/85"
           style={FELL}
         >
           Every cowpoke on their own phone. Ride in whenever you please —
@@ -82,7 +82,7 @@ export default function MultiLandingPage() {
           {/* Primary — brass plaque */}
           <Link
             href="/multi/create"
-            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-3.5 text-center transition-transform active:scale-[0.985]"
+            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-3.5 text-center transition-transform active:scale-[0.985]"
             style={{
               background:
                 "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)",
@@ -91,7 +91,7 @@ export default function MultiLandingPage() {
             }}
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
               style={{
                 ...RYE,
                 letterSpacing: "0.22em",
@@ -101,7 +101,7 @@ export default function MultiLandingPage() {
               Set the Table
             </span>
             <span
-              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-dark)]/75"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               Start a new hand
@@ -111,7 +111,7 @@ export default function MultiLandingPage() {
           {/* Secondary — outlined leather */}
           <Link
             href="/multi/join"
-            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#c99a33]/55 py-3.5 text-center transition-colors hover:border-[#ffd17a]/80 active:scale-[0.985]"
+            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-mid)]/55 py-3.5 text-center transition-colors hover:border-[var(--accent-light)]/80 active:scale-[0.985]"
             style={{
               background:
                 "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",
@@ -120,7 +120,7 @@ export default function MultiLandingPage() {
             }}
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[#f4e4b7]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--parchment-light)]"
               style={{
                 ...RYE,
                 letterSpacing: "0.22em",
@@ -130,7 +130,7 @@ export default function MultiLandingPage() {
               Pull Up A Chair
             </span>
             <span
-              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#f4e4b7]/65"
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--parchment-light)]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               Join with a code
@@ -139,15 +139,15 @@ export default function MultiLandingPage() {
         </div>
 
         {/* House-rules style divider */}
-        <div className="mt-10 flex w-full items-center gap-3 text-[#c99a33]/55">
-          <span className="h-px flex-1 bg-[#c99a33]/30" />
+        <div className="mt-10 flex w-full items-center gap-3 text-[var(--accent-mid)]/55">
+          <span className="h-px flex-1 bg-[var(--accent-mid)]/30" />
           <span
-            className="text-[0.6rem] uppercase text-[#f4e4b7]/70"
+            className="text-[0.6rem] uppercase text-[var(--parchment-light)]/70"
             style={{ ...FELL, letterSpacing: "0.36em" }}
           >
             Pick a name · Share the code · Roll
           </span>
-          <span className="h-px flex-1 bg-[#c99a33]/30" />
+          <span className="h-px flex-1 bg-[var(--accent-mid)]/30" />
         </div>
       </div>
     </main>

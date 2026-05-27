@@ -96,7 +96,7 @@ export default function LobbyView({ code }: { code: string }) {
         <div className="mb-6 grid grid-cols-[1fr_auto_1fr] items-center">
           <button
             onClick={handleLeave}
-            className="justify-self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 transition-colors hover:text-[#ffd17a]"
+            className="justify-self-start text-[0.78rem] font-bold text-[var(--parchment-light)]/75 transition-colors hover:text-[var(--accent-light)]"
             style={FELL}
           >
             ← Leave
@@ -106,9 +106,9 @@ export default function LobbyView({ code }: { code: string }) {
             style={{
               ...RYE,
               fontSize: "clamp(1.75rem, 7vw, 2.25rem)",
-              color: "#f4e4b7",
+              color: "var(--parchment-light)",
               textShadow:
-                "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
+                "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
               letterSpacing: "0.02em",
             }}
           >
@@ -124,14 +124,14 @@ export default function LobbyView({ code }: { code: string }) {
 
         {/* ── Invite card — parchment poster pinned to the wall ──── */}
         <section
-          className="parchment relative mb-4 overflow-hidden rounded-[16px] border-[1.5px] border-[#5c3b1e] px-5 pt-4 pb-5 text-center"
+          className="parchment relative mb-4 overflow-hidden rounded-[16px] border-[1.5px] border-[var(--wood-mid)] px-5 pt-4 pb-5 text-center"
           style={{
             boxShadow:
               "0 1px 0 rgba(255,240,210,0.6) inset, 0 -1px 0 rgba(101,67,33,0.18) inset, 0 12px 28px rgba(0,0,0,0.5)",
           }}
         >
           <div
-            className="text-[0.6rem] uppercase text-[#5c3b1e]/75"
+            className="text-[0.6rem] uppercase text-[var(--wood-mid)]/75"
             style={{ ...FELL, letterSpacing: "0.4em" }}
           >
             ★  Game Code  ★
@@ -142,7 +142,7 @@ export default function LobbyView({ code }: { code: string }) {
             className="relative my-3 block w-full select-all text-center transition-transform active:scale-[0.98]"
             style={{
               ...RYE,
-              color: "#2a1a0a",
+              color: "var(--wood-dark)",
               fontSize: "clamp(2.6rem, 12vw, 3.6rem)",
               letterSpacing: "0.34em",
               textShadow: "0 2px 0 rgba(255,240,210,0.55)",
@@ -160,7 +160,7 @@ export default function LobbyView({ code }: { code: string }) {
             </PaperButton>
           </div>
           <p
-            className="mt-3 text-[0.78rem] italic text-[#5c3b1e]/70"
+            className="mt-3 text-[0.78rem] italic text-[var(--wood-mid)]/70"
             style={FELL}
           >
             Share the code or link. Anyone holdin&apos; it can ride in.
@@ -169,7 +169,7 @@ export default function LobbyView({ code }: { code: string }) {
 
         {/* ── Players ────────────────────────────────────────────── */}
         <section
-          className="relative mb-5 rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-4"
+          className="relative mb-5 rounded-[16px] border-[1.5px] border-[var(--accent-mid)]/35 p-4"
           style={{
             background:
               "linear-gradient(180deg, rgba(10,40,28,0.65) 0%, rgba(5,28,20,0.78) 100%)",
@@ -179,13 +179,13 @@ export default function LobbyView({ code }: { code: string }) {
         >
           <div className="mb-3 flex items-center justify-between">
             <h2
-              className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
+              className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
             >
               At the Table
             </h2>
             <span
-              className="text-[0.7rem] font-bold text-[#f4e4b7]/55"
+              className="text-[0.7rem] font-bold text-[var(--parchment-light)]/55"
               style={{ ...FELL, letterSpacing: "0.18em" }}
             >
               {game.mode === "loser"
@@ -198,7 +198,7 @@ export default function LobbyView({ code }: { code: string }) {
 
           {players.length === 0 ? (
             <div
-              className="rounded-[10px] border border-dashed border-[#c99a33]/30 py-7 text-center text-[0.88rem] italic text-[#f4e4b7]/55"
+              className="rounded-[10px] border border-dashed border-[var(--accent-mid)]/30 py-7 text-center text-[0.88rem] italic text-[var(--parchment-light)]/55"
               style={FELL}
             >
               Waiting for riders to mosey in…
@@ -216,7 +216,7 @@ export default function LobbyView({ code }: { code: string }) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, x: 40, scale: 0.9 }}
                       transition={{ duration: 0.18 }}
-                      className="parchment relative flex items-center gap-3 overflow-hidden rounded-[10px] border-[1.5px] border-[#5c3b1e] px-3 py-2"
+                      className="parchment relative flex items-center gap-3 overflow-hidden rounded-[10px] border-[1.5px] border-[var(--wood-mid)] px-3 py-2"
                       style={{
                         boxShadow:
                           "0 1px 0 rgba(255,240,210,0.55) inset, 0 -1px 0 rgba(101,67,33,0.18) inset, 0 4px 12px rgba(0,0,0,0.35)",
@@ -227,7 +227,7 @@ export default function LobbyView({ code }: { code: string }) {
                         style={{
                           backgroundColor: p.color,
                           boxShadow:
-                            "0 0 0 1.5px #ffd17a, 0 0 0 2.5px #5c3b1e, 0 2px 4px rgba(0,0,0,0.4)",
+                            "0 0 0 1.5px var(--accent-light), 0 0 0 2.5px var(--wood-mid), 0 2px 4px rgba(0,0,0,0.4)",
                           ...RYE,
                         }}
                       >
@@ -236,7 +236,7 @@ export default function LobbyView({ code }: { code: string }) {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 truncate">
                           <span
-                            className="truncate text-[0.95rem] font-bold text-[#2a1a0a]"
+                            className="truncate text-[0.95rem] font-bold text-[var(--wood-dark)]"
                             style={RYE}
                           >
                             {p.display_name}
@@ -245,7 +245,7 @@ export default function LobbyView({ code }: { code: string }) {
                           {isMe && <Tag color="ink">You</Tag>}
                         </div>
                         <div
-                          className="text-[0.6rem] font-bold uppercase text-[#5c3b1e]/70"
+                          className="text-[0.6rem] font-bold uppercase text-[var(--wood-mid)]/70"
                           style={{ ...FELL, letterSpacing: "0.32em" }}
                         >
                           Seat {p.seat + 1}
@@ -254,7 +254,7 @@ export default function LobbyView({ code }: { code: string }) {
                       {isHost && !isMe && (
                         <button
                           onClick={() => handleKick(p.id, p.display_name)}
-                          className="px-2 text-xl font-black text-[#5c3b1e]/55 transition-colors hover:text-[#8b2222]"
+                          className="px-2 text-xl font-black text-[var(--wood-mid)]/55 transition-colors hover:text-[#8b2222]"
                           aria-label={`Kick ${p.display_name}`}
                         >
                           ×
@@ -282,10 +282,10 @@ export default function LobbyView({ code }: { code: string }) {
           <button
             onClick={handleStart}
             disabled={!canStart || starting}
-            className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-4 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
+            className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-4 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
               style={{
                 ...RYE,
                 letterSpacing: "0.22em",
@@ -300,7 +300,7 @@ export default function LobbyView({ code }: { code: string }) {
             </span>
             {canStart && !starting && (
               <span
-                className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
+                className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-dark)]/75"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 {game.mode === "loser"
@@ -313,7 +313,7 @@ export default function LobbyView({ code }: { code: string }) {
           </button>
         ) : (
           <div
-            className="rounded-[14px] border-[1.5px] border-dashed border-[#c99a33]/40 py-5 text-center text-[#f4e4b7]/70"
+            className="rounded-[14px] border-[1.5px] border-dashed border-[var(--accent-mid)]/40 py-5 text-center text-[var(--parchment-light)]/70"
             style={{
               ...FELL,
               fontStyle: "italic",
@@ -367,12 +367,12 @@ function PaperButton({
   return (
     <button
       onClick={onClick}
-      className="flex-1 rounded-[8px] border-[1.5px] border-[#5c3b1e] py-2 text-[0.72rem] font-bold uppercase text-[#2a1a0a] transition-transform active:scale-[0.97]"
+      className="flex-1 rounded-[8px] border-[1.5px] border-[var(--wood-mid)] py-2 text-[0.72rem] font-bold uppercase text-[var(--wood-dark)] transition-transform active:scale-[0.97]"
       style={{
         fontFamily: "var(--font-rye), Georgia, serif",
         letterSpacing: "0.22em",
         background:
-          "linear-gradient(180deg, #fdf2ce 0%, #f1dfa3 60%, #d6b87a 100%)",
+          "linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment-mid) 60%, var(--parchment-dark) 100%)",
         boxShadow:
           "0 1px 0 rgba(255,240,210,0.55) inset, 0 -1px 0 rgba(101,67,33,0.18) inset, 0 3px 8px rgba(0,0,0,0.35)",
       }}
@@ -394,13 +394,13 @@ function Tag({
     color === "brass"
       ? {
           bg: "rgba(201,154,51,0.22)",
-          border: "#c99a33",
-          text: "#5c3b1e",
+          border: "var(--accent-mid)",
+          text: "var(--wood-mid)",
         }
       : {
           bg: "rgba(42,26,10,0.18)",
-          border: "#5c3b1e",
-          text: "#5c3b1e",
+          border: "var(--wood-mid)",
+          text: "var(--wood-mid)",
         };
   return (
     <span

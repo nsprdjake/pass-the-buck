@@ -26,7 +26,7 @@ export default function AuthPage() {
 function AuthFallback() {
   return (
     <main className="felt-saloon flex min-h-[100dvh] items-center justify-center">
-      <div className="text-[#f4e4b7]/65" style={FELL}>
+      <div className="text-[var(--parchment-light)]/65" style={FELL}>
         Loading…
       </div>
     </main>
@@ -109,14 +109,14 @@ function AuthScreen() {
       <div className="relative mx-auto flex max-w-sm flex-col items-center px-6 pt-10 pb-10 text-center">
         <Link
           href="/"
-          className="self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 transition-colors hover:text-[#ffd17a]"
+          className="self-start text-[0.78rem] font-bold text-[var(--parchment-light)]/75 transition-colors hover:text-[var(--accent-light)]"
           style={FELL}
         >
           ← Back
         </Link>
 
         <span
-          className="mt-6 text-[0.62rem] uppercase text-[#f4e4b7]/65"
+          className="mt-6 text-[0.62rem] uppercase text-[var(--parchment-light)]/65"
           style={{ ...FELL, letterSpacing: "0.48em" }}
         >
           ★  {mode === "signin" ? "Welcome Back" : "Riding In"}  ★
@@ -127,9 +127,9 @@ function AuthScreen() {
           style={{
             ...RYE,
             fontSize: "clamp(2.4rem, 11vw, 3.7rem)",
-            color: "#f4e4b7",
+            color: "var(--parchment-light)",
             textShadow:
-              "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 10px 28px rgba(0,0,0,0.6)",
+              "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45), 0 10px 28px rgba(0,0,0,0.6)",
             letterSpacing: "0.01em",
           }}
         >
@@ -137,19 +137,19 @@ function AuthScreen() {
             <>
               Open the
               <br />
-              <span style={{ color: "#ffd17a" }}>Saloon Doors</span>
+              <span style={{ color: "var(--accent-light)" }}>Saloon Doors</span>
             </>
           ) : (
             <>
               Stake Your
               <br />
-              <span style={{ color: "#ffd17a" }}>Claim</span>
+              <span style={{ color: "var(--accent-light)" }}>Claim</span>
             </>
           )}
         </h1>
 
         <p
-          className="mt-4 max-w-[20rem] text-[0.95rem] italic leading-snug text-[#f4e4b7]/80"
+          className="mt-4 max-w-[20rem] text-[0.95rem] italic leading-snug text-[var(--parchment-light)]/80"
           style={FELL}
         >
           {mode === "signin"
@@ -159,7 +159,7 @@ function AuthScreen() {
 
         {/* Mode toggle */}
         <div
-          className="mt-7 inline-flex rounded-full border-[1.5px] border-[#c99a33]/40 p-1"
+          className="mt-7 inline-flex rounded-full border-[1.5px] border-[var(--accent-mid)]/40 p-1"
           style={{
             background:
               "linear-gradient(180deg, rgba(10,40,28,0.6) 0%, rgba(5,28,20,0.75) 100%)",
@@ -187,7 +187,7 @@ function AuthScreen() {
           className="mt-5 w-full"
         >
           <section
-            className="rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-5"
+            className="rounded-[16px] border-[1.5px] border-[var(--accent-mid)]/35 p-5"
             style={{
               background:
                 "linear-gradient(180deg, rgba(10,40,28,0.65) 0%, rgba(5,28,20,0.78) 100%)",
@@ -207,7 +207,7 @@ function AuthScreen() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
+                  className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[var(--wood-dark)] placeholder-[var(--wood-mid)]/55 focus:outline-none"
                   style={FELL}
                 />
               </Field>
@@ -230,7 +230,7 @@ function AuthScreen() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••"
-                  className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
+                  className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[var(--wood-dark)] placeholder-[var(--wood-mid)]/55 focus:outline-none"
                   style={FELL}
                 />
               </Field>
@@ -238,10 +238,10 @@ function AuthScreen() {
               <button
                 type="submit"
                 disabled={submitDisabled}
-                className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-3.5 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
+                className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-3.5 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
               >
                 <span
-                  className="relative block text-[1rem] font-bold uppercase text-[#2a1a0a]"
+                  className="relative block text-[1rem] font-bold uppercase text-[var(--wood-dark)]"
                   style={{
                     ...RYE,
                     letterSpacing: "0.22em",
@@ -266,7 +266,7 @@ function AuthScreen() {
               )}
               {info && (
                 <div
-                  className="rounded-[10px] border-[1.5px] border-[#c99a33]/45 bg-[#c99a33]/15 px-3 py-2 text-[0.82rem] font-bold text-[#ffd17a]"
+                  className="rounded-[10px] border-[1.5px] border-[var(--accent-mid)]/45 bg-[var(--accent-mid)]/15 px-3 py-2 text-[0.82rem] font-bold text-[var(--accent-light)]"
                   style={FELL}
                 >
                   {info}
@@ -277,13 +277,13 @@ function AuthScreen() {
         </motion.div>
 
         <p
-          className="mt-6 text-[0.78rem] italic text-[#f4e4b7]/55"
+          className="mt-6 text-[0.78rem] italic text-[var(--parchment-light)]/55"
           style={FELL}
         >
           Don&apos;t want an account?{" "}
           <Link
             href="/"
-            className="underline transition-colors hover:text-[#ffd17a]"
+            className="underline transition-colors hover:text-[var(--accent-light)]"
           >
             Keep playing as a stranger.
           </Link>
@@ -294,17 +294,17 @@ function AuthScreen() {
         :global(.parchment-input) {
           background: linear-gradient(
             180deg,
-            #fdf2ce 0%,
-            #f1dfa3 60%,
-            #d6b87a 100%
+            var(--parchment-light) 0%,
+            var(--parchment-mid) 60%,
+            var(--parchment-dark) 100%
           );
-          border: 1.5px solid #5c3b1e;
+          border: 1.5px solid var(--wood-mid);
           box-shadow: 0 1px 0 rgba(255, 240, 210, 0.55) inset,
             0 -1px 0 rgba(101, 67, 33, 0.18) inset,
             0 3px 10px rgba(0, 0, 0, 0.35);
         }
         :global(.parchment-input:focus) {
-          box-shadow: 0 0 0 2px #ffd17a,
+          box-shadow: 0 0 0 2px var(--accent-light),
             0 1px 0 rgba(255, 240, 210, 0.55) inset,
             0 3px 10px rgba(0, 0, 0, 0.4);
         }
@@ -356,7 +356,7 @@ function ToggleTab({
       style={{
         ...FELL,
         letterSpacing: "0.22em",
-        color: active ? "#2a1a0a" : "rgba(244,228,183,0.7)",
+        color: active ? "var(--wood-dark)" : "rgba(244,228,183,0.7)",
         background: active
           ? "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)"
           : "transparent",
@@ -386,7 +386,7 @@ function Field({
     <div>
       <label
         htmlFor={htmlFor}
-        className="mb-2 block text-[0.62rem] font-bold uppercase text-[#f4e4b7]/65"
+        className="mb-2 block text-[0.62rem] font-bold uppercase text-[var(--parchment-light)]/65"
         style={{ ...FELL, letterSpacing: "0.36em" }}
       >
         {label}
@@ -394,7 +394,7 @@ function Field({
       {children}
       {hint && (
         <p
-          className="mt-1.5 text-[0.72rem] italic text-[#f4e4b7]/50"
+          className="mt-1.5 text-[0.72rem] italic text-[var(--parchment-light)]/50"
           style={FELL}
         >
           {hint}

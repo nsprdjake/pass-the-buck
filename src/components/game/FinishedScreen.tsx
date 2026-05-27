@@ -75,7 +75,7 @@ export default function FinishedScreen({
                 repeat: Infinity,
                 ease: "linear",
               }}
-              className="absolute h-1 w-1 rounded-full bg-[#f4e4b7]/40"
+              className="absolute h-1 w-1 rounded-full bg-[var(--parchment-light)]/40"
             />
           ))}
         </div>
@@ -127,14 +127,14 @@ export default function FinishedScreen({
               className="mx-auto mt-6 inline-flex max-w-full items-center gap-2 rounded-[10px] border-[1.5px] px-5 py-3"
               style={{
                 background:
-                  "linear-gradient(180deg, #fdf2ce 0%, #f1dfa3 60%, #d6b87a 100%)",
-                borderColor: "#5c3b1e",
+                  "linear-gradient(180deg, var(--parchment-light) 0%, var(--parchment-mid) 60%, var(--parchment-dark) 100%)",
+                borderColor: "var(--wood-mid)",
                 boxShadow:
                   "0 1px 0 rgba(255,240,210,0.6) inset, 0 4px 14px rgba(0,0,0,0.55)",
               }}
             >
               <span
-                className="text-[0.6rem] font-bold uppercase text-[#5c3b1e]/85"
+                className="text-[0.6rem] font-bold uppercase text-[var(--wood-mid)]/85"
                 style={{
                   fontFamily: "var(--font-rye), Georgia, serif",
                   letterSpacing: "0.32em",
@@ -143,7 +143,7 @@ export default function FinishedScreen({
                 Owes
               </span>
               <span
-                className="text-[1.15rem] font-bold text-[#2a1a0a]"
+                className="text-[1.15rem] font-bold text-[var(--wood-dark)]"
                 style={{
                   fontFamily: "var(--font-fell), Georgia, serif",
                 }}
@@ -153,7 +153,7 @@ export default function FinishedScreen({
             </div>
           ) : (
             <p
-              className="mt-4 text-[#f4e4b7]/65 italic"
+              className="mt-4 text-[var(--parchment-light)]/65 italic"
               style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
             >
               You know the deal. Pay up.
@@ -161,7 +161,7 @@ export default function FinishedScreen({
           )}
 
           <p
-            className="mt-4 text-[0.85rem] italic text-[#f4e4b7]/45"
+            className="mt-4 text-[0.85rem] italic text-[var(--parchment-light)]/45"
             style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
           >
             Last one with {finalBucks} eyeBuck
@@ -171,10 +171,10 @@ export default function FinishedScreen({
 
           <button
             onClick={onRematch}
-            className="brass-cta mt-10 block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-4 text-center transition-transform active:scale-[0.985]"
+            className="brass-cta mt-10 block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-4 text-center transition-transform active:scale-[0.985]"
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
               style={{
                 fontFamily: "var(--font-rye), Georgia, serif",
                 letterSpacing: "0.22em",
@@ -186,7 +186,7 @@ export default function FinishedScreen({
           </button>
           <button
             onClick={onExit}
-            className="mt-3 block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#c99a33]/40 py-3.5 text-center text-[#f4e4b7]/85 transition-transform active:scale-[0.985]"
+            className="mt-3 block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-mid)]/40 py-3.5 text-center text-[var(--parchment-light)]/85 transition-transform active:scale-[0.985]"
             style={{
               background:
                 "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",
@@ -304,10 +304,10 @@ export default function FinishedScreen({
         )}
         <button
           onClick={onRematch}
-          className="brass-cta mt-10 block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-4 text-center transition-transform active:scale-[0.985]"
+          className="brass-cta mt-10 block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-4 text-center transition-transform active:scale-[0.985]"
         >
           <span
-            className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+            className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
             style={{
               fontFamily: "var(--font-rye), Georgia, serif",
               letterSpacing: "0.22em",
@@ -319,7 +319,7 @@ export default function FinishedScreen({
         </button>
         <button
           onClick={onExit}
-          className="mt-3 block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#c99a33]/40 py-3.5 text-center text-[#f4e4b7]/85 transition-transform active:scale-[0.985]"
+          className="mt-3 block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-mid)]/40 py-3.5 text-center text-[var(--parchment-light)]/85 transition-transform active:scale-[0.985]"
           style={{
             background:
               "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",

@@ -20,7 +20,7 @@ export default function CreateMultiGamePage() {
       fallback={
         <main className="felt-saloon flex min-h-[100dvh] items-center justify-center">
           <div
-            className="text-[var(--parchment-light)]/65"
+            className="text-[#f4e4b7]/65"
             style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
           >
             Loading…
@@ -107,7 +107,7 @@ function CreateMultiGameInner() {
         <div className="mb-6 grid grid-cols-[1fr_auto_1fr] items-center">
           <Link
             href="/multi"
-            className="justify-self-start text-[0.78rem] font-bold text-[var(--parchment-light)]/75 transition-colors hover:text-[var(--accent-light)]"
+            className="justify-self-start text-[0.78rem] font-bold text-[#f4e4b7]/75 transition-colors hover:text-[#ffd17a]"
             style={FELL}
           >
             ← Back
@@ -117,9 +117,9 @@ function CreateMultiGameInner() {
             style={{
               ...RYE,
               fontSize: "clamp(1.6rem, 6.5vw, 2.1rem)",
-              color: "var(--parchment-light)",
+              color: "#f4e4b7",
               textShadow:
-                "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
+                "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 6px 16px rgba(0,0,0,0.55)",
               letterSpacing: "0.02em",
             }}
           >
@@ -143,7 +143,7 @@ function CreateMultiGameInner() {
             >
               Today&apos;s Challenge
             </div>
-            <div className="mt-0.5 text-[0.8rem] italic text-[var(--parchment-light)]/85">
+            <div className="mt-0.5 text-[0.8rem] italic text-[#f4e4b7]/85">
               Stakes and wager pre-filled. Tune anything you like.
             </div>
           </div>
@@ -153,7 +153,7 @@ function CreateMultiGameInner() {
           {/* Name */}
           <Panel>
             <label
-              className="mb-2 block text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
+              className="mb-2 block text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
               style={{ ...FELL, letterSpacing: "0.36em" }}
               htmlFor="create-name"
             >
@@ -167,7 +167,7 @@ function CreateMultiGameInner() {
               maxLength={20}
               autoFocus
               placeholder="What should we call you?"
-              className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[var(--wood-dark)] placeholder-[var(--wood-mid)]/55 focus:outline-none"
+              className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
               style={FELL}
             />
           </Panel>
@@ -176,7 +176,7 @@ function CreateMultiGameInner() {
           <Panel>
             <div className="mb-3">
               <label
-                className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
+                className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 The Stakes
@@ -200,11 +200,11 @@ function CreateMultiGameInner() {
             <div className="mt-4">
               <label
                 htmlFor="wager-input"
-                className="mb-2 block text-[0.6rem] font-bold uppercase text-[var(--parchment-light)]/55"
+                className="mb-2 block text-[0.6rem] font-bold uppercase text-[#f4e4b7]/55"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 {mode === "loser" ? "The Tab" : "Side Wager"}{" "}
-                <span className="text-[var(--parchment-light)]/35">(optional)</span>
+                <span className="text-[#f4e4b7]/35">(optional)</span>
               </label>
               <input
                 id="wager-input"
@@ -217,7 +217,7 @@ function CreateMultiGameInner() {
                     : "Winner takes the bottle"
                 }
                 maxLength={80}
-                className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[var(--wood-dark)] placeholder-[var(--wood-mid)]/55 focus:outline-none"
+                className="parchment-input w-full rounded-[10px] px-4 py-3 text-[0.95rem] font-semibold text-[#2a1a0a] placeholder-[#5c3b1e]/55 focus:outline-none"
                 style={FELL}
               />
             </div>
@@ -230,7 +230,7 @@ function CreateMultiGameInner() {
           <Panel>
             <div className="mb-3 flex items-center justify-between">
               <label
-                className="text-[0.66rem] font-bold uppercase text-[var(--parchment-light)]/65"
+                className="text-[0.66rem] font-bold uppercase text-[#f4e4b7]/65"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 Buy-in
@@ -239,7 +239,7 @@ function CreateMultiGameInner() {
                 className="text-[1.15rem]"
                 style={{
                   ...RYE,
-                  color: "var(--accent-light)",
+                  color: "#ffd17a",
                   textShadow: "0 1px 0 rgba(0,0,0,0.55)",
                 }}
               >
@@ -261,7 +261,7 @@ function CreateMultiGameInner() {
               }
             />
             <p
-              className="mt-3 text-[0.82rem] italic leading-snug text-[var(--parchment-light)]/60"
+              className="mt-3 text-[0.82rem] italic leading-snug text-[#f4e4b7]/60"
               style={FELL}
             >
               Sets the pot prize and game length. Each rider starts with this
@@ -282,10 +282,10 @@ function CreateMultiGameInner() {
           <button
             type="submit"
             disabled={!name.trim() || busy}
-            className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-4 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
+            className="brass-cta block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-4 text-center transition-transform active:scale-[0.985] disabled:cursor-not-allowed"
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
               style={{
                 ...RYE,
                 letterSpacing: "0.22em",
@@ -296,7 +296,7 @@ function CreateMultiGameInner() {
             </span>
             {!busy && name.trim() && (
               <span
-                className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-dark)]/75"
+                className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
                 style={{ ...FELL, letterSpacing: "0.36em" }}
               >
                 You&apos;ll get a 6-letter code to share
@@ -306,7 +306,7 @@ function CreateMultiGameInner() {
         </form>
 
         <p
-          className="mt-5 text-center text-[0.78rem] italic text-[var(--parchment-light)]/55"
+          className="mt-5 text-center text-[0.78rem] italic text-[#f4e4b7]/55"
           style={FELL}
         >
           Players join on their own phones with the code.
@@ -320,8 +320,8 @@ function CreateMultiGameInner() {
           height: 6px;
           background: linear-gradient(
             90deg,
-            var(--accent-mid) 0%,
-            var(--accent-mid) var(--fill, 50%),
+            #c99a33 0%,
+            #c99a33 var(--fill, 50%),
             rgba(244, 228, 183, 0.18) var(--fill, 50%),
             rgba(244, 228, 183, 0.18) 100%
           );
@@ -341,7 +341,7 @@ function CreateMultiGameInner() {
             #d8a93b 55%,
             #8a6720 100%
           );
-          border: 1.5px solid var(--wood-mid);
+          border: 1.5px solid #5c3b1e;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55),
             0 0 0 1px rgba(255, 240, 200, 0.4) inset;
           cursor: grab;
@@ -356,24 +356,24 @@ function CreateMultiGameInner() {
             #d8a93b 55%,
             #8a6720 100%
           );
-          border: 1.5px solid var(--wood-mid);
+          border: 1.5px solid #5c3b1e;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
           cursor: grab;
         }
         :global(.parchment-input) {
           background: linear-gradient(
             180deg,
-            var(--parchment-light) 0%,
-            var(--parchment-mid) 60%,
-            var(--parchment-dark) 100%
+            #fdf2ce 0%,
+            #f1dfa3 60%,
+            #d6b87a 100%
           );
-          border: 1.5px solid var(--wood-mid);
+          border: 1.5px solid #5c3b1e;
           box-shadow: 0 1px 0 rgba(255, 240, 210, 0.55) inset,
             0 -1px 0 rgba(101, 67, 33, 0.18) inset,
             0 3px 10px rgba(0, 0, 0, 0.35);
         }
         :global(.parchment-input:focus) {
-          box-shadow: 0 0 0 2px var(--accent-light),
+          box-shadow: 0 0 0 2px #ffd17a,
             0 1px 0 rgba(255, 240, 210, 0.55) inset,
             0 3px 10px rgba(0, 0, 0, 0.4);
         }
@@ -416,7 +416,7 @@ function Panel({
 }) {
   return (
     <section
-      className={`relative rounded-[16px] border-[1.5px] border-[var(--accent-mid)]/35 p-4 ${className}`}
+      className={`relative rounded-[16px] border-[1.5px] border-[#c99a33]/35 p-4 ${className}`}
       style={{
         background:
           "linear-gradient(180deg, rgba(10,40,28,0.65) 0%, rgba(5,28,20,0.78) 100%)",
@@ -450,7 +450,7 @@ function ModeOption({
         background: active
           ? "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)"
           : "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
-        border: `1.5px solid ${active ? "var(--accent-dark)" : "rgba(201,154,51,0.4)"}`,
+        border: `1.5px solid ${active ? "#7a5a18" : "rgba(201,154,51,0.4)"}`,
         boxShadow: active
           ? "0 1px 0 rgba(255,240,200,0.75) inset, 0 -2px 0 rgba(60,40,8,0.35) inset, 0 4px 14px rgba(0,0,0,0.5)"
           : "0 1px 0 rgba(244,228,183,0.05) inset, 0 4px 10px rgba(0,0,0,0.35)",
@@ -458,7 +458,7 @@ function ModeOption({
     >
       <div
         className={`text-[0.78rem] font-bold uppercase leading-tight ${
-          active ? "text-[var(--wood-dark)]" : "text-[var(--parchment-light)]"
+          active ? "text-[#2a1a0a]" : "text-[#f4e4b7]"
         }`}
         style={{
           ...RYE,
@@ -472,7 +472,7 @@ function ModeOption({
       </div>
       <div
         className={`mt-1 text-[0.62rem] italic leading-snug ${
-          active ? "text-[var(--wood-dark)]/75" : "text-[var(--parchment-light)]/55"
+          active ? "text-[#2a1a0a]/75" : "text-[#f4e4b7]/55"
         }`}
         style={FELL}
       >

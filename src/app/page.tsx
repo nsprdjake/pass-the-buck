@@ -44,7 +44,7 @@ function Flourish({ className = "" }: { className?: string }) {
         />
         <path
           d="M 0 -2.4 L 2.4 0 L 0 2.4 L -2.4 0 Z"
-          fill="#052b1c"
+          fill="var(--felt-deep)"
         />
       </g>
       {/* right curl */}
@@ -114,7 +114,7 @@ export default function Home() {
         <Link
           href="/how"
           aria-label="How to play"
-          className="inline-flex items-center gap-1 rounded-full border border-[#c99a33]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[#f4e4b7]/75 transition-colors hover:border-[#ffd17a]/70 hover:text-[#ffd17a]"
+          className="inline-flex items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
           style={{
             fontFamily: "var(--font-fell), Georgia, serif",
             letterSpacing: "0.22em",
@@ -130,7 +130,7 @@ export default function Home() {
         {user ? (
           <Link
             href="/profile"
-            className="inline-flex items-center gap-1.5 truncate rounded-full border border-[#c99a33]/55 bg-[rgba(5,28,20,0.75)] py-1.5 pl-3 pr-2 text-[0.7rem] font-bold uppercase text-[#f4e4b7]/85 transition-colors hover:border-[#ffd17a]/80 hover:text-[#ffd17a]"
+            className="inline-flex items-center gap-1.5 truncate rounded-full border border-[var(--accent-mid)]/55 bg-[rgba(5,28,20,0.75)] py-1.5 pl-3 pr-2 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/85 transition-colors hover:border-[var(--accent-light)]/80 hover:text-[var(--accent-light)]"
             style={{
               fontFamily: "var(--font-fell), Georgia, serif",
               letterSpacing: "0.18em",
@@ -152,7 +152,7 @@ export default function Home() {
         ) : (
           <Link
             href="/auth"
-            className="inline-flex items-center gap-1 rounded-full border border-[#c99a33]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[#f4e4b7]/75 transition-colors hover:border-[#ffd17a]/70 hover:text-[#ffd17a]"
+            className="inline-flex items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
             style={{
               fontFamily: "var(--font-fell), Georgia, serif",
               letterSpacing: "0.22em",
@@ -172,7 +172,7 @@ export default function Home() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
-            className="parchment pointer-events-none absolute left-1/2 top-20 z-20 -translate-x-1/2 whitespace-nowrap rounded-full border-[1.5px] border-[#5c3b1e] px-4 py-1.5 text-[0.75rem] font-bold text-[#2a1a0a] shadow-[0_8px_22px_rgba(0,0,0,0.45)]"
+            className="parchment pointer-events-none absolute left-1/2 top-20 z-20 -translate-x-1/2 whitespace-nowrap rounded-full border-[1.5px] border-[var(--wood-mid)] px-4 py-1.5 text-[0.75rem] font-bold text-[var(--wood-dark)] shadow-[0_8px_22px_rgba(0,0,0,0.45)]"
             style={{
               fontFamily: "var(--font-rye), Georgia, serif",
               letterSpacing: "0.16em",
@@ -187,10 +187,10 @@ export default function Home() {
 
       <div className="relative mx-auto flex max-w-sm flex-col items-center px-6 pt-12 pb-10 text-center">
         {/* ── Hero ────────────────────────────────────────────────── */}
-        <Flourish className="text-[#c99a33]/65" />
+        <Flourish className="text-[var(--accent-mid)]/65" />
 
         <span
-          className="mt-3 text-[0.62rem] uppercase text-[#f4e4b7]/65"
+          className="mt-3 text-[0.62rem] uppercase text-[var(--parchment-light)]/65"
           style={{
             fontFamily: "var(--font-fell), Georgia, serif",
             letterSpacing: "0.48em",
@@ -204,19 +204,19 @@ export default function Home() {
           style={{
             fontFamily: "var(--font-rye), Georgia, serif",
             fontSize: "clamp(3rem, 15vw, 5rem)",
-            color: "#f4e4b7",
+            color: "var(--parchment-light)",
             textShadow:
-              "0 2px 0 #5c3b1e, 0 3px 0 rgba(0,0,0,0.45), 0 10px 28px rgba(0,0,0,0.6)",
+              "0 2px 0 var(--wood-mid), 0 3px 0 rgba(0,0,0,0.45), 0 10px 28px rgba(0,0,0,0.6)",
             letterSpacing: "0.01em",
           }}
         >
           Pass the
           <br />
-          <span style={{ color: "var(--accent-text, #ffd17a)" }}>Buck</span>
+          <span style={{ color: "var(--accent-text, var(--accent-light))" }}>Buck</span>
         </h1>
 
         <p
-          className="mt-5 max-w-[19rem] text-[1.02rem] italic leading-snug text-[#f4e4b7]/85"
+          className="mt-5 max-w-[19rem] text-[1.02rem] italic leading-snug text-[var(--parchment-light)]/85"
           style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
         >
           A frontier dice game of nerve, luck,
@@ -244,14 +244,14 @@ export default function Home() {
           {inProgress && (
             <Link
               href="/game/local"
-              className="parchment relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#5c3b1e] py-3.5 text-center transition-transform active:scale-[0.985]"
+              className="parchment relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--wood-mid)] py-3.5 text-center transition-transform active:scale-[0.985]"
               style={{
                 boxShadow:
                   "0 1px 0 rgba(255,240,210,0.6) inset, 0 -2px 0 rgba(101,67,33,0.18) inset, 0 8px 22px rgba(0,0,0,0.45)",
               }}
             >
               <span
-                className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+                className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
                 style={{
                   fontFamily: "var(--font-rye), Georgia, serif",
                   letterSpacing: "0.22em",
@@ -260,7 +260,7 @@ export default function Home() {
                 Continue the Hand
               </span>
               <span
-                className="relative mt-0.5 block text-[0.62rem] uppercase text-[#5c3b1e]/75"
+                className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-mid)]/75"
                 style={{
                   fontFamily: "var(--font-fell), Georgia, serif",
                   letterSpacing: "0.36em",
@@ -274,7 +274,7 @@ export default function Home() {
           {/* Primary — brass plaque */}
           <Link
             href="/lobby"
-            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#7a5a18] py-3.5 text-center transition-transform active:scale-[0.985]"
+            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-dark)] py-3.5 text-center transition-transform active:scale-[0.985]"
             style={{
               background:
                 "linear-gradient(180deg, #ffd989 0%, #d8a93b 48%, #a07a22 100%)",
@@ -283,7 +283,7 @@ export default function Home() {
             }}
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[#2a1a0a]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--wood-dark)]"
               style={{
                 fontFamily: "var(--font-rye), Georgia, serif",
                 letterSpacing: "0.22em",
@@ -293,7 +293,7 @@ export default function Home() {
               Ante Up
             </span>
             <span
-              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#2a1a0a]/75"
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--wood-dark)]/75"
               style={{
                 fontFamily: "var(--font-fell), Georgia, serif",
                 letterSpacing: "0.36em",
@@ -306,7 +306,7 @@ export default function Home() {
           {/* Secondary — outlined leather button on the felt */}
           <Link
             href="/multi"
-            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[#c99a33]/55 py-3.5 text-center transition-colors active:scale-[0.985] hover:border-[#ffd17a]/80"
+            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-mid)]/55 py-3.5 text-center transition-colors active:scale-[0.985] hover:border-[var(--accent-light)]/80"
             style={{
               background:
                 "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",
@@ -315,7 +315,7 @@ export default function Home() {
             }}
           >
             <span
-              className="relative block text-[1.05rem] font-bold uppercase text-[#f4e4b7]"
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--parchment-light)]"
               style={{
                 fontFamily: "var(--font-rye), Georgia, serif",
                 letterSpacing: "0.22em",
@@ -325,7 +325,7 @@ export default function Home() {
               Posse Up
             </span>
             <span
-              className="relative mt-0.5 block text-[0.62rem] uppercase text-[#f4e4b7]/65"
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--parchment-light)]/65"
               style={{
                 fontFamily: "var(--font-fell), Georgia, serif",
                 letterSpacing: "0.36em",
@@ -360,13 +360,13 @@ export default function Home() {
               Today&apos;s Challenge
             </div>
             <div
-              className="mt-0.5 truncate text-[0.95rem] font-bold text-[#f4e4b7]"
+              className="mt-0.5 truncate text-[0.95rem] font-bold text-[var(--parchment-light)]"
               style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
             >
               {daily.title}
             </div>
             <div
-              className="truncate text-[0.7rem] italic text-[#f4e4b7]/65"
+              className="truncate text-[0.7rem] italic text-[var(--parchment-light)]/65"
               style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
             >
               {daily.blurb}
@@ -387,7 +387,7 @@ export default function Home() {
         {topRich && topRich.length > 0 && (
           <Link
             href="/leaderboard"
-            className="mt-9 w-full rounded-[12px] border-[1.5px] border-[#c99a33]/35 px-3 py-2.5 transition-colors hover:border-[#ffd17a]/65"
+            className="mt-9 w-full rounded-[12px] border-[1.5px] border-[var(--accent-mid)]/35 px-3 py-2.5 transition-colors hover:border-[var(--accent-light)]/65"
             style={{
               background:
                 "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,28,20,0.7) 100%)",
@@ -404,9 +404,9 @@ export default function Home() {
               >
                 ★ Top of the Posse
               </span>
-              <span className="h-px flex-1 bg-[#c99a33]/25" />
+              <span className="h-px flex-1 bg-[var(--accent-mid)]/25" />
               <span
-                className="text-[0.55rem] font-bold uppercase text-[#f4e4b7]/45 transition-colors group-hover:text-[#ffd17a]"
+                className="text-[0.55rem] font-bold uppercase text-[var(--parchment-light)]/45 transition-colors group-hover:text-[var(--accent-light)]"
                 style={{
                   fontFamily: "var(--font-fell), Georgia, serif",
                   letterSpacing: "0.22em",
@@ -427,7 +427,7 @@ export default function Home() {
                       fontFamily: "var(--font-rye), Georgia, serif",
                       color:
                         i === 0
-                          ? "#ffd17a"
+                          ? "var(--accent-light)"
                           : i === 1
                           ? "#dfd5c0"
                           : "#d6a777",
@@ -438,19 +438,19 @@ export default function Home() {
                   <span
                     className="h-4 w-4 flex-shrink-0 rounded-full"
                     style={{
-                      backgroundColor: r.color ?? "#5c3b1e",
+                      backgroundColor: r.color ?? "var(--wood-mid)",
                       boxShadow:
-                        "0 0 0 1px #ffd17a, 0 0 0 1.8px #5c3b1e",
+                        "0 0 0 1px var(--accent-light), 0 0 0 1.8px var(--wood-mid)",
                     }}
                   />
                   <span
-                    className="min-w-0 flex-1 truncate text-[0.78rem] font-bold text-[#f4e4b7]"
+                    className="min-w-0 flex-1 truncate text-[0.78rem] font-bold text-[var(--parchment-light)]"
                     style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
                   >
                     {r.display_name || "Stranger"}
                   </span>
                   <span
-                    className="text-[0.75rem] text-[#ffd17a]"
+                    className="text-[0.75rem] text-[var(--accent-light)]"
                     style={{
                       fontFamily: "var(--font-rye), Georgia, serif",
                     }}
@@ -466,11 +466,11 @@ export default function Home() {
         {/* ── House rules marquee ─────────────────────────────────── */}
         <Link
           href="/how"
-          className="mt-5 flex w-full items-center gap-3 text-[#c99a33]/55 transition-colors hover:text-[#ffd17a]"
+          className="mt-5 flex w-full items-center gap-3 text-[var(--accent-mid)]/55 transition-colors hover:text-[var(--accent-light)]"
         >
-          <span className="h-px flex-1 bg-[#c99a33]/30" />
+          <span className="h-px flex-1 bg-[var(--accent-mid)]/30" />
           <span
-            className="text-[0.6rem] uppercase text-[#f4e4b7]/70"
+            className="text-[0.6rem] uppercase text-[var(--parchment-light)]/70"
             style={{
               fontFamily: "var(--font-fell), Georgia, serif",
               letterSpacing: "0.36em",
@@ -478,10 +478,10 @@ export default function Home() {
           >
             House Rules · How to Play
           </span>
-          <span className="h-px flex-1 bg-[#c99a33]/30" />
+          <span className="h-px flex-1 bg-[var(--accent-mid)]/30" />
         </Link>
 
-        <Flourish className="mt-5 text-[#c99a33]/45" />
+        <Flourish className="mt-5 text-[var(--accent-mid)]/45" />
       </div>
     </main>
   );

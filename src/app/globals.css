@@ -9,7 +9,8 @@
   --color-buck-coral: #F97066;
   --color-buck-blue: #60A5FA;
 
-  /* Western / Saloon theme tokens */
+  /* Western / Saloon theme tokens (legacy — kept for color-class
+     compatibility while components migrate to var() tokens) */
   --color-felt-dark: #062f1f;
   --color-felt-mid: #0a4d33;
   --color-felt-light: #126b48;
@@ -30,42 +31,152 @@
   --font-vintage: var(--font-fell), Georgia, serif;
 }
 
-/* ─── Theme accent variables ────────────────────────────────────────
-   Each theme overrides three accent stops + a single highlight color
-   used by headlines. Cascades down through any element that reads
-   var(--accent-…) directly. Components that still use hardcoded brass
-   hex values will be migrated theme-by-theme. */
+/* ═══════════════════════════════════════════════════════════════════
+   THEME PALETTE — complete vocabulary
+   Each theme overrides the same set of tokens. Components read these
+   via var(--token, fallback) so an unstyled component still works on
+   the default Saloon look.
+   ─── felt ──── the background "table" gradient
+       --felt-deep / --felt-mid / --felt-rim (3 stops, dark→light)
+   ─── wood ──── frame rails, leather-card backgrounds
+       --wood-dark / --wood-mid / --wood-light
+   ─── accent ── brass / gold / metal trim, primary CTA
+       --accent-light / --accent-mid / --accent-dark
+       --accent-text (the text-on-felt accent color for headlines)
+       --accent-glow (rgba for soft glows + lamp pools)
+   ─── parchment paper texture
+       --parchment-light / --parchment-mid / --parchment-dark / --ink
+   ─── lamp tint ── the warm spotlight cast through .felt-saloon::before
+       --lamp-tint
+   ─── seal ──── wax seal on the Buck SVG (red by default, may vary by theme)
+       --seal-light / --seal-mid / --seal-dark
+   ─────────────────────────────────────────────────────────────────── */
+
 :root,
 [data-theme="saloon"] {
+  /* Felt */
+  --felt-deep: #052b1c;
+  --felt-mid:  #0a4d33;
+  --felt-rim:  #126b48;
+  /* Wood */
+  --wood-dark: #2a1a0a;
+  --wood-mid:  #5c3b1e;
+  --wood-light: #8b5a2b;
+  /* Brass / accent */
   --accent-light: #ffd17a;
   --accent-mid:   #c99a33;
   --accent-dark:  #7a5a18;
   --accent-text:  #ffd17a;
+  --accent-glow:  rgba(255, 196, 90, 0.18);
+  /* Parchment */
+  --parchment-light: #fdf2ce;
+  --parchment-mid:   #f1dfa3;
+  --parchment-dark:  #d6b87a;
+  --ink: #2a1a0a;
+  /* Lamp pool */
+  --lamp-tint: rgba(255, 196, 90, 0.08);
+  /* Wax seal */
+  --seal-light: #c43838;
+  --seal-mid:   #8b2222;
+  --seal-dark:  #5c0f0f;
 }
+
 [data-theme="speakeasy"] {
-  --accent-light: #5dd0a5;
-  --accent-mid:   #16876a;
-  --accent-dark:  #0d4a3a;
+  /* Deep emerald banquette + black walnut, gold trim with a bottle-green
+     bias. Distinct from Saloon's warmer earth tones. */
+  --felt-deep: #050d0a;
+  --felt-mid:  #0d2820;
+  --felt-rim:  #16876a;
+  --wood-dark: #160c08;
+  --wood-mid:  #3a1f0e;
+  --wood-light: #5e3d22;
+  --accent-light: #e8c468;
+  --accent-mid:   #b8902e;
+  --accent-dark:  #5e4612;
   --accent-text:  #e8c468;
+  --accent-glow:  rgba(232, 196, 104, 0.22);
+  --parchment-light: #f6efd7;
+  --parchment-mid:   #ead7a0;
+  --parchment-dark:  #c9aa6a;
+  --ink: #1a1410;
+  --lamp-tint: rgba(232, 196, 104, 0.12);
+  --seal-light: #1f5d4a;
+  --seal-mid:   #0e3528;
+  --seal-dark:  #061d16;
 }
+
 [data-theme="cantina"] {
+  /* Sunset over the desert — burnt sienna walls, turquoise trim,
+     copper accents. Warmer and brighter overall. */
+  --felt-deep: #2a0e07;
+  --felt-mid:  #5e1a0e;
+  --felt-rim:  #c0421a;
+  --wood-dark: #1f0a05;
+  --wood-mid:  #4a2310;
+  --wood-light: #8a4520;
   --accent-light: #ffc26e;
-  --accent-mid:   #ff8830;
-  --accent-dark:  #9a4015;
+  --accent-mid:   #e07a2a;
+  --accent-dark:  #7a3a10;
   --accent-text:  #ffd07a;
+  --accent-glow:  rgba(255, 154, 80, 0.22);
+  --parchment-light: #ffeec2;
+  --parchment-mid:   #f4d28a;
+  --parchment-dark:  #d49c4a;
+  --ink: #2a0e04;
+  --lamp-tint: rgba(255, 154, 80, 0.12);
+  --seal-light: #3aa6a0;
+  --seal-mid:   #1a5e58;
+  --seal-dark:  #082e2a;
 }
+
 [data-theme="old-money"] {
+  /* Library club — navy leather, oxblood wood, oxidized gold filigree. */
+  --felt-deep: #060814;
+  --felt-mid:  #10182a;
+  --felt-rim:  #2b3a5a;
+  --wood-dark: #1a0a0a;
+  --wood-mid:  #3a1418;
+  --wood-light: #6a232a;
   --accent-light: #e6cfa1;
   --accent-mid:   #c9a059;
   --accent-dark:  #6e4a17;
   --accent-text:  #e6cfa1;
+  --accent-glow:  rgba(201, 160, 89, 0.18);
+  --parchment-light: #f0e6d2;
+  --parchment-mid:   #d8c79e;
+  --parchment-dark:  #a48656;
+  --ink: #1a0e08;
+  --lamp-tint: rgba(201, 160, 89, 0.08);
+  --seal-light: #7a1f2e;
+  --seal-mid:   #4a0e1a;
+  --seal-dark:  #260710;
 }
+
 [data-theme="riverboat"] {
+  /* Mississippi night, paddle-wheel polish — slate, mahogany, brushed
+     silver-brass. Cooler than Saloon, less dressy than Old Money. */
+  --felt-deep: #0a141c;
+  --felt-mid:  #1a242c;
+  --felt-rim:  #3a5566;
+  --wood-dark: #1a0f08;
+  --wood-mid:  #3a2010;
+  --wood-light: #6a3a1a;
   --accent-light: #e0d3b3;
-  --accent-mid:   #c5a572;
+  --accent-mid:   #b8a075;
   --accent-dark:  #6e5a2e;
   --accent-text:  #dfd5c0;
+  --accent-glow:  rgba(184, 160, 117, 0.16);
+  --parchment-light: #f0e8d6;
+  --parchment-mid:   #d4c8a8;
+  --parchment-dark:  #a08c6a;
+  --ink: #0e1014;
+  --lamp-tint: rgba(220, 200, 150, 0.07);
+  --seal-light: #6a4438;
+  --seal-mid:   #3a261e;
+  --seal-dark:  #1c120c;
 }
+
+/* ═══════════════════════════════════════════════════════════════════ */
 
 *,
 *::before,
@@ -117,10 +228,8 @@ body {
   animation: confettiFall 3s linear forwards;
 }
 
-/* === Western / Saloon scenery === */
+/* === Themed scenery — all read from CSS variables now === */
 
-/* Wood grain pattern usable as a background:
-   layered radial highlights + repeating-linear-gradient grain. */
 .wood-grain {
   background:
     repeating-linear-gradient(
@@ -137,7 +246,7 @@ body {
       transparent 1px,
       transparent 9px
     ),
-    linear-gradient(180deg, #5c3b1e 0%, #2a1a0a 100%);
+    linear-gradient(180deg, var(--wood-mid) 0%, var(--wood-dark) 100%);
   position: relative;
 }
 
@@ -153,11 +262,9 @@ body {
     radial-gradient(ellipse 14px 3px at 85% 25%, rgba(0, 0, 0, 0.32) 0%, transparent 70%);
 }
 
-/* Saloon felt background: deep emerald with a worn vignette and a faint
-   warm overhead spotlight. */
 .felt-saloon {
   background:
-    radial-gradient(ellipse at 50% 35%, #126b48 0%, #0a4d33 45%, #052b1c 100%),
+    radial-gradient(ellipse at 50% 35%, var(--felt-rim) 0%, var(--felt-mid) 45%, var(--felt-deep) 100%),
     repeating-conic-gradient(
       from 0deg,
       rgba(255, 255, 255, 0.013) 0deg 2deg,
@@ -174,7 +281,7 @@ body {
   pointer-events: none;
   background: radial-gradient(
     ellipse at 50% 30%,
-    rgba(255, 196, 90, 0.08) 0%,
+    var(--lamp-tint) 0%,
     transparent 55%
   );
 }
@@ -193,10 +300,14 @@ body {
   mix-blend-mode: multiply;
 }
 
-/* Aged-parchment texture for outcome cards / posters. */
 .parchment {
   background:
-    radial-gradient(ellipse at 50% 35%, #fdf2ce 0%, #f1dfa3 60%, #d6b87a 100%);
+    radial-gradient(
+      ellipse at 50% 35%,
+      var(--parchment-light) 0%,
+      var(--parchment-mid) 60%,
+      var(--parchment-dark) 100%
+    );
   position: relative;
 }
 
@@ -213,20 +324,43 @@ body {
     radial-gradient(circle at 22% 80%, rgba(101, 67, 33, 0.3) 0%, transparent 4%);
 }
 
-/* Pressed-brass plate finish used for highlight banners, the trophy band etc */
 .brass-plate {
   background:
-    linear-gradient(135deg, #ffd17a 0%, #c99a33 50%, #8a6720 100%);
+    linear-gradient(135deg, var(--accent-light) 0%, var(--accent-mid) 50%, var(--accent-dark) 100%);
   position: relative;
 }
 
+/* === Themed primitive buttons used widely === */
+
+.brass-cta {
+  background: linear-gradient(
+    180deg,
+    var(--accent-light) 0%,
+    var(--accent-mid) 48%,
+    var(--accent-dark) 100%
+  );
+  box-shadow: 0 1px 0 rgba(255, 240, 200, 0.85) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.35) inset,
+    0 10px 26px rgba(0, 0, 0, 0.5);
+}
+.brass-cta:disabled {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 40, 28, 0.55) 0%,
+    rgba(5, 30, 20, 0.7) 100%
+  );
+  border-color: rgba(201, 154, 51, 0.35);
+  box-shadow: 0 1px 0 rgba(244, 228, 183, 0.06) inset,
+    0 8px 22px rgba(0, 0, 0, 0.4);
+}
+.brass-cta:disabled > span {
+  color: rgba(244, 228, 183, 0.6) !important;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55) !important;
+}
+
 @keyframes chipGlow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
-  }
-  50% {
-    box-shadow: 0 0 32px 8px rgba(251, 191, 36, 0.55);
-  }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+  50% { box-shadow: 0 0 32px 8px var(--accent-glow); }
 }
 
 .chip-pulse {
@@ -234,8 +368,6 @@ body {
   animation: chipGlow 0.55s ease-in-out;
 }
 
-/* Convenience font classes — Tailwind 4 also exposes `font-display` and
-   `font-vintage` automatically via the @theme variables. */
 .font-western {
   font-family: var(--font-rye), Georgia, serif;
 }
