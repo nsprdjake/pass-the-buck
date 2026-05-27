@@ -10,6 +10,10 @@ import {
   fetchLeaderboard,
   type LeaderboardRow,
 } from "@/lib/leaderboards";
+import {
+  challengeQueryString,
+  todaysChallenge,
+} from "@/lib/dailyChallenge";
 
 // ----- Small ornamental flourish used above + below the hero block -----
 function Flourish({ className = "" }: { className?: string }) {
@@ -71,6 +75,10 @@ export default function Home() {
     const t = setTimeout(() => setShowBonus(null), 5500);
     return () => clearTimeout(t);
   }, [lastDailyBonus]);
+
+  // Today's challenge — recomputed once per render, deterministic by date.
+  const daily = todaysChallenge();
+  const dailyHref = `/multi/create${challengeQueryString(daily)}`;
 
   // Top-3 "Richest" strip on the landing. Cheap fetch; refresh on auth state.
   const [topRich, setTopRich] = useState<LeaderboardRow[] | null>(null);
@@ -327,6 +335,53 @@ export default function Home() {
             </span>
           </Link>
         </div>
+
+        {/* ── Daily challenge pill — pre-filled themed game ──────── */}
+        <Link
+          href={dailyHref}
+          className="mt-5 flex w-full items-center gap-3 rounded-[12px] border-[1.5px] border-[var(--accent-mid)]/40 px-3 py-2.5 transition-colors hover:border-[var(--accent-light)]/70"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(201,154,51,0.14) 0%, rgba(10,40,28,0.55) 100%)",
+            boxShadow: "0 1px 0 rgba(244,228,183,0.06) inset",
+          }}
+        >
+          <span className="text-[1.6rem] leading-none" aria-hidden>
+            {daily.emoji}
+          </span>
+          <div className="min-w-0 flex-1 text-left">
+            <div
+              className="text-[0.55rem] font-bold uppercase text-[var(--accent-text)]/85"
+              style={{
+                fontFamily: "var(--font-fell), Georgia, serif",
+                letterSpacing: "0.36em",
+              }}
+            >
+              Today&apos;s Challenge
+            </div>
+            <div
+              className="mt-0.5 truncate text-[0.95rem] font-bold text-[#f4e4b7]"
+              style={{ fontFamily: "var(--font-rye), Georgia, serif" }}
+            >
+              {daily.title}
+            </div>
+            <div
+              className="truncate text-[0.7rem] italic text-[#f4e4b7]/65"
+              style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+            >
+              {daily.blurb}
+            </div>
+          </div>
+          <span
+            className="text-[0.7rem] uppercase text-[var(--accent-text)]/70"
+            style={{
+              fontFamily: "var(--font-fell), Georgia, serif",
+              letterSpacing: "0.18em",
+            }}
+          >
+            Deal →
+          </span>
+        </Link>
 
         {/* ── Top-3 Richest strip — peek into the leaderboard ─────── */}
         {topRich && topRich.length > 0 && (

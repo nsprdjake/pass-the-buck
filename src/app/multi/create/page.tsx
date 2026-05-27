@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth, usePreferredName } from "@/context/AuthContext";
 import { createGame } from "@/lib/remote-game";
@@ -15,13 +15,43 @@ const FELL: React.CSSProperties = {
 };
 
 export default function CreateMultiGamePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="felt-saloon flex min-h-[100dvh] items-center justify-center">
+          <div
+            className="text-[#f4e4b7]/65"
+            style={{ fontFamily: "var(--font-fell), Georgia, serif" }}
+          >
+            Loading…
+          </div>
+        </main>
+      }
+    >
+      <CreateMultiGameInner />
+    </Suspense>
+  );
+}
+
+function CreateMultiGameInner() {
   const router = useRouter();
+  const search = useSearchParams();
   const { user, profile } = useAuth();
   const preferred = usePreferredName();
+  // Daily-challenge URL prefills. The pill on the landing passes mode +
+  // wager + buyIn through so the host can deal a themed game in one tap.
+  const urlMode = (search.get("mode") === "loser" ? "loser" : "winner") as GameMode;
+  const urlWager = search.get("wager") ?? "";
+  const urlBuyIn = (() => {
+    const raw = parseInt(search.get("buyIn") ?? "", 10);
+    return Number.isFinite(raw) && raw >= 1 && raw <= 9 ? raw : 3;
+  })();
+  const fromDaily = search.get("from") === "daily";
+
   const [name, setName] = useState("");
-  const [buyIn, setBuyIn] = useState(3);
-  const [mode, setMode] = useState<GameMode>("winner");
-  const [wager, setWager] = useState("");
+  const [buyIn, setBuyIn] = useState(urlBuyIn);
+  const [mode, setMode] = useState<GameMode>(urlMode);
+  const [wager, setWager] = useState(urlWager);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,6 +127,27 @@ export default function CreateMultiGamePage() {
           </h1>
           <div />
         </div>
+
+        {fromDaily && (
+          <div
+            className="mb-4 rounded-[12px] border-[1.5px] border-[var(--accent-mid)]/55 px-3 py-2.5 text-center"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(201,154,51,0.18) 0%, rgba(60,40,8,0.12) 100%)",
+              fontFamily: "var(--font-fell), Georgia, serif",
+            }}
+          >
+            <div
+              className="text-[0.55rem] font-bold uppercase text-[var(--accent-text)]/85"
+              style={{ letterSpacing: "0.36em" }}
+            >
+              Today&apos;s Challenge
+            </div>
+            <div className="mt-0.5 text-[0.8rem] italic text-[#f4e4b7]/85">
+              Stakes and wager pre-filled. Tune anything you like.
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleCreate} className="space-y-4">
           {/* Name */}
