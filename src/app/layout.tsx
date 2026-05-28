@@ -8,7 +8,10 @@ import {
   VT323,
 } from "next/font/google";
 import "./globals.css";
+import AchievementToaster from "@/components/AchievementToaster";
 import FontScaleSync from "@/components/FontScaleSync";
+import ThemeSync from "@/components/ThemeSync";
+import { AuthProvider } from "@/context/AuthContext";
 import { LocalGameProvider } from "@/context/LocalGameContext";
 
 const inter = Inter({
@@ -88,8 +91,12 @@ export default function RootLayout({
       className={`${inter.variable} ${rye.variable} ${fell.variable} ${orbitron.variable} ${pressStart.variable} ${vt323.variable} h-full`}
     >
       <body className="min-h-full bg-buck-dark text-white antialiased">
-        <FontScaleSync />
-        <LocalGameProvider>{children}</LocalGameProvider>
+        <AuthProvider>
+          <ThemeSync />
+          <FontScaleSync />
+          <LocalGameProvider>{children}</LocalGameProvider>
+          <AchievementToaster />
+        </AuthProvider>
       </body>
     </html>
   );
