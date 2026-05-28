@@ -8,10 +8,7 @@ import {
   VT323,
 } from "next/font/google";
 import "./globals.css";
-import AchievementToaster from "@/components/AchievementToaster";
 import FontScaleSync from "@/components/FontScaleSync";
-import ThemeSync from "@/components/ThemeSync";
-import { AuthProvider } from "@/context/AuthContext";
 import { LocalGameProvider } from "@/context/LocalGameContext";
 
 const inter = Inter({
@@ -34,8 +31,6 @@ const fell = IM_Fell_English({
   display: "swap",
 });
 
-// Theme-specific display faces. Loaded once; only render-active when
-// the matching [data-theme] is set on <html>.
 const orbitron = Orbitron({
   variable: "--font-orbitron",
   subsets: ["latin"],
@@ -89,15 +84,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="saloon"
       className={`${inter.variable} ${rye.variable} ${fell.variable} ${orbitron.variable} ${pressStart.variable} ${vt323.variable} h-full`}
     >
       <body className="min-h-full bg-buck-dark text-white antialiased">
-        <AuthProvider>
-          <ThemeSync />
-          <FontScaleSync />
-          <LocalGameProvider>{children}</LocalGameProvider>
-          <AchievementToaster />
-        </AuthProvider>
+        <FontScaleSync />
+        <LocalGameProvider>{children}</LocalGameProvider>
       </body>
     </html>
   );

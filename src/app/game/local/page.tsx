@@ -21,9 +21,7 @@ import {
   TURN_OUTRO_MS,
 } from "@/components/game/shared";
 import { Phone, Skip } from "@/components/icons";
-import { useAuth } from "@/context/AuthContext";
 import { useLocalGame } from "@/context/LocalGameContext";
-import { getSupabase } from "@/lib/supabase";
 import { getNextActivePlayer, rollCountForBucks } from "@/lib/game-logic";
 import { playSfx, unlockAudio } from "@/lib/sfx";
 import type { RollOutcome } from "@/lib/types";
@@ -56,13 +54,11 @@ export default function LocalGamePage() {
     rolling,
     mode,
     wager,
-    sessionId,
     rollDice,
     endTurn,
     resetForRematch,
     newGame,
   } = useLocalGame();
-  const { user, refreshProfile } = useAuth();
 
   const [displayedBucks, setDisplayedBucks] = useState<number>(0);
   const [displayedPot, setDisplayedPot] = useState<number>(0);
@@ -213,27 +209,6 @@ export default function LocalGamePage() {
       playSfx("winner");
     }
   }, [status]);
-
-  // When a local game finishes AND the host is signed in, record it
-  // server-side so it counts for stats + Hometown Hero. Idempotent via
-  // sessionId — safe across re-renders.
-  const finishedSessionIdRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (status !== "finished") return;
-    if (!user) return;
-    if (!sessionId) return;
-    if (finishedSessionIdRef.current === sessionId) return;
-    finishedSessionIdRef.current = sessionId;
-    (async () => {
-      try {
-        const sb = getSupabase();
-        await sb.rpc("ptb_record_local_game", { p_local_id: sessionId });
-        await refreshProfile();
-      } catch {
-        // silent — record is best-effort
-      }
-    })();
-  }, [status, sessionId, user, refreshProfile]);
 
   // === FINISHED screen ===
   if (status === "finished") {

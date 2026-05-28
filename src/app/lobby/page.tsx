@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePreferredName } from "@/context/AuthContext";
 import { useLocalGame } from "@/context/LocalGameContext";
 
 const MIN_PLAYERS = 2;
@@ -37,17 +36,6 @@ export default function LobbyPage() {
 
   const [name, setName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const preferred = usePreferredName();
-
-  // Prefill the first-player input with the signed-in user's name only
-  // when no players are at the table yet (so it doesn't override an
-  // explicit clear once a game starts taking shape).
-  useEffect(() => {
-    if (preferred && !name && players.length === 0) {
-      setName(preferred);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferred, players.length]);
 
   // If a previous game is mid-play, hop straight back into it.
   useEffect(() => {
