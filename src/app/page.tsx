@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Buck from "@/components/Buck";
+import AuthMenu from "@/components/AuthMenu";
 import { useLocalGame } from "@/context/LocalGameContext";
 
 function Flourish({ className = "" }: { className?: string }) {
@@ -74,16 +75,7 @@ export default function Home() {
           <span>How to Play</span>
         </Link>
 
-        <Link
-          href="/auth"
-          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
-          style={{
-            fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
-            letterSpacing: "0.22em",
-          }}
-        >
-          Sign In
-        </Link>
+        <AuthMenu />
       </div>
 
       <div className="relative mx-auto flex max-w-sm flex-col items-center px-6 pt-6 pb-10 text-center">

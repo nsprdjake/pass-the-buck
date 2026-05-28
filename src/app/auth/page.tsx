@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { createBrowserClient } from "@supabase/ssr";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const RYE: React.CSSProperties = {
   fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
@@ -38,14 +38,7 @@ function AuthScreen() {
   const search = useSearchParams();
   const next = search.get("next") || "/";
 
-  const supabase = useMemo(
-    () =>
-      createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      ),
-    [],
-  );
+  const supabase = getSupabaseBrowserClient();
 
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
