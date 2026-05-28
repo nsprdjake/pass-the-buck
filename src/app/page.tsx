@@ -60,7 +60,7 @@ export default function Home() {
         className="wood-grain pointer-events-none absolute inset-x-0 bottom-0 h-3 shadow-[0_-4px_14px_rgba(0,0,0,0.55)]"
       />
 
-      <div className="relative z-10 flex items-center justify-end px-4 pt-5">
+      <div className="relative z-10 flex items-center justify-between gap-2 px-4 pt-5">
         <Link
           href="/how"
           aria-label="How to play"
@@ -72,6 +72,17 @@ export default function Home() {
         >
           <span aria-hidden>?</span>
           <span>How to Play</span>
+        </Link>
+
+        <Link
+          href="/auth"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]"
+          style={{
+            fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
+            letterSpacing: "0.22em",
+          }}
+        >
+          Sign In
         </Link>
       </div>
 
@@ -186,6 +197,37 @@ export default function Home() {
               }}
             >
               Pass-and-play right here
+            </span>
+          </Link>
+
+          <Link
+            href="/multi"
+            className="relative block w-full overflow-hidden rounded-[14px] border-[1.5px] border-[var(--accent-mid)]/55 py-3.5 text-center transition-colors active:scale-[0.985] hover:border-[var(--accent-light)]/80"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(10,40,28,0.55) 0%, rgba(5,30,20,0.7) 100%)",
+              boxShadow:
+                "0 1px 0 rgba(244,228,183,0.06) inset, 0 8px 22px rgba(0,0,0,0.4)",
+            }}
+          >
+            <span
+              className="relative block text-[1.05rem] font-bold uppercase text-[var(--parchment-light)]"
+              style={{
+                fontFamily: "var(--theme-font-display, var(--font-rye), Georgia, serif)",
+                letterSpacing: "0.22em",
+                textShadow: "0 2px 0 rgba(0,0,0,0.55)",
+              }}
+            >
+              Posse Up
+            </span>
+            <span
+              className="relative mt-0.5 block text-[0.62rem] uppercase text-[var(--parchment-light)]/65"
+              style={{
+                fontFamily: "var(--theme-font-vintage, var(--font-fell), Georgia, serif)",
+                letterSpacing: "0.36em",
+              }}
+            >
+              Each rider on their own phone
             </span>
           </Link>
         </div>
