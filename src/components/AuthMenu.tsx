@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSupabaseUser } from "@/hooks/useSupabaseUser";
+import { useAuth } from "@/context/AuthContext";
 
 const PILL_CLASS =
   "inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--accent-mid)]/45 bg-[rgba(5,28,20,0.55)] px-3 py-1.5 text-[0.7rem] font-bold uppercase text-[var(--parchment-light)]/75 transition-colors hover:border-[var(--accent-light)]/70 hover:text-[var(--accent-light)]";
@@ -12,7 +12,7 @@ const PILL_STYLE: React.CSSProperties = {
 };
 
 export default function AuthMenu() {
-  const { user, loading } = useSupabaseUser();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
